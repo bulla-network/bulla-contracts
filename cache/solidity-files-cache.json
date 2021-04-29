@@ -306,55 +306,8 @@
         "JournalGroupCreator"
       ]
     },
-    "C:\\repos\\blockchain\\bulla-network\\contracts\\contracts\\journalV1.sol": {
-      "lastModificationDate": 1618693760635,
-      "contentHash": "11efc97264267b32dd8dec1e7adf71c3",
-      "sourceName": "contracts/journalV1.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "devdoc",
-                "userdoc",
-                "storageLayout",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.3"
-      ],
-      "artifacts": [
-        "BullaManager",
-        "IPFSStorage",
-        "JournalEntry",
-        "JournalGroup"
-      ]
-    },
     "C:\\repos\\blockchain\\bulla-contracts\\contracts\\journalV0.sol": {
-      "lastModificationDate": 1619026058777,
+      "lastModificationDate": 1619736273063,
       "contentHash": "428862b817db2df0d4c5e43a71e51c39",
       "sourceName": "contracts/journalV0.sol",
       "solcConfig": {
@@ -440,6 +393,95 @@
       ],
       "artifacts": [
         "IERC20"
+      ]
+    },
+    "C:\\repos\\blockchain\\bulla-contracts\\contracts\\BullaV1.sol": {
+      "lastModificationDate": 1619716326200,
+      "contentHash": "6b00a7cd8c4a2b87661095c188234879",
+      "sourceName": "contracts/BullaV1.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "devdoc",
+                "userdoc",
+                "storageLayout",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "hardhat/console.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.3"
+      ],
+      "artifacts": [
+        "BullaClaim",
+        "BullaGroup",
+        "BullaManager"
+      ]
+    },
+    "C:\\repos\\blockchain\\bulla-contracts\\node_modules\\hardhat\\console.sol": {
+      "lastModificationDate": 1619522955806,
+      "contentHash": "cc4777addd464ea56fa35b1c45df0591",
+      "sourceName": "hardhat/console.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "devdoc",
+                "userdoc",
+                "storageLayout",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.22 <0.9.0"
+      ],
+      "artifacts": [
+        "console"
       ]
     }
   }

@@ -29,7 +29,7 @@ const newJournalEntry = async (journal:Journal, reqAmt:number, creditor:Wallet, 
     
 }
     
-describe("AJT contract testing", () => {    
+xdescribe("AJT contract testing", () => {    
     let jgCreator : JournalGroupCreator;
     let journalGroup : JournalGroup;
     let journal1 : Journal;   

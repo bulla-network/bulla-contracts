@@ -7,7 +7,7 @@
     "compile": "npx hardhat compile",
     "build": "npx hardhat compile",
     "test": "npx hardhat test",
-    "deploy": "npx hardhat run --network rinkeby scripts/deploy.ts"
+    "deploy": "npx hardhat run --network rinkeby scripts/deploy-v1.ts"
   },
   "dependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.1",
@@ -22,7 +22,7 @@
     "dotenv": "^8.2.0",
     "ethereum-waffle": "^3.2.2",
     "ethers": "^5.0.26",
-    "hardhat": "^2.0.5",
+    "hardhat": "^2.1.2",
     "hardhat-deploy": "^0.7.0-beta.39",
     "hardhat-typechain": "^0.3.4",
     "solc": "0.7.5",
