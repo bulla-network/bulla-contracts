@@ -1,5 +1,12 @@
 # AJT Contract Code
 
+## Setup
+
+- Install yarn globally
+- run ```yarn install```
+- run ```yarn build``` to compile contracts
+- run ```yarn test``` to test contracts
+
 ## Ideas
 
 - https://medium.com/coinmonks/store-data-in-ethereum-by-logging-to-reduce-gas-cost-b70a13884485
