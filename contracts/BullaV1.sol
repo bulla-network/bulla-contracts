@@ -55,7 +55,7 @@ contract BullaClaim {
         uint indexed bullaId,
         address bullaClaim,
         ActionType actionType,
-        uint claimAmount,
+        uint paymentAmount,
         uint blocktime
     );
 
@@ -119,20 +119,22 @@ contract BullaClaim {
         return (value*bpFee)/10000;
     }
 
-    function emitActionEvent(ActionType actionType, uint _claimAmount) internal {
+    function emitActionEvent(ActionType actionType, uint _paymentAmount) internal {
         emit ClaimAction(
             getBullaManager(),
             bullaGroup,
             bullaId,
             address(this),
             actionType,
-            _claimAmount,
+            _paymentAmount,
             block.timestamp);
     }
 
     function payClaim() external onlyDebtor  payable {
         require(paidAmount + msg.value <= claimAmount, "repaying too much");
-       (uint feeBasisPoints, address payable collectionAddress) = getFeeInfo();
+        require(msg.value > 0, "payment must be greater than 0");
+
+        (uint feeBasisPoints, address payable collectionAddress) = getFeeInfo();
 
         uint transactionFee = feeBasisPoints > 0
             ? calculateFee(feeBasisPoints, msg.value)
@@ -201,6 +203,7 @@ contract BullaGroup {
         address indexed debtor,
         string description,
         uint claimAmount,
+        uint dueBy,
         uint blocktime
     );
 
@@ -278,6 +281,7 @@ contract BullaGroup {
             debtor,
             description,
             claimAmount,
+            dueBy,
             block.timestamp
         );
     }
