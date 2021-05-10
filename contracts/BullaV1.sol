@@ -2,15 +2,15 @@
 pragma solidity ^0.8.3;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "hardhat/console.sol";
 //https://forum.ethereum.org/discussion/14362/structs-vs-nested-contracts
 //https://ethereum.stackexchange.com/questions/17094/how-to-store-ipfs-hash-using-bytes32/17112#17112
 //https://github.com/saurfang/ipfs-multihash-on-solidity
 //https://docs.ipfs.io/how-to/best-practices-for-nft-data/#metadata
 
 //TODO: Look into packing
-    //https://docs.soliditylang.org/en/v0.8.3/internals/layout_in_storage.html
-    //https://medium.com/coinmonks/gas-optimization-in-solidity-part-i-variables-9d5775e43dde
+//https://docs.soliditylang.org/en/v0.8.3/internals/layout_in_storage.html
+//https://medium.com/coinmonks/gas-optimization-in-solidity-part-i-variables-9d5775e43dde
+
 struct FeeInfo {
     address payable collectionAddress;
     uint32 feeBasisPoints;
@@ -104,11 +104,11 @@ contract BullaClaim {
         BullaManager bullaManager = BullaManager(getBullaManager());
         uint bullaTokenBalance = bullaManager.getBullaBalance(owner);
         //FeeInfo calldata feeInfo = bullaManager.feeInfo();
-        (address payable collectionAddress, 
-            uint32 fullFee, 
+        (address payable collectionAddress,
+            uint32 fullFee,
             uint32 bullaThreshold,
             uint32 reducedFeeBasisPoints) = bullaManager.feeInfo();
-        
+
         uint32 fee = bullaThreshold > 0 && bullaTokenBalance >= bullaThreshold
             ? reducedFeeBasisPoints
             : fullFee;
@@ -149,7 +149,7 @@ contract BullaClaim {
             : status = Status.Repaying;
 
         if(transactionFee>0) {
-            collectionAddress.transfer(transactionFee);            
+            collectionAddress.transfer(transactionFee);
         }
         emit FeePaid(bullaManager, address(this), collectionAddress, transactionFee, block.timestamp);
     }
@@ -258,8 +258,7 @@ contract BullaGroup {
             address payable debtor,
             string memory description,
             uint dueBy ) public {
-        console.log("sender", msg.sender);
-        require(bullaOwners[bullaId] != address(0), "bulla does not exist");        
+        require(bullaOwners[bullaId] != address(0), "bulla does not exist");
         require(bullaOwners[bullaId] == msg.sender,"only bulla owner's may create a bulla claim");
 
         BullaClaim newBullaClaim = new BullaClaim(
@@ -287,7 +286,7 @@ contract BullaGroup {
     }
 }
 
-contract BullaManager {    
+contract BullaManager {
     bytes32 immutable public description;
     FeeInfo public feeInfo;
     IERC20 public bullaToken;
@@ -318,7 +317,7 @@ contract BullaManager {
         description = _description;
         feeInfo.feeBasisPoints = _feeBasisPoints;
 
-        console.log("desc:", _feeBasisPoints);
+
         emit FeeChanged(address(this), 0, _feeBasisPoints, block.timestamp);
         emit CollectorChanged(address(this), address(0), _collectionAddress, block.timestamp);
         emit OwnerChanged(address(this), address(0), msg.sender, block.timestamp);
@@ -338,36 +337,38 @@ contract BullaManager {
     }
 
     function setOwner(address _owner) external onlyOwner {
-        emit OwnerChanged(address(this), owner, _owner, block.timestamp);
         owner = _owner;
+        emit OwnerChanged(address(this), owner, _owner, block.timestamp);
     }
 
     function setFee(uint32 _feeBasisPoints) external onlyOwner {
-        emit FeeChanged(address(this), feeInfo.feeBasisPoints, _feeBasisPoints, block.timestamp);
         feeInfo.feeBasisPoints = _feeBasisPoints;
+        emit FeeChanged(address(this), feeInfo.feeBasisPoints, _feeBasisPoints, block.timestamp);
     }
 
     function setCollectionAddress(address payable _collectionAddress) external onlyOwner {
-        emit CollectorChanged(address(this), feeInfo.collectionAddress, _collectionAddress, block.timestamp);
         feeInfo.collectionAddress = _collectionAddress;
+        emit CollectorChanged(address(this), feeInfo.collectionAddress, _collectionAddress, block.timestamp);
     }
 
     function setbullaThreshold(uint32 _threshold) external onlyOwner {
-        emit FeeThresholdChanged(address(this), feeInfo.bullaThreshold, _threshold, block.timestamp);
         feeInfo.bullaThreshold = _threshold;
+        emit FeeThresholdChanged(address(this), feeInfo.bullaThreshold, _threshold, block.timestamp);
     }
+
     function setReducedFee(uint32 reducedFeeBasisPoints) external onlyOwner {
-        //emit FeeThresholdChanged(address(this), feeInfo.bullaThreshold, _threshold, block.timestamp);
         feeInfo.reducedFeeBasisPoints = reducedFeeBasisPoints;
+        //emit FeeThresholdChanged(address(this), feeInfo.bullaThreshold, _threshold, block.timestamp);
     }
 
     function setBullaTokenAddress(address payable _bullaTokenAddress) external onlyOwner {
-        emit BullaTokenChanged(address(this), address(bullaToken), _bullaTokenAddress, block.timestamp);
         bullaToken = IERC20(_bullaTokenAddress);
+        emit BullaTokenChanged(address(this), address(bullaToken), _bullaTokenAddress, block.timestamp);
     }
+
     function getBullaBalance(address _holder) external view returns(uint) {
         uint balance = address(bullaToken)==address(0) ? 0 : bullaToken.balanceOf(_holder);
         return balance;
     }
-    
+
 }
