@@ -1,4 +1,4 @@
-# AJT Contract Code
+# Bulla Contract Code
 
 ## Setup
 
