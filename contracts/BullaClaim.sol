@@ -7,6 +7,14 @@ import "./BullaManager.sol";
 contract BullaClaim {
     enum ActionType {Payment, Reject, Rescind}
     enum Status {Pending, Repaying, Paid, Rejected, Rescinded}
+    enum RejectReason {
+        None,
+        UnknownAddress,
+        DisputedClaim,
+        SuspectedFraud,
+        Other
+    }
+
     struct Multihash {
         bytes32 hash;
         uint8 hashFunction;
@@ -14,12 +22,10 @@ contract BullaClaim {
     }
     Multihash public multihash;
 
-    uint256 public transferPrice;
-
     uint256 public bullaId;
     address public bullaGroup;
 
-    address public owner;
+    address payable public owner;
     address payable public creditor;
     address payable public debtor;
 
@@ -27,6 +33,8 @@ contract BullaClaim {
     uint256 public dueBy;
     uint256 public paidAmount;
     Status public status;
+
+    uint256 public transferPrice;
 
     modifier onlyCreditor() {
         require(creditor == msg.sender, "restricted to creditor wallet");
@@ -38,6 +46,11 @@ contract BullaClaim {
         _;
     }
 
+    modifier onlyOwner() {
+        require(owner == msg.sender, "restricted to owning wallet");
+        _;
+    }
+
     event ClaimAction(
         address indexed bullaManager,
         address indexed bullaGroup,
@@ -45,6 +58,7 @@ contract BullaClaim {
         address bullaClaim,
         ActionType actionType,
         uint256 paymentAmount,
+        RejectReason reason,
         uint256 blocktime
     );
 
@@ -63,9 +77,24 @@ contract BullaClaim {
         uint256 blocktime
     );
 
+    event TransferPriceUpdated(
+        address indexed bullaClaim,
+        uint256 oldPrice,
+        uint256 newPrice,
+        uint256 blocktime
+    );
+
+    event ClaimTransferred(
+        address indexed bullaClaim,
+        address indexed oldOwner,
+        address indexed newOwner,
+        uint256 trasferPrice,
+        uint256 blocktime
+    );
+
     constructor(
         uint256 _bullaId,
-        address _owner,
+        address payable _owner,
         address payable _creditor,
         address payable _debtor,
         uint256 _claimAmount,
@@ -78,6 +107,45 @@ contract BullaClaim {
         debtor = _debtor;
         claimAmount = _claimAmount;
         dueBy = _dueBy;
+    }
+
+    function setTransferPrice(uint256 newPrice) external onlyOwner {
+        require(owner == creditor, "only invoices can be transferred");
+        uint256 oldPrice = transferPrice;
+        transferPrice = newPrice;
+        emit TransferPriceUpdated(
+            address(this),
+            oldPrice,
+            newPrice,
+            block.timestamp
+        );
+    }
+
+    function transferOwnership(address payable newOwner) external payable {
+        require(owner == creditor, "only invoices can be transferred");
+        require(
+            transferPrice > 0 || msg.sender == owner,
+            "this claim is not transferable by anyone other than owner"
+        );
+        require(
+            msg.value == transferPrice,
+            "incorrect msg.value to transfer ownership"
+        );
+        //SET TRANSFER PRICE TO 0
+        //TODO: is this done in the correct order. Is it safe?
+        owner.transfer(msg.value);
+        address oldOwner = owner;
+        owner = newOwner;
+        creditor = newOwner;
+        transferPrice = 0;
+
+        emit ClaimTransferred(
+            address(this),
+            oldOwner,
+            newOwner,
+            msg.value,
+            block.timestamp
+        );
     }
 
     function addMultihash(
@@ -125,9 +193,11 @@ contract BullaClaim {
         return (value * bpFee) / 10000;
     }
 
-    function emitActionEvent(ActionType actionType, uint256 _paymentAmount)
-        internal
-    {
+    function emitActionEvent(
+        ActionType actionType,
+        uint256 _paymentAmount,
+        RejectReason reason
+    ) internal {
         emit ClaimAction(
             getBullaManager(),
             bullaGroup,
@@ -135,6 +205,7 @@ contract BullaClaim {
             address(this),
             actionType,
             _paymentAmount,
+            reason,
             block.timestamp
         );
     }
@@ -151,7 +222,7 @@ contract BullaClaim {
         address bullaManager = getBullaManager();
 
         creditor.transfer(msg.value - transactionFee);
-        emitActionEvent(ActionType.Payment, claimAmount);
+        emitActionEvent(ActionType.Payment, claimAmount, RejectReason.None);
         paidAmount += msg.value;
         paidAmount == claimAmount ? status = Status.Paid : status = Status
             .Repaying;
@@ -168,13 +239,13 @@ contract BullaClaim {
         );
     }
 
-    function rejectClaim() external payable onlyDebtor {
+    function rejectClaim(RejectReason reason) external payable onlyDebtor {
         require(
             status == Status.Pending,
             "cannot reject once payment has been made"
         );
         status = Status.Rejected;
-        emitActionEvent(ActionType.Reject, 0);
+        emitActionEvent(ActionType.Reject, 0, reason);
     }
 
     function rescindClaim() external payable onlyCreditor {
@@ -183,6 +254,6 @@ contract BullaClaim {
             "cannot rescind once payment has been made"
         );
         status = Status.Rescinded;
-        emitActionEvent(ActionType.Rescind, 0);
+        emitActionEvent(ActionType.Rescind, 0, RejectReason.None);
     }
 }

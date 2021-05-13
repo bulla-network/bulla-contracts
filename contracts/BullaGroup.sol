@@ -114,7 +114,7 @@ contract BullaGroup {
         BullaClaim newBullaClaim =
             new BullaClaim(
                 bullaId,
-                msg.sender,
+                payable(msg.sender),
                 creditor,
                 debtor,
                 claimAmount,
