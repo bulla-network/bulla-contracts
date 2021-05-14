@@ -58,7 +58,7 @@ contract BullaClaim {
         address bullaClaim,
         ActionType actionType,
         uint256 paymentAmount,
-        RejectReason reason,
+        RejectReason rejectReason,
         uint256 blocktime
     );
 
