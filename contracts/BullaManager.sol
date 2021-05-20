@@ -7,8 +7,8 @@ import "./BullaGroup.sol";
 struct FeeInfo {
     address payable collectionAddress;
     uint32 feeBasisPoints;
-    uint32 bullaThreshold; //# of BULLA held to get fee reduction
-    uint32 reducedFeeBasisPoints; //reduced fee for BULLA holders
+    uint32 bullaThreshold; //# of BULLA tokens held to get fee reduction
+    uint32 reducedFeeBasisPoints; //reduced fee for BULLA token holders
 }
 
 contract BullaManager {
@@ -59,6 +59,12 @@ contract BullaManager {
         address indexed bullaManager,
         uint256 prevFeeThreshold,
         uint256 newFeeThreshold,
+        uint256 blocktime
+    );
+    event ReducedFeeChanged(
+        address indexed bullaManager,
+        uint256 prevFee,
+        uint256 newFee,
         uint256 blocktime
     );
 
@@ -116,11 +122,12 @@ contract BullaManager {
     }
 
     function setFee(uint32 _feeBasisPoints) external onlyOwner {
+        uint32 oldFee = feeInfo.feeBasisPoints;
         feeInfo.feeBasisPoints = _feeBasisPoints;
         emit FeeChanged(
             address(this),
+            oldFee,
             feeInfo.feeBasisPoints,
-            _feeBasisPoints,
             block.timestamp
         );
     }
@@ -138,6 +145,7 @@ contract BullaManager {
         );
     }
 
+    //Set threshold of BULLA tokens owned that are required to receive reduced fee
     function setbullaThreshold(uint32 _threshold) external onlyOwner {
         feeInfo.bullaThreshold = _threshold;
         emit FeeThresholdChanged(
@@ -148,11 +156,19 @@ contract BullaManager {
         );
     }
 
+    //reduced fee if threshold of BULLA tokens owned is met
     function setReducedFee(uint32 reducedFeeBasisPoints) external onlyOwner {
+        uint32 oldFee = feeInfo.reducedFeeBasisPoints;
         feeInfo.reducedFeeBasisPoints = reducedFeeBasisPoints;
-        //emit FeeThresholdChanged(address(this), feeInfo.bullaThreshold, _threshold, block.timestamp);
+        emit FeeChanged(
+            address(this),
+            oldFee,
+            feeInfo.feeBasisPoints,
+            block.timestamp
+        );
     }
 
+    //set the contract address of BULLA ERC20 token
     function setBullaTokenAddress(address payable _bullaTokenAddress)
         external
         onlyOwner
@@ -166,6 +182,7 @@ contract BullaManager {
         );
     }
 
+    //get the amount of BULLA tokens held by a given address
     function getBullaBalance(address _holder) external view returns (uint256) {
         uint256 balance =
             address(bullaToken) == address(0)
