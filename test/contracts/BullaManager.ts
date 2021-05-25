@@ -12,22 +12,23 @@ import BullaManagerMock from "../../artifacts/contracts/BullaManager.sol/BullaMa
 const provider = new MockProvider();
 chai.use(solidity);
 
+// prettier-ignore
 describe("Bulla Manager", function () {
   let collector: Wallet;
   let newOwner: Wallet;
-  let bullaManagerToken: Contract;
-  let signer: SignerWithAddress;
+  let bullaManagerToken: BullaManager;
+  let signer: Wallet;
   const blocktime = Date.now();
   before(async function () {
-    [collector, newOwner] = new MockProvider().getWallets();
-    [signer] = await ethers.getSigners();
+    [collector, newOwner, signer] = new MockProvider().getWallets();
+   // [signer] = await ethers.getSigners();
     await ethers.provider.send("evm_setNextBlockTimestamp", [blocktime]);
     bullaManagerToken = await deployContract(signer, BullaManagerMock, [
       ethers.utils.formatBytes32String("Bulla Manager Test"),
       collector.address,
       100,
-    ]);
-    await bullaManagerToken.deployed();
+    ]) as BullaManager;
+    //await bullaManagerToken.deployed();
 
   });
   describe("Deployment", function () {
@@ -76,13 +77,12 @@ describe("Bulla Manager", function () {
         );
     });
   });
- async function setowner(newOwner: Wallet){
-       // @ts-ignore
-   return await bullaManagerToken.connect(newOwner).setOwner(newOwner.address).then(tx=> tx.wait())
+ async function setowner(newOwner: Wallet){       
+    return await bullaManagerToken.connect(newOwner).setOwner(newOwner.address).then(tx=> tx.wait())
   }
 
   describe("setOwner", function () {
-    it("should raise error when non-owner invokes the call", async function () {
+    it.only("should raise error when non-owner invokes the call", async function () {
       console.log(await bullaManagerToken.owner())
       console.log( newOwner.address)
       await expect(setowner(newOwner)).to.be.reverted;
