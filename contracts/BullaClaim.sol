@@ -15,6 +15,7 @@ contract BullaClaim {
         Other
     }
 
+    //structure for storing IPFS hash that may hold documents
     struct Multihash {
         bytes32 hash;
         uint8 hashFunction;
@@ -22,10 +23,10 @@ contract BullaClaim {
     }
     Multihash public multihash;
 
-    uint256 public bullaId;
-    address public bullaGroup;
+    uint256 public bullaId; //parent bullaId
+    address public bullaGroup; //parent bullaGroup
 
-    address payable public owner;
+    address payable public owner; //current owner of claim
     address payable public creditor;
     address payable public debtor;
 
@@ -34,6 +35,7 @@ contract BullaClaim {
     uint256 public paidAmount;
     Status public status;
 
+    //current price that owner is willing to transfer claim
     uint256 public transferPrice;
 
     modifier onlyCreditor() {
@@ -110,7 +112,7 @@ contract BullaClaim {
     }
 
     function setTransferPrice(uint256 newPrice) external onlyOwner {
-        require(owner == creditor, "only invoices can be transferred");
+        require(owner == creditor, "only owner can set price");
         uint256 oldPrice = transferPrice;
         transferPrice = newPrice;
         emit TransferPriceUpdated(
@@ -131,7 +133,7 @@ contract BullaClaim {
             msg.value == transferPrice,
             "incorrect msg.value to transfer ownership"
         );
-        //SET TRANSFER PRICE TO 0
+
         //TODO: is this done in the correct order. Is it safe?
         owner.transfer(msg.value);
         address oldOwner = owner;
@@ -152,8 +154,7 @@ contract BullaClaim {
         bytes32 hash,
         uint8 hashFunction,
         uint8 size
-    ) external {
-        require(owner == msg.sender, "restricted to owner wallet");
+    ) external onlyOwner {
         multihash = Multihash(hash, hashFunction, size);
         emit MultihashAdded(
             getBullaManager(),
