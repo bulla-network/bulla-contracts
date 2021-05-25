@@ -173,4 +173,6 @@ contract BullaManager {
                 : bullaToken.balanceOf(_holder);
         return balance;
     }
+
+   
 }
