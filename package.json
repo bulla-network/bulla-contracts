@@ -33,7 +33,6 @@
   },
   "devDependencies": {
     "@nomiclabs/hardhat-solhint": "^2.0.0",
-    "hardhat-contract-sizer": "^2.0.3",
-    "solidity-coverage": "^0.7.16"
+    "hardhat-contract-sizer": "^2.0.3"
   }
 }
