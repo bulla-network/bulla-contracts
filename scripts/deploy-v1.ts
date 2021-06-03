@@ -7,8 +7,6 @@ import { BullaManager } from "../typechain/BullaManager";
 
 const dateLabel = (date: Date) => date.toISOString().replace(/\D/g, "");
 const toBytes32 = (stringVal: string) => ethers.utils.formatBytes32String(stringVal);
-const fromBytes32 = (bytesVal: BytesLike) => ethers.utils.parseBytes32String(bytesVal);
-const toWei = (ether: string) => ethers.utils.parseEther(ether);
 const toEther = (wei: BigNumberish) => ethers.utils.formatEther(wei);
 
 const deployCreator = async function () {
