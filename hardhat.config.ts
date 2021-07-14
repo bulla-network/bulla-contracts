@@ -6,6 +6,7 @@ import "@nomiclabs/hardhat-ethers";
 import "hardhat-typechain";
 import "hardhat-deploy";
 import "@nomiclabs/hardhat-waffle";
+import "@nomiclabs/hardhat-solhint";
 
 const INFURA_API_KEY = process.env.INFURA_API_KEY!;
 const RINKEBY_PRIVATE_KEY = process.env.DEPLOY_PK!;

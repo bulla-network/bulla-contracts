@@ -20,7 +20,7 @@ const deployCreator = async function () {
         args: [
             ethers.utils.formatBytes32String("from hardhat deploy"),
             "0x89e03E7980C92fd81Ed3A9b72F5c73fDf57E5e6D",
-            100,
+            0,
         ],
         log: true,
     });

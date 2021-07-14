@@ -16,7 +16,6 @@ contract BullaManager {
     FeeInfo public feeInfo;
     IERC20 public bullaToken;
     address public owner;
-
     modifier onlyOwner() {
         require(owner == msg.sender, "restricted to contract owner");
         _;
