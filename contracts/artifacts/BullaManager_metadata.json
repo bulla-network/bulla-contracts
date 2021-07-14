@@ -1,0 +1,513 @@
+{
+	"compiler": {
+		"version": "0.8.4+commit.c7e474f2"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "_description",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address payable",
+						"name": "_collectionAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "uint32",
+						"name": "_feeBasisPoints",
+						"type": "uint32"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "bullaManager",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "prevBullaToken",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "newBullaToken",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "blocktime",
+						"type": "uint256"
+					}
+				],
+				"name": "BullaTokenChanged",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "bullaManager",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "prevCollector",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "newCollector",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "blocktime",
+						"type": "uint256"
+					}
+				],
+				"name": "CollectorChanged",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "bullaManager",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "prevFee",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "newFee",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "blocktime",
+						"type": "uint256"
+					}
+				],
+				"name": "FeeChanged",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "bullaManager",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "prevFeeThreshold",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "newFeeThreshold",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "blocktime",
+						"type": "uint256"
+					}
+				],
+				"name": "FeeThresholdChanged",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "bullaManager",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "bullaGroup",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "owner",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "description",
+						"type": "string"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "groupType",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "bool",
+						"name": "requireMembership",
+						"type": "bool"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "blocktime",
+						"type": "uint256"
+					}
+				],
+				"name": "NewBullaGroup",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "bullaManager",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "prevOwner",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "blocktime",
+						"type": "uint256"
+					}
+				],
+				"name": "OwnerChanged",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "bullaManager",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "prevFee",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "newFee",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "blocktime",
+						"type": "uint256"
+					}
+				],
+				"name": "ReducedFeeChanged",
+				"type": "event"
+			},
+			{
+				"inputs": [],
+				"name": "bullaToken",
+				"outputs": [
+					{
+						"internalType": "contract IERC20",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "_description",
+						"type": "string"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "groupType",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bool",
+						"name": "requireMembership",
+						"type": "bool"
+					}
+				],
+				"name": "createBullaGroup",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "description",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "feeInfo",
+				"outputs": [
+					{
+						"internalType": "address payable",
+						"name": "collectionAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "uint32",
+						"name": "feeBasisPoints",
+						"type": "uint32"
+					},
+					{
+						"internalType": "uint32",
+						"name": "bullaThreshold",
+						"type": "uint32"
+					},
+					{
+						"internalType": "uint32",
+						"name": "reducedFeeBasisPoints",
+						"type": "uint32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_holder",
+						"type": "address"
+					}
+				],
+				"name": "getBullaBalance",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address payable",
+						"name": "_bullaTokenAddress",
+						"type": "address"
+					}
+				],
+				"name": "setBullaTokenAddress",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address payable",
+						"name": "_collectionAddress",
+						"type": "address"
+					}
+				],
+				"name": "setCollectionAddress",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint32",
+						"name": "_feeBasisPoints",
+						"type": "uint32"
+					}
+				],
+				"name": "setFee",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_owner",
+						"type": "address"
+					}
+				],
+				"name": "setOwner",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint32",
+						"name": "reducedFeeBasisPoints",
+						"type": "uint32"
+					}
+				],
+				"name": "setReducedFee",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint32",
+						"name": "_threshold",
+						"type": "uint32"
+					}
+				],
+				"name": "setbullaThreshold",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"BullaManager.sol": "BullaManager"
+		},
+		"evmVersion": "istanbul",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"@openzeppelin/contracts/token/ERC20/IERC20.sol": {
+			"keccak256": "0xf8e8d118a7a8b2e134181f7da655f6266aa3a0f9134b2605747139fcb0c5d835",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://9ec48567e7ad06acb670980d5cdf3fd7f3949bf12894f02d68c3bb43e75aa84f",
+				"dweb:/ipfs/QmaG3R2J9cz92YT77vFjYrjMNU2wHp4ypwYD62HqDUqS5U"
+			]
+		},
+		"BullaClaim.sol": {
+			"keccak256": "0x692c36df8617d5193e39d860bd74e5cc96308e34ce833015d2a23c3b65ba3fc4",
+			"license": "UNLICENSED",
+			"urls": [
+				"bzz-raw://6b216ce3a7fccff36fb4e505be178bd7d51ab01170c7b5c604e1f2d248d41ce9",
+				"dweb:/ipfs/QmXC6Sb1bvgW7ykYphiQ9UR7NKvgrp4q9cuWsnXQ4X9tdQ"
+			]
+		},
+		"BullaGroup.sol": {
+			"keccak256": "0xb051b4cfeb0b58bcdd71c5d359ff0eb23064f5a50e291d7b869b78f30a9d56b7",
+			"license": "UNLICENSED",
+			"urls": [
+				"bzz-raw://97c84e3689007189fb16c613a61abbc73df228210d6a617abeca3ca180eb69f8",
+				"dweb:/ipfs/QmUGWMQNpMAb8XEaD9HN4J1AdGUmL613MYsvUXUM4aeQhY"
+			]
+		},
+		"BullaManager.sol": {
+			"keccak256": "0x4b04a8210b9b72782bce279ebc22955841b420d215123cc17dcf799bb848b49f",
+			"license": "UNLICENSED",
+			"urls": [
+				"bzz-raw://1a3580e37443d2c6c29fea5c3b501b7db64a2a2829770fb6761aa6500189d545",
+				"dweb:/ipfs/QmPxhmwv4LALchfsja1husV1NQDaju7ZGsNRuMh4D1os9C"
+			]
+		}
+	},
+	"version": 1
+}
