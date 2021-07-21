@@ -78,11 +78,10 @@ contract BullaGroup {
         if (requireMembership)
             require(
                 isMember[msg.sender] == true,
-                "non-members cannot make journal"
+                "non-members cannot create a bulla"
             );
         uint256 newBullaId = bullaCount;
 
-        //bullas[newBullaId].id = newBullaId;
         bullaOwners[newBullaId] = msg.sender;
         bullaCount++;
 
@@ -111,15 +110,14 @@ contract BullaGroup {
             "only bulla owner's may create a bulla claim"
         );
 
-        BullaClaim newBullaClaim =
-            new BullaClaim(
-                bullaId,
-                payable(msg.sender),
-                creditor,
-                debtor,
-                claimAmount,
-                dueBy
-            );
+        BullaClaim newBullaClaim = new BullaClaim(
+            bullaId,
+            payable(msg.sender),
+            creditor,
+            debtor,
+            claimAmount,
+            dueBy
+        );
 
         emit NewBullaClaim(
             bullaManager,

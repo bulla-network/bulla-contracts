@@ -5,8 +5,18 @@ import "./BullaGroup.sol";
 import "./BullaManager.sol";
 
 contract BullaClaim {
-    enum ActionType {Payment, Reject, Rescind}
-    enum Status {Pending, Repaying, Paid, Rejected, Rescinded}
+    enum ActionType {
+        Payment,
+        Reject,
+        Rescind
+    }
+    enum Status {
+        Pending,
+        Repaying,
+        Paid,
+        Rejected,
+        Rescinded
+    }
     enum RejectReason {
         None,
         UnknownAddress,
@@ -24,6 +34,7 @@ contract BullaClaim {
     Multihash public multihash;
 
     uint256 public bullaId; //parent bullaId
+    uint256 public nonOwnerBullaId;
     address public bullaGroup; //parent bullaGroup
 
     address payable public owner; //current owner of claim
@@ -50,6 +61,14 @@ contract BullaClaim {
 
     modifier onlyOwner() {
         require(owner == msg.sender, "restricted to owning wallet");
+        _;
+    }
+
+    modifier onlyBullaOwner(uint256 _bullaId) {
+        require(
+            getBullaIdOwner(_bullaId) == msg.sender,
+            "restricted to Bulla owner"
+        );
         _;
     }
 
@@ -94,6 +113,13 @@ contract BullaClaim {
         uint256 blocktime
     );
 
+    event AddNonOwnerBullaId(
+        address indexed bullaManager,
+        address indexed bullaClaim,
+        uint256 indexed bullaId,
+        uint256 blocktime
+    );
+
     constructor(
         uint256 _bullaId,
         address payable _owner,
@@ -102,6 +128,10 @@ contract BullaClaim {
         uint256 _claimAmount,
         uint256 _dueBy
     ) {
+        require(
+            getBullaIdOwner(_bullaId) == _owner,
+            "only the Bulla owner can create a claim"
+        );
         bullaGroup = msg.sender;
         bullaId = _bullaId;
         owner = _owner;
@@ -134,7 +164,6 @@ contract BullaClaim {
             "incorrect msg.value to transfer ownership"
         );
 
-        //TODO: is this done in the correct order. Is it safe?
         owner.transfer(msg.value);
         address oldOwner = owner;
         owner = newOwner;
@@ -146,6 +175,26 @@ contract BullaClaim {
             oldOwner,
             newOwner,
             msg.value,
+            block.timestamp
+        );
+    }
+
+    function addNonOwnerBullaId(uint256 _nonOwnerBullaId)
+        external
+        onlyBullaOwner(_nonOwnerBullaId)
+    {
+        require(
+            msg.sender != owner &&
+                (msg.sender == debtor || msg.sender == creditor),
+            "you must be a non-owning party to the claim"
+        );
+
+        nonOwnerBullaId = _nonOwnerBullaId;
+
+        emit AddNonOwnerBullaId(
+            getBullaManager(),
+            address(this),
+            _nonOwnerBullaId,
             block.timestamp
         );
     }
@@ -169,6 +218,10 @@ contract BullaClaim {
         return _bullaGroup.bullaManager();
     }
 
+    function getBullaIdOwner(uint256 _bullaId) internal view returns (address) {
+        return BullaGroup(bullaGroup).bullaOwners(_bullaId);
+    }
+
     function getFeeInfo() public view returns (uint256, address payable) {
         BullaManager bullaManager = BullaManager(getBullaManager());
         uint256 bullaTokenBalance = bullaManager.getBullaBalance(owner);
@@ -179,10 +232,9 @@ contract BullaClaim {
             uint32 reducedFeeBasisPoints
         ) = bullaManager.feeInfo();
 
-        uint32 fee =
-            bullaThreshold > 0 && bullaTokenBalance >= bullaThreshold
-                ? reducedFeeBasisPoints
-                : fullFee;
+        uint32 fee = bullaThreshold > 0 && bullaTokenBalance >= bullaThreshold
+            ? reducedFeeBasisPoints
+            : fullFee;
         return (fee, collectionAddress);
     }
 
@@ -215,18 +267,21 @@ contract BullaClaim {
         require(paidAmount + msg.value <= claimAmount, "repaying too much");
         require(msg.value > 0, "payment must be greater than 0");
 
-        (uint256 feeBasisPoints, address payable collectionAddress) =
-            getFeeInfo();
+        (
+            uint256 feeBasisPoints,
+            address payable collectionAddress
+        ) = getFeeInfo();
 
-        uint256 transactionFee =
-            feeBasisPoints > 0 ? calculateFee(feeBasisPoints, msg.value) : 0;
+        uint256 transactionFee = feeBasisPoints > 0
+            ? calculateFee(feeBasisPoints, msg.value)
+            : 0;
         address bullaManager = getBullaManager();
 
         creditor.transfer(msg.value - transactionFee);
         emitActionEvent(ActionType.Payment, claimAmount, RejectReason.None);
         paidAmount += msg.value;
         paidAmount == claimAmount ? status = Status.Paid : status = Status
-            .Repaying;
+        .Repaying;
 
         if (transactionFee > 0) {
             collectionAddress.transfer(transactionFee);
