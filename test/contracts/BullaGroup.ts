@@ -61,6 +61,7 @@ describe("Bulla Group", function () {
             await expect(bullaGroup.connect(newWallet).joinGroup()).to.emit(bullaGroup, "Membership");
         });
     });
+
     describe("leaveGroup", function () {
         this.beforeEach(async function () {
             await bullaGroup.connect(member).joinGroup();
@@ -90,6 +91,7 @@ describe("Bulla Group", function () {
             ).to.be.revertedWith("non-members cannot leave a group");
         });
     });
+
     describe("createBulla", function () {
         let tx;
         this.beforeEach(async function () {
@@ -107,9 +109,10 @@ describe("Bulla Group", function () {
                     .connect(nonMember)
                     .createBulla("bulla description", 1000)
                     .then(tx => tx.wait())
-            ).to.be.revertedWith("non-members cannot make journal");
+            ).to.be.revertedWith("non-members cannot create a bulla");
         });
     });
+
     describe("createBullaClaim", function () {
         let bullaClaim: Contract;
         let [creditor, debtor] = new MockProvider().getWallets();

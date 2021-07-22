@@ -113,7 +113,7 @@ contract BullaClaim {
         uint256 blocktime
     );
 
-    event AddNonOwnerBullaId(
+    event UpdateNonOwnerBullaId(
         address indexed bullaManager,
         address indexed bullaClaim,
         uint256 indexed bullaId,
@@ -128,11 +128,11 @@ contract BullaClaim {
         uint256 _claimAmount,
         uint256 _dueBy
     ) {
+        bullaGroup = msg.sender;
         require(
             getBullaIdOwner(_bullaId) == _owner,
             "only the Bulla owner can create a claim"
         );
-        bullaGroup = msg.sender;
         bullaId = _bullaId;
         owner = _owner;
         creditor = _creditor;
@@ -179,7 +179,7 @@ contract BullaClaim {
         );
     }
 
-    function addNonOwnerBullaId(uint256 _nonOwnerBullaId)
+    function updateNonOwnerBullaId(uint256 _nonOwnerBullaId)
         external
         onlyBullaOwner(_nonOwnerBullaId)
     {
@@ -191,7 +191,7 @@ contract BullaClaim {
 
         nonOwnerBullaId = _nonOwnerBullaId;
 
-        emit AddNonOwnerBullaId(
+        emit UpdateNonOwnerBullaId(
             getBullaManager(),
             address(this),
             _nonOwnerBullaId,

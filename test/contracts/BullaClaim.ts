@@ -326,4 +326,36 @@ describe("Bulla Claim", function () {
             ).to.be.revertedWith("restricted to creditor wallet");
         });
     });
+
+    describe.only("updateNonOwnerBullaId", function () {
+        this.beforeEach(async function () {
+            let tx = await bullaGroup
+                .connect(debtor)
+                .createBulla("bulla description", 1000)
+                .then(tx => tx.wait());
+        });
+        it("should add non owner bulla id", async function () {
+            await bullaClaim.connect(debtor).updateNonOwnerBullaId(1);
+            const nonOwnerBullaId = await bullaClaim.nonOwnerBullaId();
+            expect(nonOwnerBullaId).to.be.equal(1);
+        });
+        it("should revert when bull owner adds nonOwnerBullaId", async function () {
+            await expect(bullaClaim.updateNonOwnerBullaId(1)).to.be.revertedWith("restricted to Bulla owner");
+        });
+        it("should revert when a wallet other than non-owning party adds bulla id", async function () {
+            let tx = await bullaGroup
+                .connect(notOwner)
+                .createBulla("bulla description", 1000)
+                .then(tx => tx.wait());
+            await expect(bullaClaim.connect(notOwner).updateNonOwnerBullaId(2)).to.be.revertedWith(
+                "you must be a non-owning party to the claim"
+            );
+        });
+        it("should emit UpdateNonOwnerBullaId event", async function () {
+            await expect(bullaClaim.connect(debtor).updateNonOwnerBullaId(1)).to.emit(
+                bullaClaim,
+                "UpdateNonOwnerBullaId"
+            );
+        });
+    });
 });
