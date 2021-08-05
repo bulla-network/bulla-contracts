@@ -29,12 +29,12 @@ describe("Bulla Manager", function () {
             expect(await bullaManagerToken.owner()).to.equal(signer.address);
         });
         it("should set collection address", async function () {
-            let { collectionAddress } = await bullaManagerToken.feeInfo();
+            let { collectionAddress } = await bullaManagerToken.getFeeInfo();
             expect(collectionAddress).to.equal(collector.address);
         });
 
         it("should set fee basis point", async function () {
-            let { feeBasisPoints } = await bullaManagerToken.feeInfo();
+            let { feeBasisPoints } = await bullaManagerToken.getFeeInfo();
             expect(feeBasisPoints).to.equal(100);
         });
 
@@ -77,7 +77,7 @@ describe("Bulla Manager", function () {
     describe("setFee", function () {
         it("should set new fee", async function () {
             await bullaManagerToken.setFee(400);
-            let { feeBasisPoints } = await bullaManagerToken.feeInfo();
+            let { feeBasisPoints } = await bullaManagerToken.getFeeInfo();
             expect(feeBasisPoints).to.equal(400);
         });
         it("should emit FeeChanged event", async function () {
@@ -98,7 +98,7 @@ describe("Bulla Manager", function () {
 
         it("should set new collection address", async function () {
             await bullaManagerToken.setCollectionAddress(newCollector.address);
-            let { collectionAddress } = await bullaManagerToken.feeInfo();
+            let { collectionAddress } = await bullaManagerToken.getFeeInfo();
             expect(collectionAddress).to.equal(newCollector.address);
         });
         it("should emit CollectorChanged event", async function () {
@@ -119,7 +119,7 @@ describe("Bulla Manager", function () {
     describe("setbullaThreshold", function () {
         it("should set new bulla threshold", async function () {
             await bullaManagerToken.setbullaThreshold(10);
-            let { bullaThreshold } = await bullaManagerToken.feeInfo();
+            let { bullaThreshold } = await bullaManagerToken.getFeeInfo();
             expect(bullaThreshold).to.equal(10);
         });
         it("should emit FeeThresholdChanged event", async function () {
@@ -138,7 +138,7 @@ describe("Bulla Manager", function () {
     describe("setReducedFee", function () {
         it("should set new reduced fee", async function () {
             await bullaManagerToken.setReducedFee(10);
-            let { reducedFeeBasisPoints } = await bullaManagerToken.feeInfo();
+            let { reducedFeeBasisPoints } = await bullaManagerToken.getFeeInfo();
             expect(reducedFeeBasisPoints).to.equal(10);
         });
         it("should emit FeeChanged event", async function () {
@@ -181,37 +181,6 @@ describe("Bulla Manager", function () {
         it("should get balance of new address as zero", async function () {
             let balance = await bullaManagerToken.getBullaBalance(wallet.address);
             expect(balance).to.equal(0);
-        });
-    });
-    describe("createBullaGroup", function () {
-        let bullaGroup: Contract;
-        this.beforeEach(async function () {
-            let tx = await bullaManagerToken
-                .createBullaGroup("Group Description", ethers.utils.formatBytes32String("Group Type"), false)
-                .then(tx => tx.wait());
-            let tx_address = tx.events?.[0].args?.bullaGroup;
-            bullaGroup = await ethers.getContractAt("BullaGroup", tx_address, signer);
-        });
-        it("should set self as bulla manager for new bulla group", async function () {
-            expect(await bullaGroup.bullaManager()).to.equal(bullaManagerToken.address);
-        });
-        it("should set owner for bulla group", async function () {
-            expect(await bullaGroup.owner()).to.equal(signer.address);
-        });
-        it("should set requireMembership for bulla group", async function () {
-            expect(await bullaGroup.requireMembership()).to.equal(false);
-        });
-        it("should set groupType for bulla group", async function () {
-            expect(await bullaGroup.groupType()).to.equal(ethers.utils.formatBytes32String("Group Type"));
-        });
-        it("should set groupType for bulla group", async function () {
-            expect(
-                await bullaManagerToken.createBullaGroup(
-                    "Group Description",
-                    ethers.utils.formatBytes32String("Group Type"),
-                    false
-                )
-            ).to.emit(bullaManagerToken, "NewBullaGroup");
         });
     });
 });

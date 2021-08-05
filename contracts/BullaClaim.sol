@@ -1,8 +1,31 @@
 //SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.3;
 
-import "./BullaGroup.sol";
-import "./BullaManager.sol";
+import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts/proxy/Clones.sol";
+
+interface IBullaManager {
+    function getBullaBalance(address _holder) external view returns (uint256);
+
+    function getFeeInfo()
+        external
+        view
+        returns (
+            address payable collectionAddress,
+            uint32 feeBasisPoints,
+            uint32 bullaThreshold, //# of BULLA tokens held to get fee reduction
+            uint32 reducedFeeBasisPoints
+        );
+}
+
+contract MultihashAsscoiation is Initializable {
+    struct Multihash {
+        bytes32 hash;
+        uint8 hashFunction;
+        uint8 size;
+    }
+    Multihash public multihash;
+}
 
 contract BullaClaim {
     enum ActionType {
@@ -17,13 +40,6 @@ contract BullaClaim {
         Rejected,
         Rescinded
     }
-    enum RejectReason {
-        None,
-        UnknownAddress,
-        DisputedClaim,
-        SuspectedFraud,
-        Other
-    }
 
     //structure for storing IPFS hash that may hold documents
     struct Multihash {
@@ -33,10 +49,7 @@ contract BullaClaim {
     }
     Multihash public multihash;
 
-    uint256 public bullaId; //parent bullaId
-    uint256 public nonOwnerBullaId;
-    address public bullaGroup; //parent bullaGroup
-
+    IBullaManager internal bullaManager;
     address payable public owner; //current owner of claim
     address payable public creditor;
     address payable public debtor;
@@ -50,36 +63,25 @@ contract BullaClaim {
     uint256 public transferPrice;
 
     modifier onlyCreditor() {
-        require(creditor == msg.sender, "restricted to creditor wallet");
+        require(creditor == msg.sender, "restricted to creditor");
         _;
     }
 
     modifier onlyDebtor() {
-        require(debtor == msg.sender, "restricted to debtor wallet");
+        require(debtor == msg.sender, "restricted to debtor");
         _;
     }
 
     modifier onlyOwner() {
-        require(owner == msg.sender, "restricted to owning wallet");
-        _;
-    }
-
-    modifier onlyBullaOwner(uint256 _bullaId) {
-        require(
-            getBullaIdOwner(_bullaId) == msg.sender,
-            "restricted to Bulla owner"
-        );
+        require(owner == msg.sender, "restricted to owner");
         _;
     }
 
     event ClaimAction(
         address indexed bullaManager,
-        address indexed bullaGroup,
-        uint256 indexed bullaId,
-        address bullaClaim,
+        address indexed bullaClaim,
         ActionType actionType,
         uint256 paymentAmount,
-        RejectReason rejectReason,
         uint256 blocktime
     );
 
@@ -94,6 +96,8 @@ contract BullaClaim {
     event MultihashAdded(
         address indexed bullaManager,
         address bullaClaim,
+        address indexed debtor,
+        address indexed creditor,
         Multihash ipfsHash,
         uint256 blocktime
     );
@@ -113,32 +117,51 @@ contract BullaClaim {
         uint256 blocktime
     );
 
-    event UpdateNonOwnerBullaId(
+    event ClaimCreated(
         address indexed bullaManager,
-        address indexed bullaClaim,
-        uint256 indexed bullaId,
+        address bullaClaim,
+        address owner,
+        address indexed creditor,
+        address indexed debtor,
+        string description,
+        uint256 claimAmount,
+        uint256 dueBy,
+        address createdBy,
         uint256 blocktime
     );
 
     constructor(
-        uint256 _bullaId,
+        address _bullaManager,
         address payable _owner,
         address payable _creditor,
         address payable _debtor,
+        string memory _description,
         uint256 _claimAmount,
         uint256 _dueBy
     ) {
-        bullaGroup = msg.sender;
         require(
-            getBullaIdOwner(_bullaId) == _owner,
-            "only the Bulla owner can create a claim"
+            _owner == _creditor || _owner == _debtor,
+            "owner not a debtor or creditor"
         );
-        bullaId = _bullaId;
+
+        bullaManager = IBullaManager(_bullaManager);
         owner = _owner;
         creditor = _creditor;
         debtor = _debtor;
         claimAmount = _claimAmount;
         dueBy = _dueBy;
+        emit ClaimCreated(
+            _bullaManager,
+            address(this),
+            owner,
+            creditor,
+            debtor,
+            _description,
+            claimAmount,
+            dueBy,
+            msg.sender,
+            block.timestamp
+        );
     }
 
     function setTransferPrice(uint256 newPrice) external onlyOwner {
@@ -179,26 +202,6 @@ contract BullaClaim {
         );
     }
 
-    function updateNonOwnerBullaId(uint256 _nonOwnerBullaId)
-        external
-        onlyBullaOwner(_nonOwnerBullaId)
-    {
-        require(
-            msg.sender != owner &&
-                (msg.sender == debtor || msg.sender == creditor),
-            "you must be a non-owning party to the claim"
-        );
-
-        nonOwnerBullaId = _nonOwnerBullaId;
-
-        emit UpdateNonOwnerBullaId(
-            getBullaManager(),
-            address(this),
-            _nonOwnerBullaId,
-            block.timestamp
-        );
-    }
-
     function addMultihash(
         bytes32 hash,
         uint8 hashFunction,
@@ -206,59 +209,23 @@ contract BullaClaim {
     ) external onlyOwner {
         multihash = Multihash(hash, hashFunction, size);
         emit MultihashAdded(
-            getBullaManager(),
+            address(bullaManager),
             address(this),
+            creditor,
+            debtor,
             multihash,
             block.timestamp
         );
     }
 
-    function getBullaManager() internal view returns (address) {
-        BullaGroup _bullaGroup = BullaGroup(bullaGroup);
-        return _bullaGroup.bullaManager();
-    }
-
-    function getBullaIdOwner(uint256 _bullaId) internal view returns (address) {
-        return BullaGroup(bullaGroup).bullaOwners(_bullaId);
-    }
-
-    function getFeeInfo() public view returns (uint256, address payable) {
-        BullaManager bullaManager = BullaManager(getBullaManager());
-        uint256 bullaTokenBalance = bullaManager.getBullaBalance(owner);
-        (
-            address payable collectionAddress,
-            uint32 fullFee,
-            uint32 bullaThreshold,
-            uint32 reducedFeeBasisPoints
-        ) = bullaManager.feeInfo();
-
-        uint32 fee = bullaThreshold > 0 && bullaTokenBalance >= bullaThreshold
-            ? reducedFeeBasisPoints
-            : fullFee;
-        return (fee, collectionAddress);
-    }
-
-    function calculateFee(uint256 bpFee, uint256 value)
+    function emitActionEvent(ActionType actionType, uint256 _paymentAmount)
         internal
-        pure
-        returns (uint256)
     {
-        return (value * bpFee) / 10000;
-    }
-
-    function emitActionEvent(
-        ActionType actionType,
-        uint256 _paymentAmount,
-        RejectReason reason
-    ) internal {
         emit ClaimAction(
-            getBullaManager(),
-            bullaGroup,
-            bullaId,
+            address(bullaManager),
             address(this),
             actionType,
             _paymentAmount,
-            reason,
             block.timestamp
         );
     }
@@ -267,27 +234,34 @@ contract BullaClaim {
         require(paidAmount + msg.value <= claimAmount, "repaying too much");
         require(msg.value > 0, "payment must be greater than 0");
 
+        uint256 bullaTokenBalance = bullaManager.getBullaBalance(owner);
         (
-            uint256 feeBasisPoints,
-            address payable collectionAddress
-        ) = getFeeInfo();
+            address payable collectionAddress,
+            uint32 fullFee,
+            uint32 bullaThreshold,
+            uint32 reducedFeeBasisPoints
+        ) = bullaManager.getFeeInfo();
 
-        uint256 transactionFee = feeBasisPoints > 0
-            ? calculateFee(feeBasisPoints, msg.value)
+        uint32 fee = bullaThreshold > 0 && bullaTokenBalance >= bullaThreshold
+            ? reducedFeeBasisPoints
+            : fullFee;
+
+        uint256 transactionFee = fee > 0
+            ? (msg.value * fee) / 10000 //calculateFee(feeBasisPoints, msg.value)
             : 0;
-        address bullaManager = getBullaManager();
 
-        creditor.transfer(msg.value - transactionFee);
-        emitActionEvent(ActionType.Payment, claimAmount, RejectReason.None);
+        //DOES this protect against re-entrancy? moved effect before transfer
         paidAmount += msg.value;
         paidAmount == claimAmount ? status = Status.Paid : status = Status
-        .Repaying;
+            .Repaying;
+        creditor.transfer(msg.value - transactionFee);
+        emitActionEvent(ActionType.Payment, claimAmount);
 
         if (transactionFee > 0) {
             collectionAddress.transfer(transactionFee);
         }
         emit FeePaid(
-            bullaManager,
+            address(bullaManager),
             address(this),
             collectionAddress,
             transactionFee,
@@ -295,13 +269,13 @@ contract BullaClaim {
         );
     }
 
-    function rejectClaim(RejectReason reason) external payable onlyDebtor {
+    function rejectClaim() external payable onlyDebtor {
         require(
             status == Status.Pending,
             "cannot reject once payment has been made"
         );
         status = Status.Rejected;
-        emitActionEvent(ActionType.Reject, 0, reason);
+        emitActionEvent(ActionType.Reject, 0);
     }
 
     function rescindClaim() external payable onlyCreditor {
@@ -310,6 +284,6 @@ contract BullaClaim {
             "cannot rescind once payment has been made"
         );
         status = Status.Rescinded;
-        emitActionEvent(ActionType.Rescind, 0, RejectReason.None);
+        emitActionEvent(ActionType.Rescind, 0);
     }
 }

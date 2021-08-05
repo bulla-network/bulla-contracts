@@ -13,7 +13,7 @@ struct FeeInfo {
 
 contract BullaManager {
     bytes32 public immutable description;
-    FeeInfo public feeInfo;
+    FeeInfo private feeInfo;
     IERC20 public bullaToken;
     address public owner;
     modifier onlyOwner() {
@@ -92,28 +92,27 @@ contract BullaManager {
         );
     }
 
-    function createBullaGroup(
-        string calldata _description,
-        bytes32 groupType,
-        bool requireMembership
-    ) external {
-        BullaGroup newGroup =
-            new BullaGroup(
-                address(this),
-                msg.sender,
-                groupType,
-                requireMembership
-            );
-        emit NewBullaGroup(
-            address(this),
-            address(newGroup),
-            msg.sender,
-            _description,
-            groupType,
-            requireMembership,
-            block.timestamp
-        );
-    }
+    // function createBullaGroup(
+    //     string calldata _description,
+    //     bytes32 groupType,
+    //     bool requireMembership
+    // ) external {
+    //     BullaGroup newGroup = new BullaGroup(
+    //         address(this),
+    //         msg.sender,
+    //         groupType,
+    //         requireMembership
+    //     );
+    //     emit NewBullaGroup(
+    //         address(this),
+    //         address(newGroup),
+    //         msg.sender,
+    //         _description,
+    //         groupType,
+    //         requireMembership,
+    //         block.timestamp
+    //     );
+    // }
 
     function setOwner(address _owner) external onlyOwner {
         owner = _owner;
@@ -183,10 +182,13 @@ contract BullaManager {
 
     //get the amount of BULLA tokens held by a given address
     function getBullaBalance(address _holder) external view returns (uint256) {
-        uint256 balance =
-            address(bullaToken) == address(0)
-                ? 0
-                : bullaToken.balanceOf(_holder);
+        uint256 balance = address(bullaToken) == address(0)
+            ? 0
+            : bullaToken.balanceOf(_holder);
         return balance;
+    }
+
+    function getFeeInfo() external view returns (FeeInfo memory) {
+        return feeInfo;
     }
 }
