@@ -5,19 +5,16 @@ import { deployContract, MockProvider } from "ethereum-waffle";
 import { solidity } from "ethereum-waffle";
 
 import { BullaManager } from "../../typechain/BullaManager";
-import { BullaGroup } from "../../typechain/BullaGroup";
 import { BullaClaim } from "../../typechain/BullaClaim";
 
 import BullaManagerMock from "../../artifacts/contracts/BullaManager.sol/BullaManager.json";
-import BullaGroupMock from "../../artifacts/contracts/BullaGroup.sol/BullaGroup.json";
-import BullaClaimArtifact from "../../artifacts/contracts/BullaClaim.sol/BullaClaim.json";
+import BullaClaimMock from "../../artifacts/contracts/BullaClaim.sol/BullaClaim.json";
 import { utils } from "ethers";
 chai.use(solidity);
 
 describe("Bulla Claim", function () {
     let [collector, owner, notOwner, creditor, debtor] = new MockProvider().getWallets();
     let bullaManager: BullaManager;
-    let bullaGroup: BullaGroup;
     let bullaClaim: BullaClaim;
     enum Status {
         Pending,
@@ -35,31 +32,23 @@ describe("Bulla Claim", function () {
             collector.address,
             feeBasisPoint,
         ])) as BullaManager;
-        bullaGroup = (await deployContract(owner, BullaGroupMock, [
+
+        bullaClaim = (await deployContract(creditor, BullaClaimMock, [
             bullaManager.address,
-            owner.address,
-            ethers.utils.formatBytes32String("BullaGroup Type"),
-            false,
-        ])) as BullaGroup;
-        let tx = await bullaGroup.createBulla("bulla description", 1000).then(tx => tx.wait());
-        let bullaClaimTx = await bullaGroup
-            .createBullaClaim(0, claimAmount, owner.address, debtor.address, "BullaClaim description", 60 * 1000)
-            .then(tx => tx.wait());
-        let tx_address = bullaClaimTx.events?.[0].args?.bullaClaim;
-        bullaClaim = new ethers.Contract(tx_address, BullaClaimArtifact.abi, owner) as BullaClaim;
+            creditor.address,
+            creditor.address,
+            debtor.address,
+            "BullaClaim description",
+            claimAmount,
+            60 * 1000,
+        ])) as BullaClaim;
     });
     describe("Initialize", function () {
-        it("should set bulla group for bulla claim", async function () {
-            expect(await bullaClaim.bullaGroup()).to.equal(bullaGroup.address);
-        });
-        it("should set bullaId for bulla claim", async function () {
-            expect(await bullaClaim.bullaId()).to.equal(0);
-        });
         it("should set owner for bulla claim", async function () {
-            expect(await bullaClaim.owner()).to.equal(owner.address);
+            expect(await bullaClaim.owner()).to.equal(creditor.address);
         });
         it("should set creditor for bulla claim", async function () {
-            expect(await bullaClaim.creditor()).to.equal(owner.address);
+            expect(await bullaClaim.creditor()).to.equal(creditor.address);
         });
         it("should set debtor for bulla claim", async function () {
             expect(await bullaClaim.debtor()).to.equal(debtor.address);
@@ -88,30 +77,17 @@ describe("Bulla Claim", function () {
                     .connect(notOwner)
                     .setTransferPrice(1)
                     .then(tx => tx.wait())
-            ).to.be.revertedWith("restricted to owning wallet");
-        });
-        it("should revert when called by creditor", async function () {
-            let bullaClaimTx = await bullaGroup
-                .createBullaClaim(0, 100, creditor.address, debtor.address, "BullaClaim description", 60 * 1000)
-                .then(tx => tx.wait());
-            let tx_address = bullaClaimTx.events?.[0].args?.bullaClaim;
-            bullaClaim = new ethers.Contract(tx_address, BullaClaimArtifact.abi, owner) as BullaClaim;
-            await expect(
-                bullaClaim
-                    .connect(owner)
-                    .setTransferPrice(1)
-                    .then(tx => tx.wait())
-            ).to.be.revertedWith("only owner can set price");
+            ).to.be.revertedWith("restricted to owner");
         });
     });
     describe("transferOwnership", function () {
-        it("should transfer owner ship", async function () {
+        it("should transfer ownership", async function () {
             let newOwner = notOwner;
 
             await bullaClaim.transferOwnership(newOwner.address);
             expect(await bullaClaim.owner()).to.equal(newOwner.address);
         });
-        it("should transfer owner ship when transfer fee is less than zero", async function () {
+        it("should transfer owner ship when transfer fee is more than zero", async function () {
             let newOwner = notOwner;
             await bullaClaim.setTransferPrice(1);
             await bullaClaim.connect(newOwner).transferOwnership(newOwner.address, { value: 1 });
@@ -129,13 +105,11 @@ describe("Bulla Claim", function () {
         });
         it("should transfer amount from owner", async function () {
             let newOwner = notOwner;
-            let transferFee = ethers.utils.parseEther("245.0");
+            let transferFee = ethers.utils.parseEther("25.0");
             await bullaClaim.setTransferPrice(transferFee);
             await expect(
-                await bullaClaim.connect(notOwner).transferOwnership(newOwner.address, {
-                    value: transferFee,
-                })
-            ).to.changeEtherBalance(owner, transferFee);
+                await bullaClaim.connect(newOwner).transferOwnership(newOwner.address, { value: transferFee })
+            ).to.changeEtherBalance(creditor, transferFee);
         });
         it("should set transfer price to zero", async function () {
             let newOwner = notOwner;
@@ -144,12 +118,9 @@ describe("Bulla Claim", function () {
             expect(await bullaClaim.transferPrice()).to.equal(0);
         });
         it("should revert transactions from non-owner", async function () {
-            await expect(
-                bullaClaim
-                    .connect(notOwner)
-                    .transferOwnership(notOwner.address)
-                    .then(tx => tx.wait())
-            ).to.be.revertedWith("this claim is not transferable by anyone other than owner");
+            await expect(bullaClaim.connect(notOwner).transferOwnership(notOwner.address)).to.be.revertedWith(
+                "this claim is not transferable by anyone other than owner"
+            );
         });
         it("should revert transactions from non-owner", async function () {
             await expect(
@@ -161,10 +132,7 @@ describe("Bulla Claim", function () {
         });
         it("should revert transactions when msg value doesnt mtch transfer price", async function () {
             await expect(
-                bullaClaim
-                    .connect(owner)
-                    .transferOwnership(notOwner.address, { value: 1 })
-                    .then(tx => tx.wait())
+                bullaClaim.transferOwnership(notOwner.address, { value: 1 }).then(tx => tx.wait())
             ).to.be.revertedWith("incorrect msg.value to transfer ownership");
         });
     });
@@ -196,19 +164,7 @@ describe("Bulla Claim", function () {
                     .connect(notOwner)
                     .addMultihash(someHash, 0, 0)
                     .then(tx => tx.wait())
-            ).to.be.revertedWith("restricted to owning wallet");
-        });
-    });
-    describe("getFeeInfo", function () {
-        let feeInfo: any[];
-        this.beforeEach(async function () {
-            feeInfo = await bullaClaim.getFeeInfo();
-        });
-        it("should return fee", async function () {
-            expect(feeInfo[0]).to.be.equal(feeBasisPoint);
-        });
-        it("should return collectionAddress ", async function () {
-            expect(feeInfo[1]).to.be.equal(collector.address);
+            ).to.be.revertedWith("restricted to owner");
         });
     });
     describe("payClaim", function () {
@@ -221,7 +177,7 @@ describe("Bulla Claim", function () {
             expect(await bullaClaim.status()).to.equal(Status.Repaying);
         });
         it("should transfer amount to creditor", async function () {
-            await expect(await bullaClaim.connect(debtor).payClaim({ value: 100 })).to.changeEtherBalance(owner, 90);
+            await expect(await bullaClaim.connect(debtor).payClaim({ value: 100 })).to.changeEtherBalance(creditor, 90);
         });
 
         it("should transfer amount to collector", async function () {
@@ -257,35 +213,24 @@ describe("Bulla Claim", function () {
                     .connect(creditor)
                     .payClaim({ value: 0 })
                     .then(tx => tx.wait())
-            ).to.be.revertedWith("restricted to debtor wallet");
+            ).to.be.revertedWith("restricted to debtor");
         });
     });
     describe("rejectClaim", function () {
-        enum RejectReason {
-            None,
-            UnknownAddress,
-            DisputedClaim,
-            SuspectedFraud,
-            Other,
-        }
-
         it("should reject pending claim", async function () {
-            await bullaClaim.connect(debtor).rejectClaim(RejectReason.DisputedClaim);
+            await bullaClaim.connect(debtor).rejectClaim();
             expect(await bullaClaim.status()).to.be.equal(Status.Rejected);
         });
 
         it("should emit ClaimAction event", async function () {
-            expect(await bullaClaim.connect(debtor).rejectClaim(RejectReason.DisputedClaim)).to.emit(
-                bullaClaim,
-                "ClaimAction"
-            );
+            expect(await bullaClaim.connect(debtor).rejectClaim()).to.emit(bullaClaim, "ClaimAction");
         });
         it("should revert when status is not pending", async function () {
             await bullaClaim.connect(debtor).payClaim({ value: 100 });
             await expect(
                 bullaClaim
                     .connect(debtor)
-                    .rejectClaim(RejectReason.DisputedClaim)
+                    .rejectClaim()
                     .then(tx => tx.wait())
             ).to.be.revertedWith("cannot reject once payment has been made");
         });
@@ -294,28 +239,25 @@ describe("Bulla Claim", function () {
             await expect(
                 bullaClaim
                     .connect(creditor)
-                    .rejectClaim(RejectReason.DisputedClaim)
+                    .rejectClaim()
                     .then(tx => tx.wait())
-            ).to.be.revertedWith("restricted to debtor wallet");
+            ).to.be.revertedWith("restricted to debtor");
         });
     });
     describe("rescindClaim", function () {
         let creditor = owner;
-        it("should reject pending claim", async function () {
-            await bullaClaim.connect(creditor).rescindClaim();
+        it("should rescind pending claim", async function () {
+            await bullaClaim.rescindClaim();
             expect(await bullaClaim.status()).to.be.equal(Status.Rescinded);
         });
         it("should emit ClaimAction event", async function () {
-            expect(await bullaClaim.connect(creditor).rescindClaim()).to.emit(bullaClaim, "ClaimAction");
+            expect(await bullaClaim.rescindClaim()).to.emit(bullaClaim, "ClaimAction");
         });
         it("should revert when status is not pending", async function () {
             await bullaClaim.connect(debtor).payClaim({ value: 100 });
-            await expect(
-                bullaClaim
-                    .connect(creditor)
-                    .rescindClaim()
-                    .then(tx => tx.wait())
-            ).to.be.revertedWith("cannot rescind once payment has been made");
+            await expect(bullaClaim.rescindClaim().then(tx => tx.wait())).to.be.revertedWith(
+                "cannot rescind once payment has been made"
+            );
         });
         it("should revert transactions not coming from creditor", async function () {
             await expect(
@@ -323,39 +265,7 @@ describe("Bulla Claim", function () {
                     .connect(debtor)
                     .rescindClaim()
                     .then(tx => tx.wait())
-            ).to.be.revertedWith("restricted to creditor wallet");
-        });
-    });
-
-    describe.only("updateNonOwnerBullaId", function () {
-        this.beforeEach(async function () {
-            let tx = await bullaGroup
-                .connect(debtor)
-                .createBulla("bulla description", 1000)
-                .then(tx => tx.wait());
-        });
-        it("should add non owner bulla id", async function () {
-            await bullaClaim.connect(debtor).updateNonOwnerBullaId(1);
-            const nonOwnerBullaId = await bullaClaim.nonOwnerBullaId();
-            expect(nonOwnerBullaId).to.be.equal(1);
-        });
-        it("should revert when bull owner adds nonOwnerBullaId", async function () {
-            await expect(bullaClaim.updateNonOwnerBullaId(1)).to.be.revertedWith("restricted to Bulla owner");
-        });
-        it("should revert when a wallet other than non-owning party adds bulla id", async function () {
-            let tx = await bullaGroup
-                .connect(notOwner)
-                .createBulla("bulla description", 1000)
-                .then(tx => tx.wait());
-            await expect(bullaClaim.connect(notOwner).updateNonOwnerBullaId(2)).to.be.revertedWith(
-                "you must be a non-owning party to the claim"
-            );
-        });
-        it("should emit UpdateNonOwnerBullaId event", async function () {
-            await expect(bullaClaim.connect(debtor).updateNonOwnerBullaId(1)).to.emit(
-                bullaClaim,
-                "UpdateNonOwnerBullaId"
-            );
+            ).to.be.revertedWith("restricted to creditor");
         });
     });
 });

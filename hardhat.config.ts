@@ -7,6 +7,7 @@ import "hardhat-typechain";
 import "hardhat-deploy";
 import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-solhint";
+import "hardhat-gas-reporter";
 
 const INFURA_API_KEY = process.env.INFURA_API_KEY!;
 const RINKEBY_PRIVATE_KEY = process.env.DEPLOY_PK!;
@@ -47,5 +48,10 @@ const config: HardhatUserConfig = {
             31: "0x3b6Ac45817b3bB0544C19412Fbe8B022D0a4db61",
         },
     },
+    // gasReporter: {
+    //     enabled: true,
+    //     currency: "USD",
+    //     gasPrice: 21,
+    // },
 };
 export default config;
