@@ -33,6 +33,11 @@ const config: HardhatUserConfig = {
             accounts: [RINKEBY_PRIVATE_KEY],
             chainId: 31,
         },
+        celo_testnet: {
+            url: `https://alfajores-forno.celo-testnet.org`,
+            accounts: [RINKEBY_PRIVATE_KEY],
+            chainId: 44787,
+        },
     },
     namedAccounts: {
         deployer: {
