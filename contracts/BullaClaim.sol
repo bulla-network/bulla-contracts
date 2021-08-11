@@ -18,15 +18,6 @@ interface IBullaManager {
         );
 }
 
-contract MultihashAsscoiation is Initializable {
-    struct Multihash {
-        bytes32 hash;
-        uint8 hashFunction;
-        uint8 size;
-    }
-    Multihash public multihash;
-}
-
 contract BullaClaim {
     enum ActionType {
         Payment,
@@ -41,6 +32,7 @@ contract BullaClaim {
         Rescinded
     }
 
+    //https://medium.com/temporal-cloud/efficient-usable-and-cheap-storage-of-ipfs-hashes-in-solidity-smart-contracts-eb3bef129eba
     //structure for storing IPFS hash that may hold documents
     struct Multihash {
         bytes32 hash;
