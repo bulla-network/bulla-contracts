@@ -7,7 +7,7 @@ import "./BullaGroup.sol";
 struct FeeInfo {
     address payable collectionAddress;
     uint32 feeBasisPoints;
-    uint32 bullaThreshold; //# of BULLA tokens held to get fee reduction
+    uint32 bullaTokenThreshold; //# of BULLA tokens held to get fee reduction
     uint32 reducedFeeBasisPoints; //reduced fee for BULLA token holders
 }
 
@@ -21,15 +21,6 @@ contract BullaManager {
         _;
     }
 
-    event NewBullaGroup(
-        address indexed bullaManager,
-        address indexed bullaGroup,
-        address owner,
-        string description,
-        bytes32 groupType,
-        bool requireMembership,
-        uint256 blocktime
-    );
     event FeeChanged(
         address indexed bullaManager,
         uint256 prevFee,
@@ -145,10 +136,10 @@ contract BullaManager {
 
     //Set threshold of BULLA tokens owned that are required to receive reduced fee
     function setbullaThreshold(uint32 _threshold) external onlyOwner {
-        feeInfo.bullaThreshold = _threshold;
+        feeInfo.bullaTokenThreshold = _threshold;
         emit FeeThresholdChanged(
             address(this),
-            feeInfo.bullaThreshold,
+            feeInfo.bullaTokenThreshold,
             _threshold,
             block.timestamp
         );

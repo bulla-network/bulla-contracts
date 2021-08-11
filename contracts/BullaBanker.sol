@@ -20,12 +20,13 @@ contract BullaBanker {
         address indexed creditor,
         address indexed debtor,
         string description,
+        bytes32 tag,
         uint256 claimAmount,
         uint256 dueBy,
         uint256 blocktime
     );
 
-    event BullaTagUpdate(
+    event BullaTagUpdated(
         address indexed bullaManager,
         address indexed bullaClaim,
         bytes32 creditorTag,
@@ -62,6 +63,7 @@ contract BullaBanker {
             creditor,
             debtor,
             description,
+            bullaTag,
             claimAmount,
             dueBy,
             block.timestamp
@@ -72,7 +74,7 @@ contract BullaBanker {
         if (msg.sender == debtor) newTag.debtorTag = bullaTag;
         bullaTags[address(newBullaClaim)] = newTag;
 
-        emit BullaTagUpdate(
+        emit BullaTagUpdated(
             bullaManager,
             address(newBullaClaim),
             newTag.creditorTag,
@@ -92,7 +94,7 @@ contract BullaBanker {
             bullaTags[_bullaClaim].creditorTag = newTag;
         if (msg.sender == bullaClaim.debtor())
             bullaTags[_bullaClaim].debtorTag = newTag;
-        emit BullaTagUpdate(
+        emit BullaTagUpdated(
             bullaManager,
             address(bullaClaim),
             bullaTags[_bullaClaim].creditorTag,
