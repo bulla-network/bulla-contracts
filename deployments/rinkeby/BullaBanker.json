@@ -1,0 +1,327 @@
+{
+  "address": "0x6Ebe1829954b1a797275F3851d6191Ae7f302524",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_bullaManager",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_implementation",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "bullaManager",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "bullaClaim",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "creditor",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "debtor",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "description",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "tag",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "claimAmount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "dueBy",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "blocktime",
+          "type": "uint256"
+        }
+      ],
+      "name": "BullaBankerClaimCreated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "bullaManager",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "bullaClaim",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "creditorTag",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "debtorTag",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "blocktime",
+          "type": "uint256"
+        }
+      ],
+      "name": "BullaTagUpdated",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "bullaManager",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "bullaTags",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "creditorTag",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "debtorTag",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "claimAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address payable",
+          "name": "creditor",
+          "type": "address"
+        },
+        {
+          "internalType": "address payable",
+          "name": "debtor",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "description",
+          "type": "string"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "bullaTag",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "dueBy",
+          "type": "uint256"
+        }
+      ],
+      "name": "createBullaClaim",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "implementation",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_bullaClaim",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "newTag",
+          "type": "bytes32"
+        }
+      ],
+      "name": "updateBullaTag",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x62550100af2936de34805e43f4d57981b2d861d3c3b165183d2f7749df668a48",
+  "receipt": {
+    "to": null,
+    "from": "0x3b6Ac45817b3bB0544C19412Fbe8B022D0a4db61",
+    "contractAddress": "0x6Ebe1829954b1a797275F3851d6191Ae7f302524",
+    "transactionIndex": 14,
+    "gasUsed": "594503",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0xfd1e41d1d3206466d6ba022d5b187005b052e2b4186d65d2342b35bccf2d8d52",
+    "transactionHash": "0x62550100af2936de34805e43f4d57981b2d861d3c3b165183d2f7749df668a48",
+    "logs": [],
+    "blockNumber": 9126262,
+    "cumulativeGasUsed": "2468682",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [
+    "0x75bd9bE688DACAFB05EB99Bdb81e8F5e53783Db9",
+    "0x706b2Db812C8d340A166764eA2CFD23F6743C478"
+  ],
+  "solcInputHash": "329f5615c573ded6f1ab86986788ab0e",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.3+commit.8d00100c\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_bullaManager\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_implementation\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"bullaManager\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"bullaClaim\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"creditor\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"debtor\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"tag\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"claimAmount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"dueBy\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"blocktime\",\"type\":\"uint256\"}],\"name\":\"BullaBankerClaimCreated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"bullaManager\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"bullaClaim\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"creditorTag\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"debtorTag\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"blocktime\",\"type\":\"uint256\"}],\"name\":\"BullaTagUpdated\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"bullaManager\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"bullaTags\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"creditorTag\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"debtorTag\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"claimAmount\",\"type\":\"uint256\"},{\"internalType\":\"address payable\",\"name\":\"creditor\",\"type\":\"address\"},{\"internalType\":\"address payable\",\"name\":\"debtor\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"},{\"internalType\":\"bytes32\",\"name\":\"bullaTag\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"dueBy\",\"type\":\"uint256\"}],\"name\":\"createBullaClaim\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"implementation\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_bullaClaim\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"newTag\",\"type\":\"bytes32\"}],\"name\":\"updateBullaTag\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/BullaBanker.sol\":\"BullaBanker\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/proxy/Clones.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev https://eips.ethereum.org/EIPS/eip-1167[EIP 1167] is a standard for\\n * deploying minimal proxy contracts, also known as \\\"clones\\\".\\n *\\n * > To simply and cheaply clone contract functionality in an immutable way, this standard specifies\\n * > a minimal bytecode implementation that delegates all calls to a known, fixed address.\\n *\\n * The library includes functions to deploy a proxy using either `create` (traditional deployment) or `create2`\\n * (salted deterministic deployment). It also includes functions to predict the addresses of clones deployed using the\\n * deterministic method.\\n *\\n * _Available since v3.4._\\n */\\nlibrary Clones {\\n    /**\\n     * @dev Deploys and returns the address of a clone that mimics the behaviour of `implementation`.\\n     *\\n     * This function uses the create opcode, which should never revert.\\n     */\\n    function clone(address implementation) internal returns (address instance) {\\n        assembly {\\n            let ptr := mload(0x40)\\n            mstore(ptr, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)\\n            mstore(add(ptr, 0x14), shl(0x60, implementation))\\n            mstore(add(ptr, 0x28), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)\\n            instance := create(0, ptr, 0x37)\\n        }\\n        require(instance != address(0), \\\"ERC1167: create failed\\\");\\n    }\\n\\n    /**\\n     * @dev Deploys and returns the address of a clone that mimics the behaviour of `implementation`.\\n     *\\n     * This function uses the create2 opcode and a `salt` to deterministically deploy\\n     * the clone. Using the same `implementation` and `salt` multiple time will revert, since\\n     * the clones cannot be deployed twice at the same address.\\n     */\\n    function cloneDeterministic(address implementation, bytes32 salt) internal returns (address instance) {\\n        assembly {\\n            let ptr := mload(0x40)\\n            mstore(ptr, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)\\n            mstore(add(ptr, 0x14), shl(0x60, implementation))\\n            mstore(add(ptr, 0x28), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)\\n            instance := create2(0, ptr, 0x37, salt)\\n        }\\n        require(instance != address(0), \\\"ERC1167: create2 failed\\\");\\n    }\\n\\n    /**\\n     * @dev Computes the address of a clone deployed using {Clones-cloneDeterministic}.\\n     */\\n    function predictDeterministicAddress(\\n        address implementation,\\n        bytes32 salt,\\n        address deployer\\n    ) internal pure returns (address predicted) {\\n        assembly {\\n            let ptr := mload(0x40)\\n            mstore(ptr, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)\\n            mstore(add(ptr, 0x14), shl(0x60, implementation))\\n            mstore(add(ptr, 0x28), 0x5af43d82803e903d91602b57fd5bf3ff00000000000000000000000000000000)\\n            mstore(add(ptr, 0x38), shl(0x60, deployer))\\n            mstore(add(ptr, 0x4c), salt)\\n            mstore(add(ptr, 0x6c), keccak256(ptr, 0x37))\\n            predicted := keccak256(add(ptr, 0x37), 0x55)\\n        }\\n    }\\n\\n    /**\\n     * @dev Computes the address of a clone deployed using {Clones-cloneDeterministic}.\\n     */\\n    function predictDeterministicAddress(address implementation, bytes32 salt)\\n        internal\\n        view\\n        returns (address predicted)\\n    {\\n        return predictDeterministicAddress(implementation, salt, address(this));\\n    }\\n}\\n\",\"keccak256\":\"0xa3bbab77849522b73d8c6cd3d2ac54bef7580e4354484f35f4cabf55d3d2b3f9\",\"license\":\"MIT\"},\"contracts/BullaBanker.sol\":{\"content\":\"//SPDX-License-Identifier: UNLICENSED\\r\\npragma solidity ^0.8.3;\\r\\n\\r\\n//import \\\"./BullaClaim.sol\\\";\\r\\nimport \\\"@openzeppelin/contracts/proxy/Clones.sol\\\";\\r\\n\\r\\nstruct BullaTag {\\r\\n    bytes32 creditorTag;\\r\\n    bytes32 debtorTag;\\r\\n}\\r\\n\\r\\ninterface IBullaClaim {\\r\\n    function init(\\r\\n        address _bullaManager,\\r\\n        address payable _owner,\\r\\n        address payable _creditor,\\r\\n        address payable _debtor,\\r\\n        string memory _description,\\r\\n        uint256 _claimAmount,\\r\\n        uint256 _dueBy\\r\\n    ) external;\\r\\n\\r\\n    function getCreditor() external view returns (address);\\r\\n\\r\\n    function getDebtor() external view returns (address);\\r\\n}\\r\\n\\r\\ncontract BullaBanker {\\r\\n    address public immutable bullaManager;\\r\\n    mapping(address => BullaTag) public bullaTags;\\r\\n\\r\\n    address public implementation;\\r\\n\\r\\n    event BullaBankerClaimCreated(\\r\\n        address indexed bullaManager,\\r\\n        address bullaClaim,\\r\\n        address owner,\\r\\n        address indexed creditor,\\r\\n        address indexed debtor,\\r\\n        string description,\\r\\n        bytes32 tag,\\r\\n        uint256 claimAmount,\\r\\n        uint256 dueBy,\\r\\n        uint256 blocktime\\r\\n    );\\r\\n\\r\\n    event BullaTagUpdated(\\r\\n        address indexed bullaManager,\\r\\n        address indexed bullaClaim,\\r\\n        bytes32 creditorTag,\\r\\n        bytes32 debtorTag,\\r\\n        uint256 blocktime\\r\\n    );\\r\\n\\r\\n    constructor(address _bullaManager, address _implementation) {\\r\\n        bullaManager = _bullaManager;\\r\\n        implementation = _implementation;\\r\\n    }\\r\\n\\r\\n    function createBullaClaim(\\r\\n        uint256 claimAmount,\\r\\n        address payable creditor,\\r\\n        address payable debtor,\\r\\n        string memory description,\\r\\n        bytes32 bullaTag,\\r\\n        uint256 dueBy\\r\\n    ) external {\\r\\n        address newClaimAddress = Clones.clone(implementation);\\r\\n\\r\\n        IBullaClaim(newClaimAddress).init(\\r\\n            bullaManager,\\r\\n            payable(msg.sender),\\r\\n            creditor,\\r\\n            debtor,\\r\\n            description,\\r\\n            claimAmount,\\r\\n            dueBy\\r\\n        );\\r\\n\\r\\n        emit BullaBankerClaimCreated(\\r\\n            bullaManager,\\r\\n            newClaimAddress,\\r\\n            msg.sender,\\r\\n            creditor,\\r\\n            debtor,\\r\\n            description,\\r\\n            bullaTag,\\r\\n            claimAmount,\\r\\n            dueBy,\\r\\n            block.timestamp\\r\\n        );\\r\\n\\r\\n        BullaTag memory newTag;\\r\\n        if (msg.sender == creditor) newTag.creditorTag = bullaTag;\\r\\n        if (msg.sender == debtor) newTag.debtorTag = bullaTag;\\r\\n        bullaTags[newClaimAddress] = newTag;\\r\\n\\r\\n        emit BullaTagUpdated(\\r\\n            bullaManager,\\r\\n            newClaimAddress,\\r\\n            newTag.creditorTag,\\r\\n            newTag.debtorTag,\\r\\n            block.timestamp\\r\\n        );\\r\\n    }\\r\\n\\r\\n    function updateBullaTag(address _bullaClaim, bytes32 newTag) public {\\r\\n        IBullaClaim bullaClaim = IBullaClaim(_bullaClaim);\\r\\n        require(\\r\\n            msg.sender == bullaClaim.getCreditor() ||\\r\\n                msg.sender == bullaClaim.getDebtor()\\r\\n        );\\r\\n\\r\\n        if (msg.sender == bullaClaim.getCreditor())\\r\\n            bullaTags[_bullaClaim].creditorTag = newTag;\\r\\n        if (msg.sender == bullaClaim.getDebtor())\\r\\n            bullaTags[_bullaClaim].debtorTag = newTag;\\r\\n        emit BullaTagUpdated(\\r\\n            bullaManager,\\r\\n            address(bullaClaim),\\r\\n            bullaTags[_bullaClaim].creditorTag,\\r\\n            bullaTags[_bullaClaim].debtorTag,\\r\\n            block.timestamp\\r\\n        );\\r\\n    }\\r\\n}\\r\\n\\r\\n//\\\"0x7465737400000000000000000000000000000000000000000000000000000000\\\"\\r\\n\",\"keccak256\":\"0xaf02d475ae11ec5857071a9d2e2586c585b85b157d40cc55d4e201625e4386f6\",\"license\":\"UNLICENSED\"}},\"version\":1}",
+  "bytecode": "0x60a060405234801561001057600080fd5b50604051610a45380380610a4583398101604081905261002f91610082565b60609190911b6001600160601b031916608052600180546001600160a01b0319166001600160a01b039092169190911790556100b4565b80516001600160a01b038116811461007d57600080fd5b919050565b60008060408385031215610094578182fd5b61009d83610066565b91506100ab60208401610066565b90509250929050565b60805160601c6109586100ed600039600081816091015281816103c101528181610451015281816104cd01526105ba01526109586000f3fe608060405234801561001057600080fd5b50600436106100575760003560e01c80635c60da1b1461005c5780635e39986f1461008c5780639a1309ce146100b3578063c0265a69146100ef578063cbac4cbe14610104575b600080fd5b60015461006f906001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b61006f7f000000000000000000000000000000000000000000000000000000000000000081565b6100da6100c13660046106b0565b6000602081905290815260409020805460019091015482565b60408051928352602083019190915201610083565b6101026100fd3660046106ef565b610117565b005b61010261011236600461071a565b610412565b6000829050806001600160a01b031663f89d1ec06040518163ffffffff1660e01b815260040160206040518083038186803b15801561015557600080fd5b505afa158015610169573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061018d91906106d3565b6001600160a01b0316336001600160a01b0316148061022d5750806001600160a01b0316637e78fdb96040518163ffffffff1660e01b815260040160206040518083038186803b1580156101e057600080fd5b505afa1580156101f4573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061021891906106d3565b6001600160a01b0316336001600160a01b0316145b61023657600080fd5b806001600160a01b031663f89d1ec06040518163ffffffff1660e01b815260040160206040518083038186803b15801561026f57600080fd5b505afa158015610283573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906102a791906106d3565b6001600160a01b0316336001600160a01b031614156102dc576001600160a01b03831660009081526020819052604090208290555b806001600160a01b0316637e78fdb96040518163ffffffff1660e01b815260040160206040518083038186803b15801561031557600080fd5b505afa158015610329573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061034d91906106d3565b6001600160a01b0316336001600160a01b03161415610385576001600160a01b03831660009081526020819052604090206001018290555b6001600160a01b0383811660009081526020818152604091829020805460019091015483519182529181019190915242818301529051838316927f000000000000000000000000000000000000000000000000000000000000000016917f6983c83be0aec9d6e53954f3349b7b6fb2e8464bcdb1ad55bd2b0a17b24f42d9919081900360600190a3505050565b60015460009061042a906001600160a01b031661060f565b6040516316929ca960e21b81529091506001600160a01b03821690635a4a72a490610485907f00000000000000000000000000000000000000000000000000000000000000009033908b908b908b908f908b90600401610850565b600060405180830381600087803b15801561049f57600080fd5b505af11580156104b3573d6000803e3d6000fd5b50505050846001600160a01b0316866001600160a01b03167f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03167f075eb52bb942edf07479e41db3f82f6d2dfbdb176335fdb9fc5fcd99d997b79b843389898e8a4260405161053097969594939291906108a2565b60405180910390a46040805180820190915260008082526020820152336001600160a01b0388161415610561578381525b336001600160a01b038716141561057a57602081018490525b6001600160a01b038281166000818152602081815260409182902085518082558683015160019092018290558351908152918201524281830152905191927f000000000000000000000000000000000000000000000000000000000000000016917f6983c83be0aec9d6e53954f3349b7b6fb2e8464bcdb1ad55bd2b0a17b24f42d99181900360600190a35050505050505050565b6000604051733d602d80600a3d3981f3363d3d373d3d3d363d7360601b81528260601b60148201526e5af43d82803e903d91602b57fd5bf360881b60288201526037816000f09150506001600160a01b0381166106ab5760405162461bcd60e51b8152602060048201526016602482015275115490cc4c4d8dce8818dc99585d194819985a5b195960521b604482015260640160405180910390fd5b919050565b6000602082840312156106c1578081fd5b81356106cc8161090a565b9392505050565b6000602082840312156106e4578081fd5b81516106cc8161090a565b60008060408385031215610701578081fd5b823561070c8161090a565b946020939093013593505050565b60008060008060008060c08789031215610732578182fd5b8635955060208701356107448161090a565b945060408701356107548161090a565b9350606087013567ffffffffffffffff80821115610770578384fd5b818901915089601f830112610783578384fd5b813581811115610795576107956108f4565b604051601f8201601f19908116603f011681019083821181831017156107bd576107bd6108f4565b816040528281528c60208487010111156107d5578687fd5b8260208601602083013791820160200195909552979a969950949760808101359660a09091013595509350505050565b60008151808452815b8181101561082a5760208185018101518683018201520161080e565b8181111561083b5782602083870101525b50601f01601f19169290920160200192915050565b6001600160a01b038881168252878116602083015286811660408301528516606082015260e06080820181905260009061088c90830186610805565b60a08301949094525060c0015295945050505050565b6001600160a01b0388811682528716602082015260e0604082018190526000906108ce90830188610805565b90508560608301528460808301528360a08301528260c083015298975050505050505050565b634e487b7160e01b600052604160045260246000fd5b6001600160a01b038116811461091f57600080fd5b5056fea26469706673582212205ccd3069623bd797a809d11d80c86db2c8fed689c42bc88b01649997cbe5033364736f6c63430008030033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100575760003560e01c80635c60da1b1461005c5780635e39986f1461008c5780639a1309ce146100b3578063c0265a69146100ef578063cbac4cbe14610104575b600080fd5b60015461006f906001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b61006f7f000000000000000000000000000000000000000000000000000000000000000081565b6100da6100c13660046106b0565b6000602081905290815260409020805460019091015482565b60408051928352602083019190915201610083565b6101026100fd3660046106ef565b610117565b005b61010261011236600461071a565b610412565b6000829050806001600160a01b031663f89d1ec06040518163ffffffff1660e01b815260040160206040518083038186803b15801561015557600080fd5b505afa158015610169573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061018d91906106d3565b6001600160a01b0316336001600160a01b0316148061022d5750806001600160a01b0316637e78fdb96040518163ffffffff1660e01b815260040160206040518083038186803b1580156101e057600080fd5b505afa1580156101f4573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061021891906106d3565b6001600160a01b0316336001600160a01b0316145b61023657600080fd5b806001600160a01b031663f89d1ec06040518163ffffffff1660e01b815260040160206040518083038186803b15801561026f57600080fd5b505afa158015610283573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906102a791906106d3565b6001600160a01b0316336001600160a01b031614156102dc576001600160a01b03831660009081526020819052604090208290555b806001600160a01b0316637e78fdb96040518163ffffffff1660e01b815260040160206040518083038186803b15801561031557600080fd5b505afa158015610329573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061034d91906106d3565b6001600160a01b0316336001600160a01b03161415610385576001600160a01b03831660009081526020819052604090206001018290555b6001600160a01b0383811660009081526020818152604091829020805460019091015483519182529181019190915242818301529051838316927f000000000000000000000000000000000000000000000000000000000000000016917f6983c83be0aec9d6e53954f3349b7b6fb2e8464bcdb1ad55bd2b0a17b24f42d9919081900360600190a3505050565b60015460009061042a906001600160a01b031661060f565b6040516316929ca960e21b81529091506001600160a01b03821690635a4a72a490610485907f00000000000000000000000000000000000000000000000000000000000000009033908b908b908b908f908b90600401610850565b600060405180830381600087803b15801561049f57600080fd5b505af11580156104b3573d6000803e3d6000fd5b50505050846001600160a01b0316866001600160a01b03167f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03167f075eb52bb942edf07479e41db3f82f6d2dfbdb176335fdb9fc5fcd99d997b79b843389898e8a4260405161053097969594939291906108a2565b60405180910390a46040805180820190915260008082526020820152336001600160a01b0388161415610561578381525b336001600160a01b038716141561057a57602081018490525b6001600160a01b038281166000818152602081815260409182902085518082558683015160019092018290558351908152918201524281830152905191927f000000000000000000000000000000000000000000000000000000000000000016917f6983c83be0aec9d6e53954f3349b7b6fb2e8464bcdb1ad55bd2b0a17b24f42d99181900360600190a35050505050505050565b6000604051733d602d80600a3d3981f3363d3d373d3d3d363d7360601b81528260601b60148201526e5af43d82803e903d91602b57fd5bf360881b60288201526037816000f09150506001600160a01b0381166106ab5760405162461bcd60e51b8152602060048201526016602482015275115490cc4c4d8dce8818dc99585d194819985a5b195960521b604482015260640160405180910390fd5b919050565b6000602082840312156106c1578081fd5b81356106cc8161090a565b9392505050565b6000602082840312156106e4578081fd5b81516106cc8161090a565b60008060408385031215610701578081fd5b823561070c8161090a565b946020939093013593505050565b60008060008060008060c08789031215610732578182fd5b8635955060208701356107448161090a565b945060408701356107548161090a565b9350606087013567ffffffffffffffff80821115610770578384fd5b818901915089601f830112610783578384fd5b813581811115610795576107956108f4565b604051601f8201601f19908116603f011681019083821181831017156107bd576107bd6108f4565b816040528281528c60208487010111156107d5578687fd5b8260208601602083013791820160200195909552979a969950949760808101359660a09091013595509350505050565b60008151808452815b8181101561082a5760208185018101518683018201520161080e565b8181111561083b5782602083870101525b50601f01601f19169290920160200192915050565b6001600160a01b038881168252878116602083015286811660408301528516606082015260e06080820181905260009061088c90830186610805565b60a08301949094525060c0015295945050505050565b6001600160a01b0388811682528716602082015260e0604082018190526000906108ce90830188610805565b90508560608301528460808301528360a08301528260c083015298975050505050505050565b634e487b7160e01b600052604160045260246000fd5b6001600160a01b038116811461091f57600080fd5b5056fea26469706673582212205ccd3069623bd797a809d11d80c86db2c8fed689c42bc88b01649997cbe5033364736f6c63430008030033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 246,
+        "contract": "contracts/BullaBanker.sol:BullaBanker",
+        "label": "bullaTags",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_mapping(t_address,t_struct(BullaTag)211_storage)"
+      },
+      {
+        "astId": 248,
+        "contract": "contracts/BullaBanker.sol:BullaBanker",
+        "label": "implementation",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_address"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_bytes32": {
+        "encoding": "inplace",
+        "label": "bytes32",
+        "numberOfBytes": "32"
+      },
+      "t_mapping(t_address,t_struct(BullaTag)211_storage)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => struct BullaTag)",
+        "numberOfBytes": "32",
+        "value": "t_struct(BullaTag)211_storage"
+      },
+      "t_struct(BullaTag)211_storage": {
+        "encoding": "inplace",
+        "label": "struct BullaTag",
+        "members": [
+          {
+            "astId": 208,
+            "contract": "contracts/BullaBanker.sol:BullaBanker",
+            "label": "creditorTag",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bytes32"
+          },
+          {
+            "astId": 210,
+            "contract": "contracts/BullaBanker.sol:BullaBanker",
+            "label": "debtorTag",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_bytes32"
+          }
+        ],
+        "numberOfBytes": "64"
+      }
+    }
+  }
+}
