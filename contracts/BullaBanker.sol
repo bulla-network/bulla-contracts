@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.3;
 
-import "./BullaClaim.sol";
+//import "./BullaClaim.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 
 struct BullaTag {
@@ -9,9 +9,27 @@ struct BullaTag {
     bytes32 debtorTag;
 }
 
+interface IBullaClaim {
+    function init(
+        address _bullaManager,
+        address payable _owner,
+        address payable _creditor,
+        address payable _debtor,
+        string memory _description,
+        uint256 _claimAmount,
+        uint256 _dueBy
+    ) external;
+
+    function getCreditor() external view returns (address);
+
+    function getDebtor() external view returns (address);
+}
+
 contract BullaBanker {
     address public immutable bullaManager;
     mapping(address => BullaTag) public bullaTags;
+
+    address public implementation;
 
     event BullaBankerClaimCreated(
         address indexed bullaManager,
@@ -34,8 +52,9 @@ contract BullaBanker {
         uint256 blocktime
     );
 
-    constructor(address _bullaManager) {
+    constructor(address _bullaManager, address _implementation) {
         bullaManager = _bullaManager;
+        implementation = _implementation;
     }
 
     function createBullaClaim(
@@ -46,7 +65,9 @@ contract BullaBanker {
         bytes32 bullaTag,
         uint256 dueBy
     ) external {
-        BullaClaim newBullaClaim = new BullaClaim(
+        address newClaimAddress = Clones.clone(implementation);
+
+        IBullaClaim(newClaimAddress).init(
             bullaManager,
             payable(msg.sender),
             creditor,
@@ -58,7 +79,7 @@ contract BullaBanker {
 
         emit BullaBankerClaimCreated(
             bullaManager,
-            address(newBullaClaim),
+            newClaimAddress,
             msg.sender,
             creditor,
             debtor,
@@ -72,11 +93,11 @@ contract BullaBanker {
         BullaTag memory newTag;
         if (msg.sender == creditor) newTag.creditorTag = bullaTag;
         if (msg.sender == debtor) newTag.debtorTag = bullaTag;
-        bullaTags[address(newBullaClaim)] = newTag;
+        bullaTags[newClaimAddress] = newTag;
 
         emit BullaTagUpdated(
             bullaManager,
-            address(newBullaClaim),
+            newClaimAddress,
             newTag.creditorTag,
             newTag.debtorTag,
             block.timestamp
@@ -84,15 +105,15 @@ contract BullaBanker {
     }
 
     function updateBullaTag(address _bullaClaim, bytes32 newTag) public {
-        BullaClaim bullaClaim = BullaClaim(_bullaClaim);
+        IBullaClaim bullaClaim = IBullaClaim(_bullaClaim);
         require(
-            msg.sender == bullaClaim.creditor() ||
-                msg.sender == bullaClaim.debtor()
+            msg.sender == bullaClaim.getCreditor() ||
+                msg.sender == bullaClaim.getDebtor()
         );
 
-        if (msg.sender == bullaClaim.creditor())
+        if (msg.sender == bullaClaim.getCreditor())
             bullaTags[_bullaClaim].creditorTag = newTag;
-        if (msg.sender == bullaClaim.debtor())
+        if (msg.sender == bullaClaim.getDebtor())
             bullaTags[_bullaClaim].debtorTag = newTag;
         emit BullaTagUpdated(
             bullaManager,

@@ -14,7 +14,7 @@ import BullaClaimMock from "../../artifacts/contracts/BullaClaim.sol/BullaClaim.
 import { utils } from "ethers";
 chai.use(solidity);
 
-describe("Bulla Claim", function () {
+describe("Bulla Banker", function () {
     let [collector, owner, notOwner, creditor, debtor] = new MockProvider().getWallets();
     let bullaManager: BullaManager;
     let bullaBanker: BullaBanker;
@@ -27,7 +27,12 @@ describe("Bulla Claim", function () {
             collector.address,
             feeBasisPoint,
         ])) as BullaManager;
-        bullaBanker = (await deployContract(owner, BullaBankerMock, [bullaManager.address])) as BullaBanker;
+        const bullaClaim = (await deployContract(owner, BullaClaimMock)) as BullaClaim;
+        const claimImplementation = bullaClaim.address;
+        bullaBanker = (await deployContract(owner, BullaBankerMock, [
+            bullaManager.address,
+            claimImplementation,
+        ])) as BullaBanker;
     });
     describe("Initialize", function () {
         it("should set bulla manager for bulla banker", async function () {

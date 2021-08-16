@@ -119,8 +119,8 @@ describe("Bulla Manager", function () {
     describe("setbullaThreshold", function () {
         it("should set new bulla threshold", async function () {
             await bullaManagerToken.setbullaThreshold(10);
-            let { bullaThreshold } = await bullaManagerToken.getFeeInfo();
-            expect(bullaThreshold).to.equal(10);
+            let { bullaTokenThreshold } = await bullaManagerToken.getFeeInfo();
+            expect(bullaTokenThreshold).to.equal(10);
         });
         it("should emit FeeThresholdChanged event", async function () {
             expect(await bullaManagerToken.setbullaThreshold(10)).to.emit(bullaManagerToken, "FeeThresholdChanged");

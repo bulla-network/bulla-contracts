@@ -18,7 +18,7 @@ interface IBullaManager {
         );
 }
 
-contract BullaClaim {
+contract BullaClaim is Initializable {
     enum ActionType {
         Payment,
         Reject,
@@ -43,13 +43,14 @@ contract BullaClaim {
 
     IBullaManager internal bullaManager;
     address payable public owner; //current owner of claim
-    address payable public creditor;
-    address payable public debtor;
+    address payable creditor;
+    address payable debtor;
 
     uint256 public claimAmount;
     uint256 public dueBy;
     uint256 public paidAmount;
     Status public status;
+    bool isInitialized;
 
     //current price that owner is willing to transfer claim
     uint256 public transferPrice;
@@ -122,7 +123,7 @@ contract BullaClaim {
         uint256 blocktime
     );
 
-    constructor(
+    function init(
         address _bullaManager,
         address payable _owner,
         address payable _creditor,
@@ -130,18 +131,21 @@ contract BullaClaim {
         string memory _description,
         uint256 _claimAmount,
         uint256 _dueBy
-    ) {
+    ) external {
         require(
             _owner == _creditor || _owner == _debtor,
             "owner not a debtor or creditor"
         );
+        require(!isInitialized, "already initialized");
 
+        isInitialized = true;
         bullaManager = IBullaManager(_bullaManager);
         owner = _owner;
         creditor = _creditor;
         debtor = _debtor;
         claimAmount = _claimAmount;
         dueBy = _dueBy;
+
         emit ClaimCreated(
             _bullaManager,
             address(this),
@@ -277,5 +281,13 @@ contract BullaClaim {
         );
         status = Status.Rescinded;
         emitActionEvent(ActionType.Rescind, 0);
+    }
+
+    function getCreditor() external view returns (address) {
+        return creditor;
+    }
+
+    function getDebtor() external view returns (address) {
+        return debtor;
     }
 }

@@ -33,25 +33,26 @@ describe("Bulla Claim", function () {
             feeBasisPoint,
         ])) as BullaManager;
 
-        bullaClaim = (await deployContract(creditor, BullaClaimMock, [
+        bullaClaim = (await deployContract(creditor, BullaClaimMock)) as BullaClaim;
+        await bullaClaim.init(
             bullaManager.address,
             creditor.address,
             creditor.address,
             debtor.address,
             "BullaClaim description",
             claimAmount,
-            60 * 1000,
-        ])) as BullaClaim;
+            60 * 1000
+        );
     });
     describe("Initialize", function () {
         it("should set owner for bulla claim", async function () {
             expect(await bullaClaim.owner()).to.equal(creditor.address);
         });
         it("should set creditor for bulla claim", async function () {
-            expect(await bullaClaim.creditor()).to.equal(creditor.address);
+            expect(await bullaClaim.getCreditor()).to.equal(creditor.address);
         });
         it("should set debtor for bulla claim", async function () {
-            expect(await bullaClaim.debtor()).to.equal(debtor.address);
+            expect(await bullaClaim.getDebtor()).to.equal(debtor.address);
         });
         it("should set claimAmount for bulla claim", async function () {
             expect(await bullaClaim.claimAmount()).to.equal(claimAmount);
@@ -101,7 +102,7 @@ describe("Bulla Claim", function () {
         it("should set creditor to new owner", async function () {
             let newOwner = notOwner;
             await bullaClaim.transferOwnership(newOwner.address);
-            expect(await bullaClaim.creditor()).to.equal(newOwner.address);
+            expect(await bullaClaim.getCreditor()).to.equal(newOwner.address);
         });
         it("should transfer amount from owner", async function () {
             let newOwner = notOwner;
