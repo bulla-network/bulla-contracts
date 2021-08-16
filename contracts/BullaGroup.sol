@@ -110,28 +110,28 @@ contract BullaGroup {
             "only bulla owner's may create a bulla claim"
         );
 
-        BullaClaim newBullaClaim = new BullaClaim(
-            bullaManager,
-            payable(msg.sender),
-            creditor,
-            debtor,
-            description,
-            claimAmount,
-            dueBy
-        );
+        // BullaClaim newBullaClaim = new BullaClaim(
+        //     bullaManager,
+        //     payable(msg.sender),
+        //     creditor,
+        //     debtor,
+        //     description,
+        //     claimAmount,
+        //     dueBy
+        // );
 
-        emit NewBullaClaim(
-            bullaManager,
-            address(this),
-            bullaId,
-            address(newBullaClaim),
-            msg.sender,
-            creditor,
-            debtor,
-            description,
-            claimAmount,
-            dueBy,
-            block.timestamp
-        );
+        // emit NewBullaClaim(
+        //     bullaManager,
+        //     address(this),
+        //     bullaId,
+        //     address(newBullaClaim),
+        //     msg.sender,
+        //     creditor,
+        //     debtor,
+        //     description,
+        //     claimAmount,
+        //     dueBy,
+        //     block.timestamp
+        // );
     }
 }
