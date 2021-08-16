@@ -4,6 +4,7 @@ import { writeFileSync } from "fs";
 
 import ManagerArtifact from "../artifacts/contracts/bullaManager.sol/BullaManager.json";
 import { BullaManager } from "../typechain/BullaManager";
+import { BullaBanker } from "../typechain/BullaBanker";
 
 const dateLabel = (date: Date) => date.toISOString().replace(/\D/g, "");
 const toBytes32 = (stringVal: string) => ethers.utils.formatBytes32String(stringVal);
@@ -15,7 +16,7 @@ const deployCreator = async function () {
     const { deployer } = await getNamedAccounts();
     const [signer] = await ethers.getSigners();
 
-    const { address, receipt } = await deploy("BullaManager", {
+    const { address: managerAddress, receipt: managerReceipt } = await deploy("BullaManager", {
         from: deployer,
         args: [
             ethers.utils.formatBytes32String("from hardhat deploy"),
@@ -24,17 +25,22 @@ const deployCreator = async function () {
         ],
         log: true,
     });
-    console.log(address, toEther(receipt?.gasUsed || 0));
+    console.log(managerAddress, managerReceipt?.gasUsed || 0);
 
-    const creatorContract = new Contract(address, ManagerArtifact.abi) as BullaManager;
+    //const managerContract = new Contract(managerAddress, ManagerArtifact.abi) as BullaManager;
 
-    const pbReceipt = await creatorContract
-        .connect(signer)
-        .createBullaGroup("bulla banker", toBytes32("bulla banker"), false)
-        .then(tx => tx.wait());
+    const { address: implementAddress, receipt: implementReceipt } = await deploy("BullaClaim", {
+        from: deployer,
+        log: true,
+    });
 
-    const pbAddress: string = (pbReceipt.events && pbReceipt.events[0].args?.bullaGroup) || "failed";
-    console.log(pbAddress);
+    const { address: bankerAddress, receipt: bankerReceipt } = await deploy("BullaBanker", {
+        from: deployer,
+        log: true,
+        args: [managerAddress, implementAddress],
+    });
+
+    console.log(bankerAddress);
     const now = new Date();
     const deployInfo = {
         contract: "BullaManager",
@@ -42,11 +48,11 @@ const deployCreator = async function () {
         deployer: deployer,
         chainId: await getChainId(),
         currentTime: now.toISOString(),
-        creatorReceipt: receipt,
-        creatorAddress: address,
-        gasUsed: receipt?.gasUsed,
-        pbReceipt: pbReceipt,
-        personalBanker: pbAddress,
+        managerReceipt: managerReceipt,
+        managerAddress: managerAddress,
+        gasUsed: managerReceipt?.gasUsed,
+        bankerReceipt: bankerReceipt,
+        bankerAddress: bankerAddress,
     };
 
     writeFileSync(`./deploy_info/${deployInfo.filename}`, JSON.stringify(deployInfo, undefined, 4));

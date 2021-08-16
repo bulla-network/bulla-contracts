@@ -83,28 +83,6 @@ contract BullaManager {
         );
     }
 
-    // function createBullaGroup(
-    //     string calldata _description,
-    //     bytes32 groupType,
-    //     bool requireMembership
-    // ) external {
-    //     BullaGroup newGroup = new BullaGroup(
-    //         address(this),
-    //         msg.sender,
-    //         groupType,
-    //         requireMembership
-    //     );
-    //     emit NewBullaGroup(
-    //         address(this),
-    //         address(newGroup),
-    //         msg.sender,
-    //         _description,
-    //         groupType,
-    //         requireMembership,
-    //         block.timestamp
-    //     );
-    // }
-
     function setOwner(address _owner) external onlyOwner {
         owner = _owner;
         emit OwnerChanged(address(this), owner, _owner, block.timestamp);
