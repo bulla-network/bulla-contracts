@@ -111,7 +111,7 @@ contract BullaClaim is Initializable {
     );
 
     event ClaimCreated(
-        address indexed bullaManager,
+        address bullaManager,
         address bullaClaim,
         address owner,
         address indexed creditor,
@@ -119,7 +119,7 @@ contract BullaClaim is Initializable {
         string description,
         uint256 claimAmount,
         uint256 dueBy,
-        address createdBy,
+        address indexed creator,
         uint256 blocktime
     );
 
