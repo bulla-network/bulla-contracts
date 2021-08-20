@@ -131,14 +131,14 @@ contract BullaClaim is Initializable {
         string memory _description,
         uint256 _claimAmount,
         uint256 _dueBy
-    ) external {
+    ) public {
         require(
             _owner == _creditor || _owner == _debtor,
             "owner not a debtor or creditor"
         );
         require(!isInitialized, "already initialized");
-
         isInitialized = true;
+
         bullaManager = IBullaManager(_bullaManager);
         owner = _owner;
         creditor = _creditor;
@@ -156,6 +156,36 @@ contract BullaClaim is Initializable {
             claimAmount,
             dueBy,
             msg.sender,
+            block.timestamp
+        );
+    }
+
+    function init(
+        address _bullaManager,
+        address payable _owner,
+        address payable _creditor,
+        address payable _debtor,
+        string memory _description,
+        uint256 _claimAmount,
+        uint256 _dueBy,
+        Multihash calldata _multihash
+    ) external {
+        init(
+            _bullaManager,
+            _owner,
+            _creditor,
+            _debtor,
+            _description,
+            _claimAmount,
+            _dueBy
+        );
+        multihash = _multihash;
+        emit MultihashAdded(
+            address(bullaManager),
+            address(this),
+            creditor,
+            debtor,
+            multihash,
             block.timestamp
         );
     }
@@ -202,7 +232,7 @@ contract BullaClaim is Initializable {
         bytes32 hash,
         uint8 hashFunction,
         uint8 size
-    ) external onlyOwner {
+    ) public onlyOwner {
         multihash = Multihash(hash, hashFunction, size);
         emit MultihashAdded(
             address(bullaManager),
@@ -289,5 +319,55 @@ contract BullaClaim is Initializable {
 
     function getDebtor() external view returns (address) {
         return debtor;
+    }
+}
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+contract BullaClaimERC20 is BullaClaim {
+    IERC20 public claimToken;
+
+    function payClaim(uint256 paymentAmount) external payable onlyDebtor {
+        require(
+            claimToken.balanceOf(msg.sender) >= claimAmount,
+            "insufficient funds"
+        );
+        require(paidAmount + paymentAmount <= claimAmount, "repaying too much");
+        require(paymentAmount > 0, "payment must be greater than 0");
+
+        uint256 bullaTokenBalance = bullaManager.getBullaBalance(owner);
+        (
+            address payable collectionAddress,
+            uint32 fullFee,
+            uint32 bullaThreshold,
+            uint32 reducedFeeBasisPoints
+        ) = bullaManager.getFeeInfo();
+
+        uint32 fee = bullaThreshold > 0 && bullaTokenBalance >= bullaThreshold
+            ? reducedFeeBasisPoints
+            : fullFee;
+
+        uint256 transactionFee = fee > 0
+            ? (paymentAmount * fee) / 10000 //calculateFee(feeBasisPoints, msg.value)
+            : 0;
+
+        //DOES this protect against re-entrancy? moved effect before transfer
+        paidAmount += paymentAmount;
+        paidAmount == claimAmount ? status = Status.Paid : status = Status
+            .Repaying;
+
+        claimToken.transfer(creditor, paymentAmount - transactionFee);
+        emitActionEvent(ActionType.Payment, claimAmount);
+
+        if (transactionFee > 0) {
+            collectionAddress.transfer(transactionFee);
+        }
+        emit FeePaid(
+            address(bullaManager),
+            address(this),
+            collectionAddress,
+            transactionFee,
+            block.timestamp
+        );
     }
 }

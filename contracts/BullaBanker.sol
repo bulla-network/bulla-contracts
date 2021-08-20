@@ -8,6 +8,11 @@ struct BullaTag {
     bytes32 creditorTag;
     bytes32 debtorTag;
 }
+struct Multihash {
+    bytes32 hash;
+    uint8 hashFunction;
+    uint8 size;
+}
 
 interface IBullaClaim {
     function init(
@@ -18,6 +23,17 @@ interface IBullaClaim {
         string memory _description,
         uint256 _claimAmount,
         uint256 _dueBy
+    ) external;
+
+    function init(
+        address _bullaManager,
+        address payable _owner,
+        address payable _creditor,
+        address payable _debtor,
+        string memory _description,
+        uint256 _claimAmount,
+        uint256 _dueBy,
+        Multihash calldata _multihash
     ) external;
 
     function getCreditor() external view returns (address);
@@ -64,7 +80,7 @@ contract BullaBanker {
         string memory description,
         bytes32 bullaTag,
         uint256 dueBy
-    ) external {
+    ) public returns (address bullaClaim) {
         address newClaimAddress = Clones.clone(implementation);
 
         IBullaClaim(newClaimAddress).init(
@@ -102,6 +118,55 @@ contract BullaBanker {
             newTag.debtorTag,
             block.timestamp
         );
+    }
+
+    function createBullaClaimMultihash(
+        uint256 claimAmount,
+        address payable creditor,
+        address payable debtor,
+        string memory description,
+        bytes32 bullaTag,
+        uint256 dueBy,
+        Multihash calldata multihash
+    ) external {
+        address newClaimAddress = Clones.clone(implementation);
+
+        IBullaClaim(newClaimAddress).init(
+            bullaManager,
+            payable(msg.sender),
+            creditor,
+            debtor,
+            description,
+            claimAmount,
+            dueBy,
+            multihash
+        );
+
+        emit BullaBankerClaimCreated(
+            bullaManager,
+            newClaimAddress,
+            msg.sender,
+            creditor,
+            debtor,
+            description,
+            bullaTag,
+            claimAmount,
+            dueBy,
+            block.timestamp
+        );
+
+        BullaTag memory newTag;
+        if (msg.sender == creditor) newTag.creditorTag = bullaTag;
+        if (msg.sender == debtor) newTag.debtorTag = bullaTag;
+        bullaTags[newClaimAddress] = newTag;
+
+        // emit BullaTagUpdated(
+        //     bullaManager,
+        //     newClaimAddress,
+        //     newTag.creditorTag,
+        //     newTag.debtorTag,
+        //     block.timestamp
+        // );
     }
 
     function updateBullaTag(address _bullaClaim, bytes32 newTag) public {
