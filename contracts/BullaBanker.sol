@@ -80,7 +80,7 @@ contract BullaBanker {
         string memory description,
         bytes32 bullaTag,
         uint256 dueBy
-    ) public returns (address bullaClaim) {
+    ) public {
         address newClaimAddress = Clones.clone(implementation);
 
         IBullaClaim(newClaimAddress).init(
@@ -160,13 +160,13 @@ contract BullaBanker {
         if (msg.sender == debtor) newTag.debtorTag = bullaTag;
         bullaTags[newClaimAddress] = newTag;
 
-        // emit BullaTagUpdated(
-        //     bullaManager,
-        //     newClaimAddress,
-        //     newTag.creditorTag,
-        //     newTag.debtorTag,
-        //     block.timestamp
-        // );
+        emit BullaTagUpdated(
+            bullaManager,
+            newClaimAddress,
+            newTag.creditorTag,
+            newTag.debtorTag,
+            block.timestamp
+        );
     }
 
     function updateBullaTag(address _bullaClaim, bytes32 newTag) public {
