@@ -87,8 +87,8 @@ contract BullaClaim is Initializable {
     );
 
     event MultihashAdded(
-        address indexed bullaManager,
-        address bullaClaim,
+        address bullaManager,
+        address indexed bullaClaim,
         address indexed debtor,
         address indexed creditor,
         Multihash ipfsHash,
@@ -106,7 +106,7 @@ contract BullaClaim is Initializable {
         address indexed bullaClaim,
         address indexed oldOwner,
         address indexed newOwner,
-        uint256 trasferPrice,
+        uint256 transferPrice,
         uint256 blocktime
     );
 
