@@ -27,8 +27,6 @@ const deployCreator = async function () {
     });
     console.log(managerAddress, managerReceipt?.gasUsed || 0);
 
-    //const managerContract = new Contract(managerAddress, ManagerArtifact.abi) as BullaManager;
-
     const { address: implementAddress, receipt: implementReceipt } = await deploy("BullaClaim", {
         from: deployer,
         log: true,

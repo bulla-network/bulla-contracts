@@ -39,7 +39,7 @@ describe("Bulla Banker", function () {
             expect(await bullaBanker.bullaManager()).to.equal(bullaManager.address);
         });
     });
-    describe("Create Claim", function () {
+    describe("Create Standard Claim", function () {
         const creditorTag = utils.formatBytes32String("creditor tag");
         const debtorTag = utils.formatBytes32String("debtor tag");
         let bullaClaim: BullaClaim;
@@ -57,6 +57,58 @@ describe("Bulla Banker", function () {
                 .then(tx => tx.wait());
             const tx_address = receipt.events?.[1].args?.bullaClaim;
             bullaClaim = (await ethers.getContractAt("BullaClaim", tx_address, owner)) as BullaClaim;
+        });
+        it("should have creditor tag", async function () {
+            const bullaTag = await bullaBanker.bullaTags(bullaClaim.address);
+            expect(bullaTag.creditorTag).to.equal(creditorTag);
+        });
+        it("should add debtor tag when debtor updates tags", async function () {
+            await bullaBanker.connect(debtor).updateBullaTag(bullaClaim.address, debtorTag);
+            expect((await bullaBanker.bullaTags(bullaClaim.address)).debtorTag).to.equal(debtorTag);
+        });
+        it("should emit BullaBankerClaimCreated event", async function () {
+            expect(
+                await bullaBanker
+                    .connect(creditor)
+                    .createBullaClaim(
+                        claimAmount,
+                        creditor.address,
+                        debtor.address,
+                        "test",
+                        creditorTag,
+                        utils.hexlify(60 * 1000)
+                    )
+            ).to.emit(bullaBanker, "BullaBankerClaimCreated");
+        });
+    });
+    describe.only("Create Mulithashed Claim", function () {
+        const creditorTag = utils.formatBytes32String("creditor tag");
+        const debtorTag = utils.formatBytes32String("debtor tag");
+        let bullaClaim: BullaClaim;
+        const multihash = {
+            hash: ethers.utils.formatBytes32String("some hash"),
+            hashFunction: 0,
+            size: 0,
+        };
+        this.beforeEach(async function () {
+            let receipt = await bullaBanker
+                .connect(creditor)
+                .createBullaClaimMultihash(
+                    claimAmount,
+                    creditor.address,
+                    debtor.address,
+                    "test",
+                    creditorTag,
+                    utils.hexlify(60 * 1000),
+                    multihash
+                )
+                .then(tx => tx.wait());
+            const tx_address = receipt.events?.[2].args?.bullaClaim;
+            bullaClaim = (await ethers.getContractAt("BullaClaim", tx_address, owner)) as BullaClaim;
+        });
+        it("should set multihash", async function () {
+            const _multihash = await bullaClaim.multihash();
+            expect(_multihash.hash).to.be.equal(multihash.hash);
         });
         it("should have creditor tag", async function () {
             const bullaTag = await bullaBanker.bullaTags(bullaClaim.address);
