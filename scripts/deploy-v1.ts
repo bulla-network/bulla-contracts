@@ -16,7 +16,7 @@ const deployCreator = async function () {
     const { deployer } = await getNamedAccounts();
     const [signer] = await ethers.getSigners();
 
-    const { address: managerAddress, receipt: managerReceipt } = await deploy("BullaManager", {
+    const { address: managerAddress, receipt: managerReceipt,  } = await deploy("BullaManager", {
         from: deployer,
         args: [
             ethers.utils.formatBytes32String("from hardhat deploy"),
@@ -25,7 +25,7 @@ const deployCreator = async function () {
         ],
         log: true,
     });
-    console.log(managerAddress, managerReceipt?.gasUsed || 0);
+    console.log({managerAddress, gasUsed:Number( managerReceipt?.gasUsed || 0)});
 
     const { address: implementAddress, receipt: implementReceipt } = await deploy("BullaClaim", {
         from: deployer,
@@ -38,7 +38,7 @@ const deployCreator = async function () {
         args: [managerAddress, implementAddress],
     });
 
-    console.log(bankerAddress);
+    console.log({bankerAddress, deployedOnBlock: managerReceipt?.blockNumber});
     const now = new Date();
     const deployInfo = {
         contract: "BullaManager",
