@@ -81,7 +81,7 @@ describe("Bulla Banker", function () {
             ).to.emit(bullaBanker, "BullaBankerClaimCreated");
         });
     });
-    describe.only("Create Mulithashed Claim", function () {
+    describe("Create Mulithashed Claim", function () {
         const creditorTag = utils.formatBytes32String("creditor tag");
         const debtorTag = utils.formatBytes32String("debtor tag");
         let bullaClaim: BullaClaim;
