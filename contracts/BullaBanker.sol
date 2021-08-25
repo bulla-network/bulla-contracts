@@ -1,7 +1,6 @@
 //SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.3;
 
-//import "./BullaClaim.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 
 struct BullaTag {
@@ -180,6 +179,7 @@ contract BullaBanker {
             bullaTags[_bullaClaim].creditorTag = newTag;
         if (msg.sender == bullaClaim.getDebtor())
             bullaTags[_bullaClaim].debtorTag = newTag;
+
         emit BullaTagUpdated(
             bullaManager,
             address(bullaClaim),
@@ -189,5 +189,3 @@ contract BullaBanker {
         );
     }
 }
-
-//"0x7465737400000000000000000000000000000000000000000000000000000000"
