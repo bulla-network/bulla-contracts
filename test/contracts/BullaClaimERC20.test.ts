@@ -15,13 +15,6 @@ import { utils } from "ethers";
 
 chai.use(solidity);
 
-const tokenSetup = deployments.createFixture(async () => {
-    await deployments.fixture();
-    const [tokenCreator] = await getUnnamedAccounts();
-    const tokenContract = <ERC20>await ethers.getContract("ERC20Token");
-    return { tokenCreator: tokenCreator, tokenContract };
-});
-
 describe("Bulla Claim ERC20", function () {
     let [collector, owner, notOwner, creditor, debtor] = new MockProvider().getWallets();
     let bullaManager: BullaManager;
@@ -102,7 +95,7 @@ describe("Bulla Claim ERC20", function () {
         });
     });
 
-    describe.only("transferOwnership", function () {
+    describe("transferOwnership", function () {
         it("should transfer ownership", async function () {
             let newOwner = notOwner;
 
@@ -123,25 +116,22 @@ describe("Bulla Claim ERC20", function () {
                 "ClaimTransferred"
             );
         });
-
         it("should set creditor to new owner", async function () {
-            let newOwner = notOwner;
+            const newOwner = notOwner;
             await bullaClaim.setTransferPrice(transferPrice);
             await bullaClaim.connect(newOwner).transferOwnership(newOwner.address, transferPrice);
             expect(await bullaClaim.getCreditor()).to.equal(newOwner.address);
         });
-        it("should transfer amount from owner", async function () {
-            let newOwner = notOwner;
-            //let transferFee = ethers.utils.parseEther("25.0");
+        it("should transfer amount to owner", async function () {
+            const newOwner = notOwner;
+            const preBal = await erc20Contract.balanceOf(creditor.address);
             await bullaClaim.setTransferPrice(transferPrice);
-            // await expect(
-            //     await bullaClaim.connect(newOwner).transferOwnership(newOwner.address, transferPrice)
-            // ).to.changeTokenBalance(creditor, transferPrice);
+            await bullaClaim.connect(newOwner).transferOwnership(newOwner.address, transferPrice);
+            const postBal = await erc20Contract.balanceOf(creditor.address);
+            await expect(postBal.sub(preBal)).to.equal(transferPrice);
         });
         it("should set transfer price to zero", async function () {
-            let newOwner = notOwner;
             await bullaClaim.setTransferPrice(0);
-            //await bullaClaim.transferOwnership(newOwner.address, transferPrice);
             expect(await bullaClaim.transferPrice()).to.equal(0);
         });
         it("should revert transactions from non-owner", async function () {
@@ -149,7 +139,6 @@ describe("Bulla Claim ERC20", function () {
                 bullaClaim.connect(notOwner).transferOwnership(notOwner.address, transferPrice)
             ).to.be.revertedWith("this claim is not transferable by anyone other than owner");
         });
-
         it("should revert transactions when msg value doesnt mtch transfer price", async function () {
             await expect(bullaClaim.transferOwnership(notOwner.address, transferPrice)).to.be.revertedWith(
                 "incorrect value to transfer ownership"
@@ -188,6 +177,7 @@ describe("Bulla Claim ERC20", function () {
             ).to.be.revertedWith("restricted to owner");
         });
     });
+
     describe("payClaim", function () {
         it("should be able to pay the claim in full", async function () {
             await bullaClaim.connect(debtor).payClaim(claimAmount);

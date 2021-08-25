@@ -6,11 +6,12 @@ import { solidity } from "ethereum-waffle";
 
 import { BullaManager } from "../../typechain/BullaManager";
 import { BullaBanker } from "../../typechain/BullaBanker";
-import { BullaClaim } from "../../typechain/BullaClaim";
+import { BullaClaimNative } from "../../typechain/BullaClaimNative";
 
 import BullaManagerMock from "../../artifacts/contracts/BullaManager.sol/BullaManager.json";
 import BullaBankerMock from "../../artifacts/contracts/BullaBanker.sol/BullaBanker.json";
-import BullaClaimMock from "../../artifacts/contracts/BullaClaim.sol/BullaClaim.json";
+//import BullaClaimMock from "../../artifacts/contracts/BullaClaim.sol/BullaClaim.json";
+import BullaClaimNativeMock from "../../artifacts/contracts/BullaClaim.sol/BullaClaimNative.json";
 import { utils } from "ethers";
 chai.use(solidity);
 
@@ -27,7 +28,7 @@ describe("Bulla Banker", function () {
             collector.address,
             feeBasisPoint,
         ])) as BullaManager;
-        const bullaClaim = (await deployContract(owner, BullaClaimMock)) as BullaClaim;
+        const bullaClaim = (await deployContract(owner, BullaClaimNativeMock)) as BullaClaimNative;
         const claimImplementation = bullaClaim.address;
         bullaBanker = (await deployContract(owner, BullaBankerMock, [
             bullaManager.address,
@@ -39,10 +40,10 @@ describe("Bulla Banker", function () {
             expect(await bullaBanker.bullaManager()).to.equal(bullaManager.address);
         });
     });
-    describe("Create Standard Claim", function () {
+    describe.only("Create Standard Claim", function () {
         const creditorTag = utils.formatBytes32String("creditor tag");
         const debtorTag = utils.formatBytes32String("debtor tag");
-        let bullaClaim: BullaClaim;
+        let bullaClaim: BullaClaimNative;
         this.beforeEach(async function () {
             let receipt = await bullaBanker
                 .connect(creditor)
@@ -56,7 +57,7 @@ describe("Bulla Banker", function () {
                 )
                 .then(tx => tx.wait());
             const tx_address = receipt.events?.[1].args?.bullaClaim;
-            bullaClaim = (await ethers.getContractAt("BullaClaim", tx_address, owner)) as BullaClaim;
+            bullaClaim = (await ethers.getContractAt("BullaClaim", tx_address, owner)) as BullaClaimNative;
         });
         it("should have creditor tag", async function () {
             const bullaTag = await bullaBanker.bullaTags(bullaClaim.address);
@@ -64,6 +65,8 @@ describe("Bulla Banker", function () {
         });
         it("should add debtor tag when debtor updates tags", async function () {
             await bullaBanker.connect(debtor).updateBullaTag(bullaClaim.address, debtorTag);
+            const bullaTag = await bullaBanker.bullaTags(bullaClaim.address);
+            console.log(bullaTag);
             expect((await bullaBanker.bullaTags(bullaClaim.address)).debtorTag).to.equal(debtorTag);
         });
         it("should emit BullaBankerClaimCreated event", async function () {
@@ -84,7 +87,7 @@ describe("Bulla Banker", function () {
     describe("Create Mulithashed Claim", function () {
         const creditorTag = utils.formatBytes32String("creditor tag");
         const debtorTag = utils.formatBytes32String("debtor tag");
-        let bullaClaim: BullaClaim;
+        let bullaClaim: BullaClaimNative;
         const multihash = {
             hash: ethers.utils.formatBytes32String("some hash"),
             hashFunction: 0,
@@ -103,8 +106,8 @@ describe("Bulla Banker", function () {
                     multihash
                 )
                 .then(tx => tx.wait());
-            const tx_address = receipt.events?.[2].args?.bullaClaim;
-            bullaClaim = (await ethers.getContractAt("BullaClaim", tx_address, owner)) as BullaClaim;
+            const tx_address = receipt.events?.find(evt => evt.event == "BullaBankerClaimCreated")?.args?.bullaClaim;
+            bullaClaim = (await ethers.getContractAt("BullaClaim", tx_address, owner)) as BullaClaimNative;
         });
         it("should set multihash", async function () {
             const _multihash = await bullaClaim.multihash();
