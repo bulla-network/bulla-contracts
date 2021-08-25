@@ -25,7 +25,7 @@ interface IBullaClaim {
         uint256 _dueBy
     ) external;
 
-    function init(
+    function initMultihash(
         address _bullaManager,
         address payable _owner,
         address payable _creditor,
@@ -131,7 +131,7 @@ contract BullaBanker {
     ) external {
         address newClaimAddress = Clones.clone(implementation);
 
-        IBullaClaim(newClaimAddress).init(
+        IBullaClaim(newClaimAddress).initMultihash(
             bullaManager,
             payable(msg.sender),
             creditor,

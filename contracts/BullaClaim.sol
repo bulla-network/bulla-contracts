@@ -18,7 +18,7 @@ interface IBullaManager {
         );
 }
 
-contract BullaClaim is Initializable {
+abstract contract BullaClaim is Initializable {
     enum ActionType {
         Payment,
         Reject,
@@ -110,6 +110,74 @@ contract BullaClaim is Initializable {
         uint256 blocktime
     );
 
+    function setTransferPrice(uint256 newPrice) external onlyOwner {
+        require(owner == creditor, "only owner can set price");
+        uint256 oldPrice = transferPrice;
+        transferPrice = newPrice;
+        emit TransferPriceUpdated(
+            address(this),
+            oldPrice,
+            newPrice,
+            block.timestamp
+        );
+    }
+
+    function addMultihash(
+        bytes32 hash,
+        uint8 hashFunction,
+        uint8 size
+    ) public onlyOwner {
+        multihash = Multihash(hash, hashFunction, size);
+        emit MultihashAdded(
+            address(bullaManager),
+            address(this),
+            creditor,
+            debtor,
+            multihash,
+            block.timestamp
+        );
+    }
+
+    function emitActionEvent(ActionType actionType, uint256 _paymentAmount)
+        internal
+    {
+        emit ClaimAction(
+            address(bullaManager),
+            address(this),
+            actionType,
+            _paymentAmount,
+            block.timestamp
+        );
+    }
+
+    function rejectClaim() external payable onlyDebtor {
+        require(
+            status == Status.Pending,
+            "cannot reject once payment has been made"
+        );
+        status = Status.Rejected;
+        emitActionEvent(ActionType.Reject, 0);
+    }
+
+    function rescindClaim() external payable onlyCreditor {
+        require(
+            status == Status.Pending,
+            "cannot rescind once payment has been made"
+        );
+        status = Status.Rescinded;
+        emitActionEvent(ActionType.Rescind, 0);
+    }
+
+    function getCreditor() external view returns (address) {
+        return creditor;
+    }
+
+    function getDebtor() external view returns (address) {
+        return debtor;
+    }
+}
+
+contract BullaClaimNative is BullaClaim {
     event ClaimCreated(
         address bullaManager,
         address bullaClaim,
@@ -160,7 +228,7 @@ contract BullaClaim is Initializable {
         );
     }
 
-    function init(
+    function initMultihash(
         address _bullaManager,
         address payable _owner,
         address payable _creditor,
@@ -186,18 +254,6 @@ contract BullaClaim is Initializable {
             creditor,
             debtor,
             multihash,
-            block.timestamp
-        );
-    }
-
-    function setTransferPrice(uint256 newPrice) external onlyOwner {
-        require(owner == creditor, "only owner can set price");
-        uint256 oldPrice = transferPrice;
-        transferPrice = newPrice;
-        emit TransferPriceUpdated(
-            address(this),
-            oldPrice,
-            newPrice,
             block.timestamp
         );
     }
@@ -228,34 +284,6 @@ contract BullaClaim is Initializable {
         );
     }
 
-    function addMultihash(
-        bytes32 hash,
-        uint8 hashFunction,
-        uint8 size
-    ) public onlyOwner {
-        multihash = Multihash(hash, hashFunction, size);
-        emit MultihashAdded(
-            address(bullaManager),
-            address(this),
-            creditor,
-            debtor,
-            multihash,
-            block.timestamp
-        );
-    }
-
-    function emitActionEvent(ActionType actionType, uint256 _paymentAmount)
-        internal
-    {
-        emit ClaimAction(
-            address(bullaManager),
-            address(this),
-            actionType,
-            _paymentAmount,
-            block.timestamp
-        );
-    }
-
     function payClaim() external payable onlyDebtor {
         require(paidAmount + msg.value <= claimAmount, "repaying too much");
         require(msg.value > 0, "payment must be greater than 0");
@@ -276,7 +304,6 @@ contract BullaClaim is Initializable {
             ? (msg.value * fee) / 10000 //calculateFee(feeBasisPoints, msg.value)
             : 0;
 
-        //DOES this protect against re-entrancy? moved effect before transfer
         paidAmount += msg.value;
         paidAmount == claimAmount ? status = Status.Paid : status = Status
             .Repaying;
@@ -294,32 +321,6 @@ contract BullaClaim is Initializable {
             block.timestamp
         );
     }
-
-    function rejectClaim() external payable onlyDebtor {
-        require(
-            status == Status.Pending,
-            "cannot reject once payment has been made"
-        );
-        status = Status.Rejected;
-        emitActionEvent(ActionType.Reject, 0);
-    }
-
-    function rescindClaim() external payable onlyCreditor {
-        require(
-            status == Status.Pending,
-            "cannot rescind once payment has been made"
-        );
-        status = Status.Rescinded;
-        emitActionEvent(ActionType.Rescind, 0);
-    }
-
-    function getCreditor() external view returns (address) {
-        return creditor;
-    }
-
-    function getDebtor() external view returns (address) {
-        return debtor;
-    }
 }
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -327,14 +328,131 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 contract BullaClaimERC20 is BullaClaim {
     IERC20 public claimToken;
 
-    function payClaim(uint256 paymentAmount) external payable onlyDebtor {
+    event ClaimCreated(
+        address bullaManager,
+        address bullaClaim,
+        address owner,
+        address indexed creditor,
+        address indexed debtor,
+        address claimToken,
+        string description,
+        uint256 claimAmount,
+        uint256 dueBy,
+        address indexed creator,
+        uint256 blocktime
+    );
+
+    function init(
+        address _bullaManager,
+        address payable _owner,
+        address payable _creditor,
+        address payable _debtor,
+        string memory _description,
+        uint256 _claimAmount,
+        uint256 _dueBy,
+        address _claimToken
+    ) public {
+        require(
+            _owner == _creditor || _owner == _debtor,
+            "owner not a debtor or creditor"
+        );
+        require(!isInitialized, "already initialized");
+        isInitialized = true;
+
+        bullaManager = IBullaManager(_bullaManager);
+        owner = _owner;
+        creditor = _creditor;
+        debtor = _debtor;
+        claimAmount = _claimAmount;
+        dueBy = _dueBy;
+        claimToken = IERC20(_claimToken);
+
+        emit ClaimCreated(
+            _bullaManager,
+            address(this),
+            owner,
+            creditor,
+            debtor,
+            _claimToken,
+            _description,
+            claimAmount,
+            dueBy,
+            msg.sender,
+            block.timestamp
+        );
+    }
+
+    function initMultiHash(
+        address _bullaManager,
+        address payable _owner,
+        address payable _creditor,
+        address payable _debtor,
+        string memory _description,
+        uint256 _claimAmount,
+        uint256 _dueBy,
+        address _claimToken,
+        Multihash calldata _multihash
+    ) external {
+        init(
+            _bullaManager,
+            _owner,
+            _creditor,
+            _debtor,
+            _description,
+            _claimAmount,
+            _dueBy,
+            _claimToken
+        );
+        multihash = _multihash;
+        emit MultihashAdded(
+            address(bullaManager),
+            address(this),
+            creditor,
+            debtor,
+            multihash,
+            block.timestamp
+        );
+    }
+
+    function transferOwnership(address payable newOwner, uint256 transferAmount)
+        external
+    {
+        require(owner == creditor, "only invoices can be transferred");
+        require(
+            transferPrice > 0 || msg.sender == owner,
+            "this claim is not transferable by anyone other than owner"
+        );
+        require(
+            transferAmount == transferPrice,
+            "incorrect value to transfer ownership"
+        );
+
+        claimToken.transferFrom(msg.sender, owner, transferPrice);
+        address oldOwner = owner;
+        owner = newOwner;
+        creditor = newOwner;
+        transferPrice = 0;
+
+        emit ClaimTransferred(
+            address(this),
+            oldOwner,
+            newOwner,
+            transferPrice,
+            block.timestamp
+        );
+    }
+
+    function payClaim(uint256 paymentAmount) external onlyDebtor {
         require(
             claimToken.balanceOf(msg.sender) >= claimAmount,
             "insufficient funds"
         );
         require(paidAmount + paymentAmount <= claimAmount, "repaying too much");
         require(paymentAmount > 0, "payment must be greater than 0");
-
+        require(
+            claimToken.allowance(msg.sender, address(this)) >= paymentAmount,
+            "must approve transfer"
+        );
         uint256 bullaTokenBalance = bullaManager.getBullaBalance(owner);
         (
             address payable collectionAddress,
@@ -351,16 +469,23 @@ contract BullaClaimERC20 is BullaClaim {
             ? (paymentAmount * fee) / 10000 //calculateFee(feeBasisPoints, msg.value)
             : 0;
 
-        //DOES this protect against re-entrancy? moved effect before transfer
         paidAmount += paymentAmount;
         paidAmount == claimAmount ? status = Status.Paid : status = Status
             .Repaying;
 
-        claimToken.transfer(creditor, paymentAmount - transactionFee);
+        claimToken.transferFrom(
+            msg.sender,
+            creditor,
+            paymentAmount - transactionFee
+        );
         emitActionEvent(ActionType.Payment, claimAmount);
 
         if (transactionFee > 0) {
-            collectionAddress.transfer(transactionFee);
+            claimToken.transferFrom(
+                msg.sender,
+                collectionAddress,
+                transactionFee
+            );
         }
         emit FeePaid(
             address(bullaManager),

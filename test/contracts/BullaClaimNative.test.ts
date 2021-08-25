@@ -5,17 +5,17 @@ import { deployContract, MockProvider } from "ethereum-waffle";
 import { solidity } from "ethereum-waffle";
 
 import { BullaManager } from "../../typechain/BullaManager";
-import { BullaClaim } from "../../typechain/BullaClaim";
+import { BullaClaimNative } from "../../typechain/BullaClaimNative";
 
 import BullaManagerMock from "../../artifacts/contracts/BullaManager.sol/BullaManager.json";
-import BullaClaimMock from "../../artifacts/contracts/BullaClaim.sol/BullaClaim.json";
+import BullaClaimNativeMock from "../../artifacts/contracts/BullaClaim.sol/BullaClaimNative.json";
 import { utils } from "ethers";
 chai.use(solidity);
 
-describe("Bulla Claim", function () {
+describe("Bulla Claim Native", function () {
     let [collector, owner, notOwner, creditor, debtor] = new MockProvider().getWallets();
     let bullaManager: BullaManager;
-    let bullaClaim: BullaClaim;
+    let bullaClaim: BullaClaimNative;
     enum Status {
         Pending,
         Repaying,
@@ -33,7 +33,8 @@ describe("Bulla Claim", function () {
             feeBasisPoint,
         ])) as BullaManager;
 
-        bullaClaim = (await deployContract(creditor, BullaClaimMock)) as BullaClaim;
+        bullaClaim = (await deployContract(creditor, BullaClaimNativeMock)) as BullaClaimNative;
+
         await bullaClaim.init(
             bullaManager.address,
             creditor.address,
