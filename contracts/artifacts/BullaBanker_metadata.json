@@ -11,6 +11,11 @@
 						"internalType": "address",
 						"name": "_bullaManager",
 						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "_implementation",
+						"type": "address"
 					}
 				],
 				"stateMutability": "nonpayable",
@@ -54,6 +59,12 @@
 						"internalType": "string",
 						"name": "description",
 						"type": "string"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "tag",
+						"type": "bytes32"
 					},
 					{
 						"indexed": false,
@@ -111,7 +122,7 @@
 						"type": "uint256"
 					}
 				],
-				"name": "BullaTagUpdate",
+				"name": "BullaTagUpdated",
 				"type": "event"
 			},
 			{
@@ -182,11 +193,84 @@
 						"internalType": "uint256",
 						"name": "dueBy",
 						"type": "uint256"
+					},
+					{
+						"components": [
+							{
+								"internalType": "bytes32",
+								"name": "hash",
+								"type": "bytes32"
+							},
+							{
+								"internalType": "uint8",
+								"name": "hashFunction",
+								"type": "uint8"
+							},
+							{
+								"internalType": "uint8",
+								"name": "size",
+								"type": "uint8"
+							}
+						],
+						"internalType": "struct Multihash",
+						"name": "multihash",
+						"type": "tuple"
 					}
 				],
 				"name": "createBullaClaim",
 				"outputs": [],
 				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "claimAmount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address payable",
+						"name": "creditor",
+						"type": "address"
+					},
+					{
+						"internalType": "address payable",
+						"name": "debtor",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "description",
+						"type": "string"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "bullaTag",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "uint256",
+						"name": "dueBy",
+						"type": "uint256"
+					}
+				],
+				"name": "createBullaClaim",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "implementation",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
 				"type": "function"
 			},
 			{
@@ -229,8 +313,8 @@
 			"bytecodeHash": "ipfs"
 		},
 		"optimizer": {
-			"enabled": true,
-			"runs": 100
+			"enabled": false,
+			"runs": 200
 		},
 		"remappings": []
 	},
@@ -243,28 +327,12 @@
 				"dweb:/ipfs/QmeEXQ8FLWvLZKVwmfEW1n9Wuv7CqEn66SW9rGHakjaaUb"
 			]
 		},
-		"@openzeppelin/contracts/proxy/utils/Initializable.sol": {
-			"keccak256": "0x8b2abd85d0ece7e866e100e9d47ca9cbec93c87cf71a8d267b2b93eb81f7d5e9",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://fe9fa1beb63e4a09637701f783982ba80380d630d600c9cafe26b68bf58be1b2",
-				"dweb:/ipfs/QmRA3GXhTWys88joD9x8xYhdjzvGwmDGLMMzGw3LxbSEge"
-			]
-		},
 		"BullaBanker.sol": {
-			"keccak256": "0x093c40c6c01a68824bf9e43628c50cfde46f9e82227068d9d490dfdc35bea7db",
+			"keccak256": "0x623c62ad4279657d78dafebf968844437881363e7a62776b4938696d342fff55",
 			"license": "UNLICENSED",
 			"urls": [
-				"bzz-raw://a10fea4588f7edb29081fc54780e725ad990710da661d6ddbbcc4523242da6f3",
-				"dweb:/ipfs/Qmc2SjcnZNwEVF8582hgJtF8nsTzcQu2ZsfddCtpeQFJvL"
-			]
-		},
-		"BullaClaim.sol": {
-			"keccak256": "0x16064a77d8cbbe1f48773b86654446ed76d2d7d31edc30d2737a5656c0a125f1",
-			"license": "UNLICENSED",
-			"urls": [
-				"bzz-raw://1fc5f2c1cafa2d26ac5102022735923c6535bb13cee3fc3f055a13e2830c06e5",
-				"dweb:/ipfs/QmTBRtWfNUZZQnsV3cmrDTHAABbcpqgb8iKH5Nf9JFTeQJ"
+				"bzz-raw://6937e38398bb66b055f0000fec5423ae0c0b8d75c8c7d51930c0ff25c1365e9a",
+				"dweb:/ipfs/QmWznkk2aj8gRn1hiPGQiQCk6GFp3VMoay5LTnNYjmQPAY"
 			]
 		}
 	},

@@ -10,10 +10,12 @@ import { BullaClaimNative } from "../../typechain/BullaClaimNative";
 import BullaManagerMock from "../../artifacts/contracts/BullaManager.sol/BullaManager.json";
 import BullaClaimNativeMock from "../../artifacts/contracts/BullaClaim.sol/BullaClaimNative.json";
 import { utils } from "ethers";
+import { declareSignerWithAddress } from "../test-utils";
+
 chai.use(solidity);
 
 describe("Bulla Claim Native", function () {
-    let [collector, owner, notOwner, creditor, debtor] = new MockProvider().getWallets();
+    let [collector, owner, notOwner, creditor, debtor] = declareSignerWithAddress();
     let bullaManager: BullaManager;
     let bullaClaim: BullaClaimNative;
     enum Status {
@@ -27,6 +29,7 @@ describe("Bulla Claim Native", function () {
     let claimAmount = ethers.utils.parseEther("100.0");
     let feeBasisPoint = 1000;
     this.beforeEach(async function () {
+        [collector, owner, notOwner, creditor, debtor] = await ethers.getSigners();
         bullaManager = (await deployContract(owner, BullaManagerMock, [
             ethers.utils.formatBytes32String("Bulla Manager Test"),
             collector.address,

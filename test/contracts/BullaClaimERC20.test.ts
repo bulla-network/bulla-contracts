@@ -12,11 +12,12 @@ import BullaManagerMock from "../../artifacts/contracts/BullaManager.sol/BullaMa
 import BullaClaimERC20Mock from "../../artifacts/contracts/BullaClaim.sol/BullaClaimERC20.json";
 import ERC20Mock from "../../artifacts/contracts/BullaToken.sol/BullaToken.json";
 import { utils } from "ethers";
+import { declareSignerWithAddress } from "../test-utils";
 
 chai.use(solidity);
 
 describe("Bulla Claim ERC20", function () {
-    let [collector, owner, notOwner, creditor, debtor] = new MockProvider().getWallets();
+    let [collector, owner, notOwner, creditor, debtor] = declareSignerWithAddress();
     let bullaManager: BullaManager;
     let bullaClaim: BullaClaimERC20;
     let erc20Contract: ERC20;
@@ -33,6 +34,7 @@ describe("Bulla Claim ERC20", function () {
     const transferPrice = 80;
     let feeBasisPoint = 1000;
     this.beforeEach(async function () {
+        [collector, owner, notOwner, creditor, debtor] = await ethers.getSigners();
         erc20Contract = (await deployContract(debtor, ERC20Mock)) as ERC20;
 
         bullaManager = (await deployContract(owner, BullaManagerMock, [
