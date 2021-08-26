@@ -23,3 +23,4 @@
 //TODO: Look into packing
 - https://docs.soliditylang.org/en/v0.8.3/internals/layout_in_storage.html
 - https://medium.com/coinmonks/gas-optimization-in-solidity-part-i-variables-9d5775e43dde
+remixd -s <path-to-the-shared-folder> -u --remix-ide https://remix.ethereum.org

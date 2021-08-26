@@ -10,19 +10,21 @@ import { BullaClaimNative } from "../../typechain/BullaClaimNative";
 
 import BullaManagerMock from "../../artifacts/contracts/BullaManager.sol/BullaManager.json";
 import BullaBankerMock from "../../artifacts/contracts/BullaBanker.sol/BullaBanker.json";
-//import BullaClaimMock from "../../artifacts/contracts/BullaClaim.sol/BullaClaim.json";
 import BullaClaimNativeMock from "../../artifacts/contracts/BullaClaim.sol/BullaClaimNative.json";
 import { utils } from "ethers";
+import { declareSignerWithAddress } from "../test-utils";
+
 chai.use(solidity);
 
 describe("Bulla Banker", function () {
-    let [collector, owner, notOwner, creditor, debtor] = new MockProvider().getWallets();
+    let [collector, owner, notOwner, creditor, debtor] = declareSignerWithAddress();
     let bullaManager: BullaManager;
     let bullaBanker: BullaBanker;
 
     let claimAmount = ethers.utils.parseEther("100.0");
     let feeBasisPoint = 1000;
     this.beforeEach(async function () {
+        [collector, owner, notOwner, creditor, debtor] = await ethers.getSigners();
         bullaManager = (await deployContract(owner, BullaManagerMock, [
             ethers.utils.formatBytes32String("Bulla Manager Test"),
             collector.address,
@@ -40,7 +42,7 @@ describe("Bulla Banker", function () {
             expect(await bullaBanker.bullaManager()).to.equal(bullaManager.address);
         });
     });
-    describe.only("Create Standard Claim", function () {
+    describe("Create Standard Claim", function () {
         const creditorTag = utils.formatBytes32String("creditor tag");
         const debtorTag = utils.formatBytes32String("debtor tag");
         let bullaClaim: BullaClaimNative;
@@ -65,8 +67,7 @@ describe("Bulla Banker", function () {
         });
         it("should add debtor tag when debtor updates tags", async function () {
             await bullaBanker.connect(debtor).updateBullaTag(bullaClaim.address, debtorTag);
-            const bullaTag = await bullaBanker.bullaTags(bullaClaim.address);
-            console.log(bullaTag);
+
             expect((await bullaBanker.bullaTags(bullaClaim.address)).debtorTag).to.equal(debtorTag);
         });
         it("should emit BullaBankerClaimCreated event", async function () {

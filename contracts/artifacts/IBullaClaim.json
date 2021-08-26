@@ -1,0 +1,192 @@
+{
+	"deploy": {
+		"VM:-": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"main:1": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"ropsten:3": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"rinkeby:4": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"kovan:42": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"görli:5": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"Custom": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		}
+	},
+	"data": {
+		"bytecode": {
+			"generatedSources": [],
+			"linkReferences": {},
+			"object": "",
+			"opcodes": "",
+			"sourceMap": ""
+		},
+		"deployedBytecode": {
+			"generatedSources": [],
+			"immutableReferences": {},
+			"linkReferences": {},
+			"object": "",
+			"opcodes": "",
+			"sourceMap": ""
+		},
+		"gasEstimates": null,
+		"methodIdentifiers": {
+			"getCreditor()": "f89d1ec0",
+			"getDebtor()": "7e78fdb9",
+			"init(address,address,address,address,string,uint256,uint256)": "5a4a72a4",
+			"initMultihash(address,address,address,address,string,uint256,uint256,(bytes32,uint8,uint8))": "b88887b7"
+		}
+	},
+	"abi": [
+		{
+			"inputs": [],
+			"name": "getCreditor",
+			"outputs": [
+				{
+					"internalType": "address",
+					"name": "",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "getDebtor",
+			"outputs": [
+				{
+					"internalType": "address",
+					"name": "",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_bullaManager",
+					"type": "address"
+				},
+				{
+					"internalType": "address payable",
+					"name": "_owner",
+					"type": "address"
+				},
+				{
+					"internalType": "address payable",
+					"name": "_creditor",
+					"type": "address"
+				},
+				{
+					"internalType": "address payable",
+					"name": "_debtor",
+					"type": "address"
+				},
+				{
+					"internalType": "string",
+					"name": "_description",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_claimAmount",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_dueBy",
+					"type": "uint256"
+				}
+			],
+			"name": "init",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_bullaManager",
+					"type": "address"
+				},
+				{
+					"internalType": "address payable",
+					"name": "_owner",
+					"type": "address"
+				},
+				{
+					"internalType": "address payable",
+					"name": "_creditor",
+					"type": "address"
+				},
+				{
+					"internalType": "address payable",
+					"name": "_debtor",
+					"type": "address"
+				},
+				{
+					"internalType": "string",
+					"name": "_description",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_claimAmount",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_dueBy",
+					"type": "uint256"
+				},
+				{
+					"components": [
+						{
+							"internalType": "bytes32",
+							"name": "hash",
+							"type": "bytes32"
+						},
+						{
+							"internalType": "uint8",
+							"name": "hashFunction",
+							"type": "uint8"
+						},
+						{
+							"internalType": "uint8",
+							"name": "size",
+							"type": "uint8"
+						}
+					],
+					"internalType": "struct Multihash",
+					"name": "_multihash",
+					"type": "tuple"
+				}
+			],
+			"name": "initMultihash",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		}
+	]
+}

@@ -10,7 +10,7 @@ import "@nomiclabs/hardhat-solhint";
 import "hardhat-gas-reporter";
 
 const INFURA_API_KEY = process.env.INFURA_API_KEY!;
-const RINKEBY_PRIVATE_KEY = process.env.DEPLOY_PK!;
+const DEPLOY_PK = process.env.DEPLOY_PK!;
 
 const config: HardhatUserConfig = {
     defaultNetwork: "hardhat",
@@ -21,22 +21,22 @@ const config: HardhatUserConfig = {
     networks: {
         rinkeby: {
             url: `https://rinkeby.infura.io/v3/${INFURA_API_KEY}`,
-            accounts: [RINKEBY_PRIVATE_KEY],
+            accounts: [DEPLOY_PK],
             chainId: 4,
         },
         xdai: {
             url: "https://rpc.xdaichain.com",
-            accounts: [RINKEBY_PRIVATE_KEY],
+            accounts: [DEPLOY_PK],
             chainId: 100,
         },
         rsk_testnet: {
             url: `https://public-node.testnet.rsk.co`,
-            accounts: [RINKEBY_PRIVATE_KEY],
+            accounts: [DEPLOY_PK],
             chainId: 31,
         },
         celo_testnet: {
             url: `https://alfajores-forno.celo-testnet.org`,
-            accounts: [RINKEBY_PRIVATE_KEY],
+            accounts: [DEPLOY_PK],
             chainId: 44787,
         },
     },

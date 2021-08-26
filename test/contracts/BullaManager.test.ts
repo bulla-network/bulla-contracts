@@ -7,17 +7,16 @@ import { Wallet } from "@ethersproject/wallet";
 import { BullaManager } from "../../typechain/BullaManager";
 import BullaManagerMock from "../../artifacts/contracts/BullaManager.sol/BullaManager.json";
 import { Contract } from "@ethersproject/contracts";
+import { declareSignerWithAddress } from "../test-utils";
 
 chai.use(solidity);
 
 describe("Bulla Manager", function () {
-    let collector: Wallet;
-    let newOwner: Wallet;
+    let [collector, newOwner, signer] = declareSignerWithAddress();
     let bullaManagerToken: BullaManager;
-    let signer: Wallet;
 
     beforeEach(async function () {
-        [collector, newOwner, signer] = new MockProvider().getWallets();
+        [collector, newOwner, signer] = await ethers.getSigners();
         bullaManagerToken = (await deployContract(signer, BullaManagerMock, [
             ethers.utils.formatBytes32String("Bulla Manager Test"),
             collector.address,
