@@ -324,8 +324,10 @@ contract BullaClaimNative is BullaClaim {
 }
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract BullaClaimERC20 is BullaClaim {
+    using SafeERC20 for IERC20;
     IERC20 public claimToken;
 
     event ClaimCreated(
@@ -427,7 +429,7 @@ contract BullaClaimERC20 is BullaClaim {
             "incorrect value to transfer ownership"
         );
 
-        claimToken.transferFrom(msg.sender, owner, transferPrice);
+        claimToken.safeTransferFrom(msg.sender, owner, transferPrice);
         address oldOwner = owner;
         owner = newOwner;
         creditor = newOwner;
@@ -453,6 +455,7 @@ contract BullaClaimERC20 is BullaClaim {
             claimToken.allowance(msg.sender, address(this)) >= paymentAmount,
             "must approve transfer"
         );
+
         uint256 bullaTokenBalance = bullaManager.getBullaBalance(owner);
         (
             address payable collectionAddress,
@@ -473,7 +476,7 @@ contract BullaClaimERC20 is BullaClaim {
         paidAmount == claimAmount ? status = Status.Paid : status = Status
             .Repaying;
 
-        claimToken.transferFrom(
+        claimToken.safeTransferFrom(
             msg.sender,
             creditor,
             paymentAmount - transactionFee
@@ -481,7 +484,7 @@ contract BullaClaimERC20 is BullaClaim {
         emitActionEvent(ActionType.Payment, claimAmount);
 
         if (transactionFee > 0) {
-            claimToken.transferFrom(
+            claimToken.safeTransferFrom(
                 msg.sender,
                 collectionAddress,
                 transactionFee

@@ -6,7 +6,6 @@ import { solidity } from "ethereum-waffle";
 import { Wallet } from "@ethersproject/wallet";
 import { BullaManager } from "../../typechain/BullaManager";
 import BullaManagerMock from "../../artifacts/contracts/BullaManager.sol/BullaManager.json";
-import { Contract } from "@ethersproject/contracts";
 import { declareSignerWithAddress } from "../test-utils";
 
 chai.use(solidity);
