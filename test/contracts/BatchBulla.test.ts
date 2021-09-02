@@ -4,9 +4,9 @@ import { ethers } from "hardhat";
 import { deployContract, MockProvider } from "ethereum-waffle";
 import { solidity } from "ethereum-waffle";
 
-import { BatchBulla } from "../../typechain/BatchBulla";
-import { BullaManager } from "../../typechain/BullaManager";
-import { BullaGroup } from "../../typechain/BullaGroup";
+// import { BatchBulla } from "../../typechain/BatchBulla";
+// import { BullaManager } from "../../typechain/BullaManager";
+// import { BullaGroup } from "../../typechain/BullaGroup";
 
 // import BullaManagerMock from "../../artifacts/contracts/BullaManager.sol/BullaManager.json";
 // import BatchBullaMock from "../../artifacts/contracts/BatchBulla.sol/BatchBulla.json";
