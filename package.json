@@ -1,7 +1,6 @@
 {
-  "name": "ajt-contracts",
+  "name": "bulla-contracts",
   "version": "1.0.0",
-  "main": "index.ts",
   "license": "MIT",
   "scripts": {
     "compile": "npx hardhat compile",

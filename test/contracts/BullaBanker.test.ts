@@ -16,7 +16,7 @@ import { declareSignerWithAddress } from "../test-utils";
 
 chai.use(solidity);
 
-describe("Bulla Banker", function () {
+describe.only("Bulla Banker", function () {
     let [collector, owner, notOwner, creditor, debtor] = declareSignerWithAddress();
     let bullaManager: BullaManager;
     let bullaBanker: BullaBanker;
@@ -30,8 +30,10 @@ describe("Bulla Banker", function () {
             collector.address,
             feeBasisPoint,
         ])) as BullaManager;
+
         const bullaClaim = (await deployContract(owner, BullaClaimNativeMock)) as BullaClaimNative;
         const claimImplementation = bullaClaim.address;
+
         bullaBanker = (await deployContract(owner, BullaBankerMock, [
             bullaManager.address,
             claimImplementation,
@@ -58,7 +60,7 @@ describe("Bulla Banker", function () {
                     utils.hexlify(60 * 1000)
                 )
                 .then(tx => tx.wait());
-            const tx_address = receipt.events?.[1].args?.bullaClaim;
+            const tx_address = receipt.events?.find(evt => evt.event == "BullaTagUpdated")?.args?.bullaClaim;
             bullaClaim = (await ethers.getContractAt("BullaClaim", tx_address, owner)) as BullaClaimNative;
         });
         it("should have creditor tag", async function () {
@@ -69,20 +71,6 @@ describe("Bulla Banker", function () {
             await bullaBanker.connect(debtor).updateBullaTag(bullaClaim.address, debtorTag);
 
             expect((await bullaBanker.bullaTags(bullaClaim.address)).debtorTag).to.equal(debtorTag);
-        });
-        it("should emit BullaBankerClaimCreated event", async function () {
-            expect(
-                await bullaBanker
-                    .connect(creditor)
-                    .createBullaClaim(
-                        claimAmount,
-                        creditor.address,
-                        debtor.address,
-                        "test",
-                        creditorTag,
-                        utils.hexlify(60 * 1000)
-                    )
-            ).to.emit(bullaBanker, "BullaBankerClaimCreated");
         });
     });
     describe("Create Mulithashed Claim", function () {
@@ -107,7 +95,7 @@ describe("Bulla Banker", function () {
                     multihash
                 )
                 .then(tx => tx.wait());
-            const tx_address = receipt.events?.find(evt => evt.event == "BullaBankerClaimCreated")?.args?.bullaClaim;
+            const tx_address = receipt.events?.find(evt => evt.event == "BullaTagUpdated")?.args?.bullaClaim;
             bullaClaim = (await ethers.getContractAt("BullaClaim", tx_address, owner)) as BullaClaimNative;
         });
         it("should set multihash", async function () {
@@ -121,20 +109,6 @@ describe("Bulla Banker", function () {
         it("should add debtor tag when debtor updates tags", async function () {
             await bullaBanker.connect(debtor).updateBullaTag(bullaClaim.address, debtorTag);
             expect((await bullaBanker.bullaTags(bullaClaim.address)).debtorTag).to.equal(debtorTag);
-        });
-        it("should emit BullaBankerClaimCreated event", async function () {
-            expect(
-                await bullaBanker
-                    .connect(creditor)
-                    .createBullaClaim(
-                        claimAmount,
-                        creditor.address,
-                        debtor.address,
-                        "test",
-                        creditorTag,
-                        utils.hexlify(60 * 1000)
-                    )
-            ).to.emit(bullaBanker, "BullaBankerClaimCreated");
         });
     });
 });

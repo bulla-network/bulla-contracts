@@ -41,23 +41,10 @@ interface IBullaClaim {
 }
 
 contract BullaBanker {
-    address public immutable bullaManager;
+    address public bullaManager;
     mapping(address => BullaTag) public bullaTags;
 
-    address public implementation;
-
-    event BullaBankerClaimCreated(
-        address indexed bullaManager,
-        address bullaClaim,
-        address owner,
-        address indexed creditor,
-        address indexed debtor,
-        string description,
-        bytes32 tag,
-        uint256 claimAmount,
-        uint256 dueBy,
-        uint256 blocktime
-    );
+    address public claimImplementation;
 
     event BullaTagUpdated(
         address indexed bullaManager,
@@ -68,9 +55,16 @@ contract BullaBanker {
         uint256 blocktime
     );
 
-    constructor(address _bullaManager, address _implementation) {
+    event BullaBankerCreated(
+        address indexed bullaManager,
+        address bullaBanker,
+        uint256 blocktime
+    );
+
+    constructor(address _bullaManager, address _claimImplementation) {
         bullaManager = _bullaManager;
-        implementation = _implementation;
+        claimImplementation = _claimImplementation;
+        emit BullaBankerCreated(bullaManager, address(this), block.timestamp);
     }
 
     function createBullaClaim(
@@ -81,7 +75,7 @@ contract BullaBanker {
         bytes32 bullaTag,
         uint256 dueBy
     ) public {
-        address newClaimAddress = Clones.clone(implementation);
+        address newClaimAddress = Clones.clone(claimImplementation);
 
         IBullaClaim(newClaimAddress).init(
             bullaManager,
@@ -91,19 +85,6 @@ contract BullaBanker {
             description,
             claimAmount,
             dueBy
-        );
-
-        emit BullaBankerClaimCreated(
-            bullaManager,
-            newClaimAddress,
-            msg.sender,
-            creditor,
-            debtor,
-            description,
-            bullaTag,
-            claimAmount,
-            dueBy,
-            block.timestamp
         );
 
         BullaTag memory newTag;
@@ -130,7 +111,7 @@ contract BullaBanker {
         uint256 dueBy,
         Multihash calldata multihash
     ) external {
-        address newClaimAddress = Clones.clone(implementation);
+        address newClaimAddress = Clones.clone(claimImplementation);
 
         IBullaClaim(newClaimAddress).initMultihash(
             bullaManager,
@@ -141,19 +122,6 @@ contract BullaBanker {
             claimAmount,
             dueBy,
             multihash
-        );
-
-        emit BullaBankerClaimCreated(
-            bullaManager,
-            newClaimAddress,
-            msg.sender,
-            creditor,
-            debtor,
-            description,
-            bullaTag,
-            claimAmount,
-            dueBy,
-            block.timestamp
         );
 
         BullaTag memory newTag;
