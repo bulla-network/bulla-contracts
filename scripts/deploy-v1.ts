@@ -19,7 +19,7 @@ const deployCreator = async function () {
     const { address: managerAddress, receipt: managerReceipt,  } = await deploy("BullaManager", {
         from: deployer,
         args: [
-            ethers.utils.formatBytes32String("from hardhat deploy"),
+            ethers.utils.formatBytes32String("BullaManager v1"),
             "0x89e03E7980C92fd81Ed3A9b72F5c73fDf57E5e6D",
             0,
         ],
@@ -27,10 +27,11 @@ const deployCreator = async function () {
     });
     console.log({managerAddress, gasUsed:Number( managerReceipt?.gasUsed || 0)});
 
-    const { address: implementAddress, receipt: implementReceipt } = await deploy("BullaClaim", {
+    const { address: implementAddress, receipt: implementReceipt } = await deploy("BullaClaimNative", {
         from: deployer,
         log: true,
     });
+    console.log({ implementAddress, gasUsed:Number( implementReceipt?.gasUsed || 0) })
 
     const { address: bankerAddress, receipt: bankerReceipt } = await deploy("BullaBanker", {
         from: deployer,
@@ -38,7 +39,7 @@ const deployCreator = async function () {
         args: [managerAddress, implementAddress],
     });
 
-    console.log({bankerAddress, deployedOnBlock: managerReceipt?.blockNumber});
+    console.log({bankerAddress, deployedOnBlock: managerReceipt?.blockNumber, gasUsed:Number( bankerReceipt?.gasUsed || 0) });
     const now = new Date();
     const deployInfo = {
         contract: "BullaManager",

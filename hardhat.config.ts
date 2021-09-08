@@ -10,7 +10,9 @@ import "@nomiclabs/hardhat-solhint";
 import "hardhat-gas-reporter";
 
 const INFURA_API_KEY = process.env.INFURA_API_KEY!;
+const GET_BLOCK_API_KEY = process.env.GET_BLOCK_API_KEY!;
 const DEPLOY_PK = process.env.DEPLOY_PK!;
+const DEPLOYER_ADDRESS = process.env.DEPLOYER_ADDRESS!;
 
 const config: HardhatUserConfig = {
     defaultNetwork: "hardhat",
@@ -29,10 +31,10 @@ const config: HardhatUserConfig = {
             accounts: [DEPLOY_PK],
             chainId: 100,
         },
-        rsk_testnet: {
-            url: `https://public-node.testnet.rsk.co`,
+        rsk: {
+            url: `https://rsk.getblock.io/mainnet/?api_key=${GET_BLOCK_API_KEY}`,
             accounts: [DEPLOY_PK],
-            chainId: 31,
+            chainId: 30,
         },
         celo_testnet: {
             url: `https://alfajores-forno.celo-testnet.org`,
@@ -43,10 +45,11 @@ const config: HardhatUserConfig = {
     namedAccounts: {
         deployer: {
             default: 0,
-            4: "0x3b6Ac45817b3bB0544C19412Fbe8B022D0a4db61",
-            100: "0x3b6Ac45817b3bB0544C19412Fbe8B022D0a4db61",
-            31: "0x3b6Ac45817b3bB0544C19412Fbe8B022D0a4db61",
-        },
+            4: DEPLOYER_ADDRESS,
+            100: DEPLOYER_ADDRESS,
+            44787: DEPLOYER_ADDRESS,
+            30: DEPLOYER_ADDRESS,
+         },
     },
     // gasReporter: {
     //     enabled: true,
