@@ -16,7 +16,7 @@ import { declareSignerWithAddress } from "../test-utils";
 
 chai.use(solidity);
 
-describe.only("Bulla Banker", function () {
+describe("Bulla Banker", function () {
     let [collector, owner, notOwner, creditor, debtor] = declareSignerWithAddress();
     let bullaManager: BullaManager;
     let bullaBanker: BullaBanker;
