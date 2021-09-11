@@ -27,12 +27,12 @@ describe("Bulla Manager", function () {
             expect(await bullaManagerToken.owner()).to.equal(signer.address);
         });
         it("should set collection address", async function () {
-            let { collectionAddress } = await bullaManagerToken.getFeeInfo();
+            let [_, collectionAddress] = await bullaManagerToken.getFeeInfo(newOwner.address);
             expect(collectionAddress).to.equal(collector.address);
         });
 
         it("should set fee basis point", async function () {
-            let { feeBasisPoints } = await bullaManagerToken.getFeeInfo();
+            let { feeBasisPoints } = await bullaManagerToken.feeInfo();
             expect(feeBasisPoints).to.equal(100);
         });
 
@@ -75,7 +75,7 @@ describe("Bulla Manager", function () {
     describe("setFee", function () {
         it("should set new fee", async function () {
             await bullaManagerToken.setFee(400);
-            let { feeBasisPoints } = await bullaManagerToken.getFeeInfo();
+            let { feeBasisPoints } = await bullaManagerToken.feeInfo();
             expect(feeBasisPoints).to.equal(400);
         });
         it("should emit FeeChanged event", async function () {
@@ -96,7 +96,7 @@ describe("Bulla Manager", function () {
 
         it("should set new collection address", async function () {
             await bullaManagerToken.setCollectionAddress(newCollector.address);
-            let { collectionAddress } = await bullaManagerToken.getFeeInfo();
+            let { collectionAddress } = await bullaManagerToken.feeInfo();
             expect(collectionAddress).to.equal(newCollector.address);
         });
         it("should emit CollectorChanged event", async function () {
@@ -117,7 +117,7 @@ describe("Bulla Manager", function () {
     describe("setbullaThreshold", function () {
         it("should set new bulla threshold", async function () {
             await bullaManagerToken.setbullaThreshold(10);
-            let { bullaTokenThreshold } = await bullaManagerToken.getFeeInfo();
+            let { bullaTokenThreshold } = await bullaManagerToken.feeInfo();
             expect(bullaTokenThreshold).to.equal(10);
         });
         it("should emit FeeThresholdChanged event", async function () {
@@ -136,7 +136,7 @@ describe("Bulla Manager", function () {
     describe("setReducedFee", function () {
         it("should set new reduced fee", async function () {
             await bullaManagerToken.setReducedFee(10);
-            let { reducedFeeBasisPoints } = await bullaManagerToken.getFeeInfo();
+            let { reducedFeeBasisPoints } = await bullaManagerToken.feeInfo();
             expect(reducedFeeBasisPoints).to.equal(10);
         });
         it("should emit FeeChanged event", async function () {

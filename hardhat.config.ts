@@ -15,7 +15,7 @@ const DEPLOY_PK = process.env.DEPLOY_PK!;
 const config: HardhatUserConfig = {
     defaultNetwork: "hardhat",
     solidity: {
-        version: "0.8.3",
+        compilers: [{ version: "0.8.7" }, { version: "0.8.3" }],
         settings: { optimizer: { enabled: true, runs: 200 } },
     },
     networks: {

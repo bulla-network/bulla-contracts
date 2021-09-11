@@ -9,7 +9,7 @@ import { BullaManager } from "../../typechain/BullaManager";
 import { BullaClaimERC20 } from "../../typechain/BullaClaimERC20";
 
 import BullaManagerMock from "../../artifacts/contracts/BullaManager.sol/BullaManager.json";
-import BullaClaimERC20Mock from "../../artifacts/contracts/BullaClaim.sol/BullaClaimERC20.json";
+import BullaClaimERC20Mock from "../../artifacts/contracts/BullaClaimERC20.sol/BullaClaimERC20.json";
 import ERC20Mock from "../../artifacts/contracts/BullaToken.sol/BullaToken.json";
 import { utils } from "ethers";
 import { declareSignerWithAddress } from "../test-utils";
