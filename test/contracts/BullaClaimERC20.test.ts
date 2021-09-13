@@ -16,7 +16,7 @@ import { declareSignerWithAddress } from "../test-utils";
 
 chai.use(solidity);
 
-describe("Bulla Claim ERC20", function () {
+describe.only("Bulla Claim ERC20", function () {
     let [collector, owner, notOwner, creditor, debtor] = declareSignerWithAddress();
     let bullaManager: BullaManager;
     let bullaClaim: BullaClaimERC20;
@@ -93,7 +93,7 @@ describe("Bulla Claim ERC20", function () {
                     .connect(notOwner)
                     .setTransferPrice(1)
                     .then(tx => tx.wait())
-            ).to.be.revertedWith("restricted to owner");
+            ).to.be.revertedWith("NotOwner");
         });
     });
 
@@ -139,11 +139,11 @@ describe("Bulla Claim ERC20", function () {
         it("should revert transactions from non-owner", async function () {
             await expect(
                 bullaClaim.connect(notOwner).transferOwnership(notOwner.address, transferPrice)
-            ).to.be.revertedWith("this claim is not transferable by anyone other than owner");
+            ).to.be.revertedWith("NotOwner");
         });
-        it("should revert transactions when msg value doesnt mtch transfer price", async function () {
+        it("should revert transactions when msg value doesnt match transfer price", async function () {
             await expect(bullaClaim.transferOwnership(notOwner.address, transferPrice)).to.be.revertedWith(
-                "incorrect value to transfer ownership"
+                "IncorrectValue"
             );
         });
     });
@@ -176,7 +176,7 @@ describe("Bulla Claim ERC20", function () {
                     .connect(notOwner)
                     .addMultihash(someHash, 0, 0)
                     .then(tx => tx.wait())
-            ).to.be.revertedWith("restricted to owner");
+            ).to.be.revertedWith("NotOwner");
         });
     });
 
@@ -210,7 +210,7 @@ describe("Bulla Claim ERC20", function () {
                     .connect(debtor)
                     .payClaim(claimAmount + 10) //claimAmount.add(10))
                     .then(tx => tx.wait())
-            ).to.be.revertedWith("repaying too much");
+            ).to.be.revertedWith("RepayingTooMuch");
         });
         it("should revert transactions that are not paying anything", async function () {
             await expect(
@@ -218,7 +218,7 @@ describe("Bulla Claim ERC20", function () {
                     .connect(debtor)
                     .payClaim(0)
                     .then(tx => tx.wait())
-            ).to.be.revertedWith("payment must be greater than 0");
+            ).to.be.revertedWith("ValueMustBeGreaterThanZero");
         });
     });
     describe("rejectClaim", function () {
@@ -237,7 +237,7 @@ describe("Bulla Claim ERC20", function () {
                     .connect(debtor)
                     .rejectClaim()
                     .then(tx => tx.wait())
-            ).to.be.revertedWith("cannot reject once payment has been made");
+            ).to.be.revertedWith("StatusNotPending");
         });
         it("should revert transactions not coming from debtor", async function () {
             let creditor = owner;
@@ -246,7 +246,7 @@ describe("Bulla Claim ERC20", function () {
                     .connect(creditor)
                     .rejectClaim()
                     .then(tx => tx.wait())
-            ).to.be.revertedWith("restricted to debtor");
+            ).to.be.revertedWith("NotDebtor");
         });
     });
     describe("rescindClaim", function () {
@@ -259,9 +259,7 @@ describe("Bulla Claim ERC20", function () {
         });
         it("should revert when status is not pending", async function () {
             await bullaClaim.connect(debtor).payClaim(100);
-            await expect(bullaClaim.rescindClaim().then(tx => tx.wait())).to.be.revertedWith(
-                "cannot rescind once payment has been made"
-            );
+            await expect(bullaClaim.rescindClaim().then(tx => tx.wait())).to.be.revertedWith("StatusNotPending");
         });
         it("should revert transactions not coming from creditor", async function () {
             await expect(
@@ -269,7 +267,7 @@ describe("Bulla Claim ERC20", function () {
                     .connect(debtor)
                     .rescindClaim()
                     .then(tx => tx.wait())
-            ).to.be.revertedWith("restricted to creditor");
+            ).to.be.revertedWith("NotCreditor");
         });
     });
 });

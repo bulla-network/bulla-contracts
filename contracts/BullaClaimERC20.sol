@@ -7,6 +7,19 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./interfaces/IBullaManager.sol";
 import "./interfaces/IBullaClaimERC20.sol";
 
+error NotCreditor(address sender);
+error NotDebtor(address sender);
+error NotOwner(address sender);
+error NotCreditorOrDebtor(address sender);
+error OwnerNotCreditor(address sender);
+error ClaimCompleted();
+error IncorrectValue(uint256 value, uint256 expectedValue);
+error InsufficientBalance(uint256 senderBalance);
+error InsufficientAllowance(uint256 senderAllowance);
+error RepayingTooMuch(uint256 amount, uint256 expectedAmount);
+error ValueMustBeGreaterThanZero();
+error StatusNotPending(IBullaClaimERC20.Status status);
+
 contract BullaClaimERC20 is IBullaClaimERC20, Initializable {
     using SafeERC20 for IERC20;
 
@@ -28,17 +41,23 @@ contract BullaClaimERC20 is IBullaClaimERC20, Initializable {
     uint256 public transferPrice;
 
     modifier onlyCreditor() {
-        require(creditor == msg.sender, "restricted to creditor");
+        if (creditor != msg.sender) revert NotCreditor(msg.sender);
         _;
     }
 
     modifier onlyDebtor() {
-        require(debtor == msg.sender, "restricted to debtor");
+        if (debtor != msg.sender) revert NotDebtor(msg.sender);
         _;
     }
 
     modifier onlyOwner() {
-        require(owner == msg.sender, "restricted to owner");
+        if (owner != msg.sender) revert NotOwner(msg.sender);
+        _;
+    }
+
+    modifier onlyIncompleteClaim() {
+        if (status != Status.Pending && status != Status.Repaying)
+            revert ClaimCompleted();
         _;
     }
 
@@ -52,10 +71,8 @@ contract BullaClaimERC20 is IBullaClaimERC20, Initializable {
         uint256 _dueBy,
         address _claimToken
     ) public override initializer {
-        require(
-            _owner == _creditor || _owner == _debtor,
-            "owner not a debtor or creditor"
-        );
+        if (_owner != _creditor && _owner != _debtor)
+            revert NotCreditorOrDebtor(_owner);
 
         bullaManager = IBullaManager(_bullaManager);
         owner = _owner;
@@ -112,14 +129,17 @@ contract BullaClaimERC20 is IBullaClaimERC20, Initializable {
         );
     }
 
-    function setTransferPrice(uint256 newPrice) external override onlyOwner {
-        require(owner == creditor, "only owner can set price");
-        require(
-            status == Status.Pending || status == Status.Repaying,
-            "claim is complete"
-        );
+    function setTransferPrice(uint256 newPrice)
+        external
+        override
+        onlyOwner
+        onlyIncompleteClaim
+    {
+        if (owner != creditor) revert OwnerNotCreditor(owner);
+
         uint256 oldPrice = transferPrice;
         transferPrice = newPrice;
+
         emit TransferPriceUpdated(
             address(this),
             oldPrice,
@@ -131,20 +151,15 @@ contract BullaClaimERC20 is IBullaClaimERC20, Initializable {
     function transferOwnership(address payable newOwner, uint256 transferAmount)
         external
         override
+        onlyIncompleteClaim
     {
-        require(owner == creditor, "only invoices can be transferred");
-        require(
-            status == Status.Pending || status == Status.Repaying,
-            "claim is complete"
-        );
-        require(
-            transferPrice > 0 || msg.sender == owner,
-            "this claim is not transferable by anyone other than owner"
-        );
-        require(
-            transferAmount == transferPrice,
-            "incorrect value to transfer ownership"
-        );
+        if (owner != creditor) revert OwnerNotCreditor(owner);
+
+        if (transferPrice == 0 && msg.sender != owner)
+            revert NotOwner(msg.sender);
+
+        if (transferAmount != transferPrice)
+            revert IncorrectValue(transferAmount, transferPrice);
 
         claimToken.safeTransferFrom(msg.sender, owner, transferPrice);
         address oldOwner = owner;
@@ -190,21 +205,20 @@ contract BullaClaimERC20 is IBullaClaimERC20, Initializable {
         );
     }
 
-    function payClaim(uint256 paymentAmount) external override {
-        require(
-            claimToken.balanceOf(msg.sender) >= claimAmount,
-            "insufficient funds"
-        );
-        require(
-            status == Status.Pending || status == Status.Repaying,
-            "claim is complete"
-        );
-        require(paidAmount + paymentAmount <= claimAmount, "repaying too much");
-        require(paymentAmount > 0, "payment must be greater than 0");
-        require(
-            claimToken.allowance(msg.sender, address(this)) >= paymentAmount,
-            "must approve transfer"
-        );
+    function payClaim(uint256 paymentAmount)
+        external
+        override
+        onlyIncompleteClaim
+    {
+        uint256 senderBalance = claimToken.balanceOf(msg.sender);
+
+        if (senderBalance < claimAmount)
+            revert InsufficientBalance(senderBalance);
+
+        if (paidAmount + paymentAmount > claimAmount)
+            revert RepayingTooMuch(paymentAmount, claimAmount - paidAmount);
+
+        if (paymentAmount == 0) revert ValueMustBeGreaterThanZero();
 
         (uint32 fee, address collectionAddress) = bullaManager.getFeeInfo(
             msg.sender
@@ -240,19 +254,15 @@ contract BullaClaimERC20 is IBullaClaimERC20, Initializable {
     }
 
     function rejectClaim() external override onlyDebtor {
-        require(
-            status == Status.Pending,
-            "cannot reject once payment has been made"
-        );
+        if (status != Status.Pending) revert StatusNotPending(status);
+
         status = Status.Rejected;
         emitActionEvent(ActionType.Reject, 0);
     }
 
     function rescindClaim() external override onlyCreditor {
-        require(
-            status == Status.Pending,
-            "cannot rescind once payment has been made"
-        );
+        if (status != Status.Pending) revert StatusNotPending(status);
+
         status = Status.Rescinded;
         emitActionEvent(ActionType.Rescind, 0);
     }

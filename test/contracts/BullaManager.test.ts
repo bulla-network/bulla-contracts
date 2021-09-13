@@ -87,7 +87,7 @@ describe("Bulla Manager", function () {
                     .connect(newOwner)
                     .setFee(400)
                     .then(tx => tx.wait())
-            ).to.be.reverted;
+            ).to.be.revertedWith("NotContractOwner");
         });
     });
 

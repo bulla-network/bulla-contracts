@@ -4,6 +4,8 @@ pragma solidity ^0.8.7;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/IBullaManager.sol";
 
+error NotContractOwner(address _sender);
+
 contract BullaManager is IBullaManager {
     bytes32 public immutable description;
     FeeInfo public feeInfo;
@@ -11,7 +13,7 @@ contract BullaManager is IBullaManager {
     address public owner;
 
     modifier onlyOwner() {
-        require(owner == msg.sender, "restricted to contract owner");
+        if (owner != msg.sender) revert NotContractOwner(msg.sender);
         _;
     }
 
