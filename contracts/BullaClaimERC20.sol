@@ -3,33 +3,13 @@ pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./interfaces/IBullaManager.sol";
+import "./interfaces/IBullaClaimERC20.sol";
 
-contract BullaClaimERC20 is Initializable {
+contract BullaClaimERC20 is IBullaClaimERC20, Initializable {
     using SafeERC20 for IERC20;
 
-    enum ActionType {
-        Payment,
-        Reject,
-        Rescind
-    }
-    enum Status {
-        Pending,
-        Repaying,
-        Paid,
-        Rejected,
-        Rescinded
-    }
-
-    //https://medium.com/temporal-cloud/efficient-usable-and-cheap-storage-of-ipfs-hashes-in-solidity-smart-contracts-eb3bef129eba
-    //structure for storing IPFS hash that may hold documents
-    struct Multihash {
-        bytes32 hash;
-        uint8 hashFunction;
-        uint8 size;
-    }
     Multihash public multihash;
 
     IERC20 public claimToken;
@@ -62,60 +42,6 @@ contract BullaClaimERC20 is Initializable {
         _;
     }
 
-    event ClaimCreated(
-        address bullaManager,
-        address bullaClaim,
-        address owner,
-        address indexed creditor,
-        address indexed debtor,
-        address claimToken,
-        string description,
-        uint256 claimAmount,
-        uint256 dueBy,
-        address indexed creator,
-        uint256 blocktime
-    );
-
-    event ClaimAction(
-        address indexed bullaManager,
-        address indexed bullaClaim,
-        ActionType indexed actionType,
-        uint256 paymentAmount,
-        uint256 blocktime
-    );
-
-    event FeePaid(
-        address indexed bullaManager,
-        address indexed bullaClaim,
-        address indexed collectionAddress,
-        uint256 transactionFee,
-        uint256 blocktime
-    );
-
-    event MultihashAdded(
-        address bullaManager,
-        address indexed bullaClaim,
-        address indexed debtor,
-        address indexed creditor,
-        Multihash ipfsHash,
-        uint256 blocktime
-    );
-
-    event TransferPriceUpdated(
-        address indexed bullaClaim,
-        uint256 oldPrice,
-        uint256 newPrice,
-        uint256 blocktime
-    );
-
-    event ClaimTransferred(
-        address indexed bullaClaim,
-        address indexed oldOwner,
-        address indexed newOwner,
-        uint256 transferPrice,
-        uint256 blocktime
-    );
-
     function init(
         address _bullaManager,
         address payable _owner,
@@ -125,7 +51,7 @@ contract BullaClaimERC20 is Initializable {
         uint256 _claimAmount,
         uint256 _dueBy,
         address _claimToken
-    ) public initializer {
+    ) public override initializer {
         require(
             _owner == _creditor || _owner == _debtor,
             "owner not a debtor or creditor"
@@ -164,7 +90,7 @@ contract BullaClaimERC20 is Initializable {
         uint256 _dueBy,
         address _claimToken,
         Multihash calldata _multihash
-    ) external initializer {
+    ) external override initializer {
         init(
             _bullaManager,
             _owner,
@@ -186,8 +112,12 @@ contract BullaClaimERC20 is Initializable {
         );
     }
 
-    function setTransferPrice(uint256 newPrice) external onlyOwner {
+    function setTransferPrice(uint256 newPrice) external override onlyOwner {
         require(owner == creditor, "only owner can set price");
+        require(
+            status == Status.Pending || status == Status.Repaying,
+            "claim is complete"
+        );
         uint256 oldPrice = transferPrice;
         transferPrice = newPrice;
         emit TransferPriceUpdated(
@@ -200,8 +130,13 @@ contract BullaClaimERC20 is Initializable {
 
     function transferOwnership(address payable newOwner, uint256 transferAmount)
         external
+        override
     {
         require(owner == creditor, "only invoices can be transferred");
+        require(
+            status == Status.Pending || status == Status.Repaying,
+            "claim is complete"
+        );
         require(
             transferPrice > 0 || msg.sender == owner,
             "this claim is not transferable by anyone other than owner"
@@ -230,7 +165,7 @@ contract BullaClaimERC20 is Initializable {
         bytes32 hash,
         uint8 hashFunction,
         uint8 size
-    ) public onlyOwner {
+    ) public override onlyOwner {
         multihash = Multihash(hash, hashFunction, size);
         emit MultihashAdded(
             address(bullaManager),
@@ -248,16 +183,21 @@ contract BullaClaimERC20 is Initializable {
         emit ClaimAction(
             address(bullaManager),
             address(this),
+            msg.sender,
             actionType,
             _paymentAmount,
             block.timestamp
         );
     }
 
-    function payClaim(uint256 paymentAmount) external onlyDebtor {
+    function payClaim(uint256 paymentAmount) external override {
         require(
             claimToken.balanceOf(msg.sender) >= claimAmount,
             "insufficient funds"
+        );
+        require(
+            status == Status.Pending || status == Status.Repaying,
+            "claim is complete"
         );
         require(paidAmount + paymentAmount <= claimAmount, "repaying too much");
         require(paymentAmount > 0, "payment must be greater than 0");
@@ -299,7 +239,7 @@ contract BullaClaimERC20 is Initializable {
         );
     }
 
-    function rejectClaim() external payable onlyDebtor {
+    function rejectClaim() external override onlyDebtor {
         require(
             status == Status.Pending,
             "cannot reject once payment has been made"
@@ -308,7 +248,7 @@ contract BullaClaimERC20 is Initializable {
         emitActionEvent(ActionType.Reject, 0);
     }
 
-    function rescindClaim() external payable onlyCreditor {
+    function rescindClaim() external override onlyCreditor {
         require(
             status == Status.Pending,
             "cannot rescind once payment has been made"
@@ -317,11 +257,11 @@ contract BullaClaimERC20 is Initializable {
         emitActionEvent(ActionType.Rescind, 0);
     }
 
-    function getCreditor() external view returns (address) {
+    function getCreditor() external view override returns (address) {
         return creditor;
     }
 
-    function getDebtor() external view returns (address) {
+    function getDebtor() external view override returns (address) {
         return debtor;
     }
 }

@@ -172,7 +172,7 @@ describe("Bulla Claim Native", function () {
             ).to.be.revertedWith("restricted to owner");
         });
     });
-    describe("payClaim", function () {
+    xdescribe("payClaim", function () {
         it("should be able to pay the claim in full", async function () {
             await bullaClaim.connect(debtor).payClaim({ value: claimAmount });
             expect(await bullaClaim.status()).to.equal(Status.Paid);
@@ -221,7 +221,7 @@ describe("Bulla Claim Native", function () {
             ).to.be.revertedWith("restricted to debtor");
         });
     });
-    describe("rejectClaim", function () {
+    xdescribe("rejectClaim", function () {
         it("should reject pending claim", async function () {
             await bullaClaim.connect(debtor).rejectClaim();
             expect(await bullaClaim.status()).to.be.equal(Status.Rejected);
@@ -249,7 +249,7 @@ describe("Bulla Claim Native", function () {
             ).to.be.revertedWith("restricted to debtor");
         });
     });
-    describe("rescindClaim", function () {
+    xdescribe("rescindClaim", function () {
         let creditor = owner;
         it("should rescind pending claim", async function () {
             await bullaClaim.rescindClaim();

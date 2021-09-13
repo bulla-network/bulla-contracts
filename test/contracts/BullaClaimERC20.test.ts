@@ -220,15 +220,6 @@ describe("Bulla Claim ERC20", function () {
                     .then(tx => tx.wait())
             ).to.be.revertedWith("payment must be greater than 0");
         });
-        it("should revert transactions not coming from debtor", async function () {
-            let creditor = owner;
-            await expect(
-                bullaClaim
-                    .connect(creditor)
-                    .payClaim(0)
-                    .then(tx => tx.wait())
-            ).to.be.revertedWith("restricted to debtor");
-        });
     });
     describe("rejectClaim", function () {
         it("should reject pending claim", async function () {
@@ -259,7 +250,6 @@ describe("Bulla Claim ERC20", function () {
         });
     });
     describe("rescindClaim", function () {
-        let creditor = owner;
         it("should rescind pending claim", async function () {
             await bullaClaim.rescindClaim();
             expect(await bullaClaim.status()).to.be.equal(Status.Rescinded);
