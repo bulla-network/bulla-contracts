@@ -16,7 +16,7 @@ import { declareSignerWithAddress } from "../test-utils";
 
 chai.use(solidity);
 
-describe.only("Bulla Claim ERC20", function () {
+describe("Bulla Claim ERC20", function () {
     let [collector, owner, notOwner, creditor, debtor] = declareSignerWithAddress();
     let bullaManager: BullaManager;
     let bullaClaim: BullaClaimERC20;

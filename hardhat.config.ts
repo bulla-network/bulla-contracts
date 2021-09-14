@@ -11,6 +11,7 @@ import "hardhat-gas-reporter";
 
 const INFURA_API_KEY = process.env.INFURA_API_KEY!;
 const DEPLOY_PK = process.env.DEPLOY_PK!;
+const COINMARKETCAP_API = process.env.COINMARKETCAP_API!;
 
 const config: HardhatUserConfig = {
     defaultNetwork: "hardhat",
@@ -48,10 +49,11 @@ const config: HardhatUserConfig = {
             31: "0x3b6Ac45817b3bB0544C19412Fbe8B022D0a4db61",
         },
     },
-    // gasReporter: {
-    //     enabled: true,
-    //     currency: "USD",
-    //     gasPrice: 21,
-    // },
+    gasReporter: {
+        enabled: true,
+        currency: "USD",
+        gasPrice: 100,
+        coinmarketcap: COINMARKETCAP_API,
+    },
 };
 export default config;
