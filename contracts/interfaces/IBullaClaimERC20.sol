@@ -4,6 +4,14 @@ pragma solidity ^0.8.7;
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./IBullaManager.sol";
 
+//https://medium.com/temporal-cloud/efficient-usable-and-cheap-storage-of-ipfs-hashes-in-solidity-smart-contracts-eb3bef129eba
+//structure for storing IPFS hash that may hold documents
+struct Multihash {
+    bytes32 hash;
+    uint8 hashFunction;
+    uint8 size;
+}
+
 interface IBullaClaimERC20 {
     enum ActionType {
         Payment,
@@ -16,14 +24,6 @@ interface IBullaClaimERC20 {
         Paid,
         Rejected,
         Rescinded
-    }
-
-    //https://medium.com/temporal-cloud/efficient-usable-and-cheap-storage-of-ipfs-hashes-in-solidity-smart-contracts-eb3bef129eba
-    //structure for storing IPFS hash that may hold documents
-    struct Multihash {
-        bytes32 hash;
-        uint8 hashFunction;
-        uint8 size;
     }
 
     event ClaimCreated(

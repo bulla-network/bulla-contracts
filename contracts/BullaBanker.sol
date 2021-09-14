@@ -2,42 +2,11 @@
 pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/proxy/Clones.sol";
+import "./interfaces/IBullaClaimERC20.sol";
 
 struct BullaTag {
     bytes32 creditorTag;
     bytes32 debtorTag;
-}
-struct Multihash {
-    bytes32 hash;
-    uint8 hashFunction;
-    uint8 size;
-}
-
-interface IBullaClaim {
-    function init(
-        address _bullaManager,
-        address payable _owner,
-        address payable _creditor,
-        address payable _debtor,
-        string memory _description,
-        uint256 _claimAmount,
-        uint256 _dueBy
-    ) external;
-
-    function initMultihash(
-        address _bullaManager,
-        address payable _owner,
-        address payable _creditor,
-        address payable _debtor,
-        string memory _description,
-        uint256 _claimAmount,
-        uint256 _dueBy,
-        Multihash calldata _multihash
-    ) external;
-
-    function getCreditor() external view returns (address);
-
-    function getDebtor() external view returns (address);
 }
 
 contract BullaBanker {
@@ -73,18 +42,20 @@ contract BullaBanker {
         address payable debtor,
         string memory description,
         bytes32 bullaTag,
-        uint256 dueBy
+        uint256 dueBy,
+        address claimToken
     ) public {
         address newClaimAddress = Clones.clone(claimImplementation);
 
-        IBullaClaim(newClaimAddress).init(
+        IBullaClaimERC20(newClaimAddress).init(
             bullaManager,
             payable(msg.sender),
             creditor,
             debtor,
             description,
             claimAmount,
-            dueBy
+            dueBy,
+            claimToken
         );
 
         BullaTag memory newTag;
@@ -109,11 +80,12 @@ contract BullaBanker {
         string memory description,
         bytes32 bullaTag,
         uint256 dueBy,
-        Multihash calldata multihash
+        Multihash calldata multihash,
+        address claimToken
     ) external {
         address newClaimAddress = Clones.clone(claimImplementation);
 
-        IBullaClaim(newClaimAddress).initMultihash(
+        IBullaClaimERC20(newClaimAddress).initMultiHash(
             bullaManager,
             payable(msg.sender),
             creditor,
@@ -121,6 +93,7 @@ contract BullaBanker {
             description,
             claimAmount,
             dueBy,
+            claimToken,
             multihash
         );
 
@@ -140,7 +113,7 @@ contract BullaBanker {
     }
 
     function updateBullaTag(address _bullaClaim, bytes32 newTag) public {
-        IBullaClaim bullaClaim = IBullaClaim(_bullaClaim);
+        IBullaClaimERC20 bullaClaim = IBullaClaimERC20(_bullaClaim);
         require(
             msg.sender == bullaClaim.getCreditor() ||
                 msg.sender == bullaClaim.getDebtor()

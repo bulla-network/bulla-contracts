@@ -32,7 +32,7 @@ describe("Bulla Claim ERC20", function () {
 
     const claimAmount = 100;
     const transferPrice = 80;
-    let feeBasisPoint = 1000;
+    const feeBasisPoint = 1000;
     this.beforeEach(async function () {
         [collector, owner, notOwner, creditor, debtor] = await ethers.getSigners();
         erc20Contract = (await deployContract(debtor, ERC20Mock)) as ERC20;
