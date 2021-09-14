@@ -38,8 +38,8 @@ contract BullaBanker {
 
     function createBullaClaim(
         uint256 claimAmount,
-        address payable creditor,
-        address payable debtor,
+        address creditor,
+        address debtor,
         string memory description,
         bytes32 bullaTag,
         uint256 dueBy,
