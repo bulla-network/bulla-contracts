@@ -83,9 +83,9 @@ interface IBullaClaimERC20 {
 
     function init(
         address _bullaManager,
-        address payable _owner,
-        address payable _creditor,
-        address payable _debtor,
+        address _owner,
+        address _creditor,
+        address _debtor,
         string memory _description,
         uint256 _claimAmount,
         uint256 _dueBy,
@@ -94,9 +94,9 @@ interface IBullaClaimERC20 {
 
     function initMultiHash(
         address _bullaManager,
-        address payable _owner,
-        address payable _creditor,
-        address payable _debtor,
+        address _owner,
+        address _creditor,
+        address _debtor,
         string memory _description,
         uint256 _claimAmount,
         uint256 _dueBy,

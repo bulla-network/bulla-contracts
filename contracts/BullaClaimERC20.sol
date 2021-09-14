@@ -63,9 +63,9 @@ contract BullaClaimERC20 is IBullaClaimERC20, Initializable {
 
     function init(
         address _bullaManager,
-        address payable _owner,
-        address payable _creditor,
-        address payable _debtor,
+        address _owner,
+        address _creditor,
+        address _debtor,
         string memory _description,
         uint256 _claimAmount,
         uint256 _dueBy,
@@ -99,9 +99,9 @@ contract BullaClaimERC20 is IBullaClaimERC20, Initializable {
 
     function initMultiHash(
         address _bullaManager,
-        address payable _owner,
-        address payable _creditor,
-        address payable _debtor,
+        address _owner,
+        address _creditor,
+        address _debtor,
         string memory _description,
         uint256 _claimAmount,
         uint256 _dueBy,
@@ -212,7 +212,7 @@ contract BullaClaimERC20 is IBullaClaimERC20, Initializable {
     {
         uint256 senderBalance = claimToken.balanceOf(msg.sender);
 
-        if (senderBalance < claimAmount)
+        if (senderBalance < claimAmount - paidAmount)
             revert InsufficientBalance(senderBalance);
 
         if (paidAmount + paymentAmount > claimAmount)
