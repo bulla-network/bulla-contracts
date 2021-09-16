@@ -3,7 +3,7 @@
 require("dotenv").config({ path: "./.env" });
 import { HardhatUserConfig } from "hardhat/types";
 import "@nomiclabs/hardhat-ethers";
-import "hardhat-typechain";
+import "@typechain/hardhat"
 import "hardhat-deploy";
 import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-solhint";
