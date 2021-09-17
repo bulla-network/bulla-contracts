@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "compile": "npx hardhat compile",
-    "build": "npx hardhat compile",
+    "compile": "npx hardhat compile && npx tsc typechain/index.ts typechain/**/*.ts",
+    "build": "npm run compile",
     "test": "npx hardhat test",
     "deploy": "npx hardhat run --network rinkeby scripts/deploy-v1.ts"
   },
