@@ -41,9 +41,8 @@ contract BullaClaimERC721 is ERC721, Ownable, IBullaClaimERC721 {
         uint256 blocktime
     );
 
-    modifier onlyCreditor(uint256 tokenId) {
-        if (claimTokens[tokenId].creditor != msg.sender)
-            revert NotCreditor(msg.sender);
+    modifier onlyTokenOwner(uint256 tokenId) {
+        if (ownerOf(tokenId) != msg.sender) revert NotCreditor(msg.sender);
         _;
     }
 
@@ -72,7 +71,6 @@ contract BullaClaimERC721 is ERC721, Ownable, IBullaClaimERC721 {
     }
 
     function createClaim(
-        address owner,
         address creditor,
         address debtor,
         string memory description,
@@ -83,10 +81,9 @@ contract BullaClaimERC721 is ERC721, Ownable, IBullaClaimERC721 {
     ) external override {
         tokenIds.increment();
         uint256 newTokenId = tokenIds.current();
-        _mint(owner, newTokenId);
+        _mint(creditor, newTokenId);
 
         Claim memory newClaim;
-        newClaim.creditor = creditor;
         newClaim.debtor = debtor;
         newClaim.claimAmount = claimAmount;
         newClaim.dueBy = dueBy;
@@ -140,9 +137,10 @@ contract BullaClaimERC721 is ERC721, Ownable, IBullaClaimERC721 {
         claim.paidAmount == claim.claimAmount
             ? claim.status = Status.Paid
             : claim.status = Status.Repaying;
+
         claimToken.safeTransferFrom(
             msg.sender,
-            claim.creditor,
+            ownerOf(tokenId),
             paymentAmount - transactionFee
         );
 
@@ -185,7 +183,7 @@ contract BullaClaimERC721 is ERC721, Ownable, IBullaClaimERC721 {
     function rescindClaim(uint256 tokenId)
         external
         override
-        onlyCreditor(tokenId)
+        onlyTokenOwner(tokenId)
     {
         if (claimTokens[tokenId].status != Status.Pending)
             revert StatusNotPending(claimTokens[tokenId].status);
@@ -207,7 +205,7 @@ contract BullaClaimERC721 is ERC721, Ownable, IBullaClaimERC721 {
             bullaManager,
             tokenId,
             claimTokens[tokenId].debtor,
-            claimTokens[tokenId].creditor,
+            ownerOf(tokenId),
             claimTokens[tokenId].attachment,
             block.timestamp
         );

@@ -26,7 +26,6 @@ struct Claim {
     Status status;
     uint256 dueBy;
     address debtor;
-    address creditor;
     address claimToken;
     Multihash attachment;
 }
@@ -84,7 +83,6 @@ interface IBullaClaimERC721 {
     );
 
     function createClaim(
-        address owner,
         address creditor,
         address debtor,
         string memory description,

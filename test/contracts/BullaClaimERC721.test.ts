@@ -21,6 +21,7 @@ describe.only("Bulla Claim ERC721", function () {
     let bullaManager: BullaManager;
     let erc20Contract: ERC20;
     let bullaClaimERC721: BullaClaimERC721;
+    let claim: any;
 
     const claimAmount = 100;
     const transferPrice = 80;
@@ -45,28 +46,29 @@ describe.only("Bulla Claim ERC721", function () {
             bullaManager.address,
         ])) as BullaClaimERC721;
 
+        await bullaClaimERC721.createClaim(
+            creditor.address,
+            debtor.address,
+            "my claim",
+            claimAmount,
+            dueBy,
+            erc20Contract.address,
+            someMultihash
+        );
+        claim = await bullaClaimERC721.getClaim(1);
+
         await erc20Contract.connect(debtor).approve(bullaClaimERC721.address, claimAmount);
         await erc20Contract.connect(debtor).transfer(notOwner.address, 1000);
         await erc20Contract.connect(notOwner).approve(bullaClaimERC721.address, transferPrice);
     });
     describe("Initialize", function () {
-        it("should set manager address for erc721", async function () {
+        it("should set bulla manager address for erc721", async function () {
             expect(await bullaClaimERC721.bullaManager()).to.equal(bullaManager.address);
         });
     });
     describe("create claim", function () {
-        it("should create new claim", async function () {
-            const newClaim = await bullaClaimERC721.createClaim(
-                owner.address,
-                creditor.address,
-                debtor.address,
-                "my claim",
-                claimAmount,
-                dueBy,
-                erc20Contract.address,
-                someMultihash
-            );
-            expect(await bullaClaimERC721.bullaManager()).to.equal(bullaManager.address);
+        it("should set token 1 owner to creditor", async function () {
+            expect(await bullaClaimERC721.ownerOf(1)).to.equal(creditor.address);
         });
     });
 });
