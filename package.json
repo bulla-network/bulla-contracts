@@ -1,6 +1,6 @@
 {
-  "name": "bulla-contracts",
-  "version": "1.0.0",
+  "name": "@bulla-network/contracts",
+  "version": "0.0.1",
   "license": "MIT",
   "files": [
     "contracts/interfaces",
