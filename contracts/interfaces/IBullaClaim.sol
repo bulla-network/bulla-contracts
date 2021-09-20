@@ -30,7 +30,7 @@ struct Claim {
     Multihash attachment;
 }
 
-interface IBullaClaimERC721 {
+interface IBullaClaim {
     event ClaimCreated(
         address bullaManager,
         uint256 tokenId,
@@ -47,6 +47,7 @@ interface IBullaClaimERC721 {
     event ClaimPayment(
         address indexed bullaManager,
         uint256 indexed tokenId,
+        address indexed debtor,
         address paidBy,
         uint256 paymentAmount,
         uint256 blocktime
@@ -90,7 +91,7 @@ interface IBullaClaimERC721 {
         uint256 dueBy,
         address claimToken,
         Multihash calldata attachment
-    ) external;
+    ) external returns (uint256 newTokenId);
 
     function updateMultihash(
         uint256 tokenId,
