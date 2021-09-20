@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interfaces/IBullaManager.sol";
-import "./interfaces/IBullaClaimERC721.sol";
+import "./interfaces/IBullaClaim.sol";
 
 error NotCreditor(address sender);
 error NotDebtor(address sender);
@@ -26,7 +26,7 @@ struct BatchClaim {
     mapping(uint256 => address) debtorClaims;
 }
 
-contract BullaClaimERC721 is ERC721, Ownable, IBullaClaimERC721 {
+contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
     using SafeERC20 for IERC20;
     using Counters for Counters.Counter;
 
@@ -78,7 +78,7 @@ contract BullaClaimERC721 is ERC721, Ownable, IBullaClaimERC721 {
         uint256 dueBy,
         address claimToken,
         Multihash calldata attachment
-    ) external override {
+    ) external override returns (uint256) {
         tokenIds.increment();
         uint256 newTokenId = tokenIds.current();
         _mint(creditor, newTokenId);
@@ -104,6 +104,8 @@ contract BullaClaimERC721 is ERC721, Ownable, IBullaClaimERC721 {
             dueBy,
             block.timestamp
         );
+
+        return newTokenId;
     }
 
     function payClaim(uint256 tokenId, uint256 paymentAmount)
@@ -147,6 +149,7 @@ contract BullaClaimERC721 is ERC721, Ownable, IBullaClaimERC721 {
         emit ClaimPayment(
             bullaManager,
             tokenId,
+            claim.debtor,
             msg.sender,
             paymentAmount,
             block.timestamp
@@ -158,6 +161,7 @@ contract BullaClaimERC721 is ERC721, Ownable, IBullaClaimERC721 {
                 transactionFee
             );
         }
+
         emit FeePaid(
             bullaManager,
             tokenId,
@@ -166,6 +170,8 @@ contract BullaClaimERC721 is ERC721, Ownable, IBullaClaimERC721 {
             transactionFee,
             block.timestamp
         );
+        //DO I WANT TO DO THIS? @adamgall @christopherdancy
+        if (claim.status == Status.Paid) _burn(tokenId);
     }
 
     function rejectClaim(uint256 tokenId)

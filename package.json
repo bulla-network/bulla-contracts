@@ -6,7 +6,8 @@
     "compile": "npx hardhat compile",
     "build": "npx hardhat compile",
     "test": "npx hardhat test",
-    "deploy": "npx hardhat run --network rinkeby scripts/deploy-v1.ts"
+    "deploy": "npx hardhat run --network rinkeby scripts/deploy-v1.ts",
+    "run-node": "npx hardhat node --fork https://rpc.xdaichain.com"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers@^0.3.0-beta.10",
