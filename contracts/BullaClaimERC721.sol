@@ -21,11 +21,6 @@ error RepayingTooMuch(uint256 amount, uint256 expectedAmount);
 error ValueMustBeGreaterThanZero();
 error StatusNotPending(Status status);
 
-struct BatchClaim {
-    address bullaGroup;
-    mapping(uint256 => address) debtorClaims;
-}
-
 contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
     using SafeERC20 for IERC20;
     using Counters for Counters.Counter;
@@ -170,6 +165,7 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
             transactionFee,
             block.timestamp
         );
+
         //DO I WANT TO DO THIS? @adamgall @christopherdancy
         if (claim.status == Status.Paid) _burn(tokenId);
     }

@@ -70,5 +70,9 @@ describe.only("Bulla Claim ERC721", function () {
         it("should set token 1 owner to creditor", async function () {
             expect(await bullaClaimERC721.ownerOf(1)).to.equal(creditor.address);
         });
+        it("should set token 1 claim debtor to debtor", async function () {
+            const claim = await bullaClaimERC721.getClaim(1);
+            expect(claim.debtor).to.equal(debtor.address);
+        });
     });
 });

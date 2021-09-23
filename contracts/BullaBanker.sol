@@ -83,7 +83,8 @@ contract BullaBanker {
         Claim memory bullaClaim = _bullaClaimERC721.getClaim(tokenId);
         address claimOwner = _bullaClaimERC721.ownerOf(tokenId);
 
-        require(msg.sender == claimOwner || msg.sender == bullaClaim.debtor);
+        if (msg.sender != claimOwner && msg.sender != bullaClaim.debtor)
+            revert NotCreditorOrDebtor(msg.sender);
 
         if (msg.sender == claimOwner) bullaTags[tokenId].creditorTag = newTag;
         if (msg.sender == bullaClaim.debtor)
