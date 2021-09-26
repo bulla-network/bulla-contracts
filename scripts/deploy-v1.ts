@@ -19,7 +19,7 @@ const deployCreator = async function () {
     const { address: managerAddress, receipt: managerReceipt,  } = await deploy("BullaManager", {
         from: deployer,
         args: [
-            ethers.utils.formatBytes32String("from hardhat deploy"),
+            ethers.utils.formatBytes32String("ERC20 implementation"),
             "0x89e03E7980C92fd81Ed3A9b72F5c73fDf57E5e6D",
             0,
         ],
@@ -27,7 +27,7 @@ const deployCreator = async function () {
     });
     console.log({managerAddress, gasUsed:Number( managerReceipt?.gasUsed || 0)});
 
-    const { address: implementAddress, receipt: implementReceipt } = await deploy("BullaClaim", {
+    const { address: implementAddress, receipt: implementReceipt } = await deploy("BullaClaimERC20", {
         from: deployer,
         log: true,
     });

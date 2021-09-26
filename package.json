@@ -6,7 +6,10 @@
     "compile": "npx hardhat compile",
     "build": "npx hardhat compile",
     "test": "npx hardhat test",
-    "deploy": "npx hardhat run --network rinkeby scripts/deploy-v1.ts"
+    "deploy:rinkeby": "npx hardhat run --network rinkeby scripts/deploy-v1.ts",
+    "deploy:xdai": "npx hardhat run --network xdai scripts/deploy-v1.ts",
+    "deploy:rsk": "npx hardhat run --network rsk scripts/deploy-v1.ts",
+    "deploy:celo": "npx hardhat run --network celo scripts/deploy-v1.ts"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers@^0.3.0-beta.10",

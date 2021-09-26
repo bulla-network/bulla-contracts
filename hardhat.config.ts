@@ -10,6 +10,7 @@ import "@nomiclabs/hardhat-solhint";
 import "hardhat-gas-reporter";
 
 const INFURA_API_KEY = process.env.INFURA_API_KEY!;
+const GET_BLOCK_API_KEY = process.env.GET_BLOCK_API_KEY!;
 const DEPLOY_PK = process.env.DEPLOY_PK!;
 const COINMARKETCAP_API = process.env.COINMARKETCAP_API!;
 
@@ -30,23 +31,24 @@ const config: HardhatUserConfig = {
             accounts: [DEPLOY_PK],
             chainId: 100,
         },
-        rsk_testnet: {
-            url: `https://public-node.testnet.rsk.co`,
+        rsk: {
+            url: `https://rsk.getblock.io/mainnet/?api_key=${GET_BLOCK_API_KEY}`,
             accounts: [DEPLOY_PK],
-            chainId: 31,
+            chainId: 30,
         },
-        celo_testnet: {
-            url: `https://alfajores-forno.celo-testnet.org`,
+        celo: {
+            url: `https://forno.celo.org`,
             accounts: [DEPLOY_PK],
-            chainId: 44787,
+            chainId: 42220,
         },
     },
     namedAccounts: {
         deployer: {
             default: 0,
-            4: "0x3b6Ac45817b3bB0544C19412Fbe8B022D0a4db61",
-            100: "0x3b6Ac45817b3bB0544C19412Fbe8B022D0a4db61",
-            31: "0x3b6Ac45817b3bB0544C19412Fbe8B022D0a4db61",
+            4: "0xe2B28b58cc5d34872794E861fd1ba1982122B907",
+            100: "0xe2B28b58cc5d34872794E861fd1ba1982122B907",
+            30: "0xe2B28b58cc5d34872794E861fd1ba1982122B907",
+            42220: "0xe2B28b58cc5d34872794E861fd1ba1982122B907",
         },
     },
     gasReporter: {
