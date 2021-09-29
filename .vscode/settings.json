@@ -1,12 +1,16 @@
 {
-    "solidity.compileUsingRemoteVersion": "v0.8.7+commit.e28d00a7",
-    "solidity.packageDefaultDependenciesDirectory": "./node_modules",
-    "files.exclude": {
-        "**/.git": true,
-        "**/.svn": true,
-        "**/.hg": true,
-        "**/CVS": true,
-        "**/.DS_Store": true,
-        "**/node_modules": true
-    }
+  "solidity.compileUsingRemoteVersion": "v0.8.7+commit.e28d00a7",
+  "solidity.packageDefaultDependenciesDirectory": "./node_modules",
+  "solidity.formatter": "prettier", // This is the default so it might be missing.
+  "[solidity]": {
+    "editor.defaultFormatter": "JuanBlanco.solidity"
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true
+    // "**/node_modules": true
+  }
 }
