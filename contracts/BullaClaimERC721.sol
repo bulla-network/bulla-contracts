@@ -7,7 +7,12 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interfaces/IBullaManager.sol";
 import "./interfaces/IBullaClaim.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 
+error ZeroAddress();
+error PastDueDate();
+error ClaimTokenNotContract();
 error NotCreditor(address sender);
 error NotDebtor(address sender);
 error NotTokenOwner(address sender);
@@ -24,6 +29,7 @@ error StatusNotPending(Status status);
 contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
     using SafeERC20 for IERC20;
     using Counters for Counters.Counter;
+    using Address for address;
 
     Counters.Counter private tokenIds;
 
@@ -74,6 +80,19 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
         address claimToken,
         Multihash calldata attachment
     ) external override returns (uint256) {
+        if(creditor == address(0) || debtor ==  address(0)){
+            revert ZeroAddress();
+        }
+        if(claimAmount == 0){
+            revert ValueMustBeGreaterThanZero();
+        }
+        if(dueBy < block.timestamp){
+            revert PastDueDate();
+        }
+        if(!claimToken.isContract()){
+            revert ClaimTokenNotContract();
+        }
+        
         tokenIds.increment();
         uint256 newTokenId = tokenIds.current();
         _mint(creditor, newTokenId);
