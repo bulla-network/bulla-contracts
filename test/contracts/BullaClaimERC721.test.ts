@@ -26,13 +26,14 @@ describe.only("Bulla Claim ERC721", function () {
     const claimAmount = 100;
     const transferPrice = 80;
     const feeBasisPoint = 1000;
-    const dueBy = utils.hexlify(60 * 1000);
+    let dueBy;
     const someMultihash = {
         hash: ethers.utils.formatBytes32String("some hash"),
         hashFunction: 0,
         size: 0,
     };
     this.beforeEach(async function () {
+        dueBy = (await (await ethers.provider.getBlock('latest')).timestamp) + 100;
         [collector, owner, notOwner, creditor, debtor] = await ethers.getSigners();
         erc20Contract = (await deployContract(debtor, ERC20Mock)) as ERC20;
 
@@ -45,7 +46,6 @@ describe.only("Bulla Claim ERC721", function () {
         bullaClaimERC721 = (await deployContract(owner, BullaClaimERC721Mock, [
             bullaManager.address,
         ])) as BullaClaimERC721;
-
         await bullaClaimERC721.createClaim(
             creditor.address,
             debtor.address,
