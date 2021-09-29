@@ -14,7 +14,6 @@ struct Multihash {
 
 enum Status {
     Pending,
-    Repaying,
     Paid,
     Rejected,
     Rescinded

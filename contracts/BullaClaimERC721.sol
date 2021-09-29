@@ -49,8 +49,7 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
 
     modifier onlyIncompleteClaim(uint256 tokenId) {
         if (
-            claimTokens[tokenId].status != Status.Pending &&
-            claimTokens[tokenId].status != Status.Repaying
+            claimTokens[tokenId].status != Status.Pending
         ) revert ClaimCompleted();
         _;
     }
@@ -133,7 +132,7 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
         claim.paidAmount += paymentAmount;
         claim.paidAmount == claim.claimAmount
             ? claim.status = Status.Paid
-            : claim.status = Status.Repaying;
+            : claim.status = Status.Pending;
 
         claimToken.safeTransferFrom(
             msg.sender,
@@ -174,10 +173,8 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
         external
         override
         onlyDebtor(tokenId)
+        onlyIncompleteClaim(tokenId)
     {
-        if (claimTokens[tokenId].status != Status.Pending)
-            revert StatusNotPending(claimTokens[tokenId].status);
-
         claimTokens[tokenId].status = Status.Rejected;
         emit ClaimRejected(bullaManager, tokenId, block.timestamp);
     }
@@ -186,10 +183,8 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
         external
         override
         onlyTokenOwner(tokenId)
+        onlyIncompleteClaim(tokenId)
     {
-        if (claimTokens[tokenId].status != Status.Pending)
-            revert StatusNotPending(claimTokens[tokenId].status);
-
         claimTokens[tokenId].status = Status.Rescinded;
         emit ClaimRescinded(bullaManager, tokenId, block.timestamp);
     }
