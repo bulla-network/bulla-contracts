@@ -19,7 +19,7 @@ import { declareSignerWithAddress } from "../test-utils";
 
 chai.use(solidity);
 
-describe("Bulla Banker", function () {
+describe.skip("Bulla Banker", function () {
     let [collector, owner, notOwner, creditor, debtor] = declareSignerWithAddress();
     let bullaManager: BullaManager;
     let bullaBanker: BullaBanker;
@@ -46,11 +46,6 @@ describe("Bulla Banker", function () {
             bullaManager.address,
             bullaClaimERC721.address,
         ])) as BullaBanker;
-    });
-    describe("Initialize", function () {
-        it("should set bulla manager for bulla banker", async function () {
-            expect(await bullaBanker.bullaManager()).to.equal(bullaManager.address);
-        });
     });
     describe("Create Standard Claim", function () {
         const creditorTag = utils.formatBytes32String("creditor tag");

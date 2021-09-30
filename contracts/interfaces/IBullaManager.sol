@@ -52,13 +52,13 @@ interface IBullaManager {
 
     function setFee(uint32 _feeBasisPoints) external;
 
-    function setCollectionAddress(address payable _collectionAddress) external;
+    function setCollectionAddress(address _collectionAddress) external;
 
     function setbullaThreshold(uint32 _threshold) external;
 
     function setReducedFee(uint32 reducedFeeBasisPoints) external;
 
-    function setBullaTokenAddress(address payable _bullaTokenAddress) external;
+    function setBullaTokenAddress(address _bullaTokenAddress) external;
 
     function getBullaBalance(address _holder) external view returns (uint256);
 
@@ -66,4 +66,6 @@ interface IBullaManager {
         external
         view
         returns (uint32, address);
+    
+    function getTransactionFee(address _holder, uint paymentAmount) external view returns(address sendFeesTo, uint transactionFee);
 }

@@ -14,6 +14,7 @@ struct Multihash {
 
 enum Status {
     Pending,
+    Repaying,
     Paid,
     Rejected,
     Rescinded
@@ -106,4 +107,6 @@ interface IBullaClaim {
     function rescindClaim(uint256 tokenId) external;
 
     function getClaim(uint256 tokenId) external view returns (Claim calldata);
+
+    function bullaManager() external view returns (address);
 }

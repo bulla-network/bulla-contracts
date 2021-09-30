@@ -11,7 +11,6 @@ struct BullaTag {
 }
 
 contract BullaBanker {
-    address public bullaManager;
     address public bullaClaimERC721;
     mapping(uint256 => BullaTag) public bullaTags;
 
@@ -31,11 +30,10 @@ contract BullaBanker {
         uint256 blocktime
     );
 
-    constructor(address _bullaManager, address _bullaClaimERC721) {
-        bullaManager = _bullaManager;
+    constructor( address _bullaClaimERC721) {
         bullaClaimERC721 = _bullaClaimERC721;
         emit BullaBankerCreated(
-            bullaManager,
+            IBullaClaim(_bullaClaimERC721).bullaManager(),
             bullaClaimERC721,
             address(this),
             block.timestamp
@@ -52,7 +50,8 @@ contract BullaBanker {
         address claimToken,
         Multihash calldata attachment
     ) public {
-        uint256 newTokenId = BullaClaimERC721(bullaClaimERC721).createClaim(
+        address _bullaClaimERC721Address = bullaClaimERC721;
+        uint256 newTokenId = BullaClaimERC721(_bullaClaimERC721Address).createClaim(
             creditor,
             debtor,
             description,
@@ -68,7 +67,7 @@ contract BullaBanker {
         bullaTags[newTokenId] = newTag;
 
         emit BullaTagUpdated(
-            bullaManager,
+            IBullaClaim(_bullaClaimERC721Address).bullaManager(),
             newTokenId,
             msg.sender,
             newTag.creditorTag,
@@ -78,7 +77,8 @@ contract BullaBanker {
     }
 
     function updateBullaTag(uint256 tokenId, bytes32 newTag) public {
-        BullaClaimERC721 _bullaClaimERC721 = BullaClaimERC721(bullaClaimERC721);
+        address _bullaClaimERC721Address = bullaClaimERC721;
+        BullaClaimERC721 _bullaClaimERC721 = BullaClaimERC721(_bullaClaimERC721Address);
 
         Claim memory bullaClaim = _bullaClaimERC721.getClaim(tokenId);
         address claimOwner = _bullaClaimERC721.ownerOf(tokenId);
@@ -91,7 +91,7 @@ contract BullaBanker {
             bullaTags[tokenId].debtorTag = newTag;
 
         emit BullaTagUpdated(
-            bullaManager,
+            IBullaClaim(_bullaClaimERC721Address).bullaManager(),
             tokenId,
             msg.sender,
             bullaTags[tokenId].creditorTag,
