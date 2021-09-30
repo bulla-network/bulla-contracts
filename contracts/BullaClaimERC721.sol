@@ -34,7 +34,7 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
 
     Counters.Counter private tokenIds;
 
-    address public bullaManager;
+    address public override bullaManager;
     mapping(uint256 => Claim) private claimTokens;
 
     event BullaManagerSet(
