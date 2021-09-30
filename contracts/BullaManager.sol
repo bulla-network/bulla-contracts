@@ -79,7 +79,6 @@ contract BullaManager is IBullaManager {
 
     //Set threshold of BULLA tokens owned that are required to receive reduced fee
     function setbullaThreshold(uint32 _threshold) external override onlyOwner {
-        if(_threshold == 0) revert ValueMustBeGreaterThanZero();
         feeInfo.bullaTokenThreshold = _threshold;
         emit FeeThresholdChanged(
             address(this),
