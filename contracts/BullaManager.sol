@@ -5,6 +5,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/IBullaManager.sol";
 
 error NotContractOwner(address _sender);
+error ZeroAddress();
+error ValueMustBeGreaterThanZero();
 
 contract BullaManager is IBullaManager {
     bytes32 public immutable description;
@@ -42,12 +44,14 @@ contract BullaManager is IBullaManager {
         );
     }
 
-    function setOwner(address _owner) external override onlyOwner {
-        owner = _owner;
-        emit OwnerChanged(address(this), owner, _owner, block.timestamp);
+    function setOwner(address _newOwner) external override onlyOwner {
+        if(_newOwner == address(0)) revert ZeroAddress();
+        owner = _newOwner;
+        emit OwnerChanged(address(this), owner, _newOwner, block.timestamp);
     }
 
     function setFee(uint32 _feeBasisPoints) external override onlyOwner {
+        if(_feeBasisPoints == 0) revert ValueMustBeGreaterThanZero();
         uint32 oldFee = feeInfo.feeBasisPoints;
         feeInfo.feeBasisPoints = _feeBasisPoints;
         emit FeeChanged(
@@ -58,11 +62,12 @@ contract BullaManager is IBullaManager {
         );
     }
 
-    function setCollectionAddress(address payable _collectionAddress)
+    function setCollectionAddress(address _collectionAddress)
         external
         override
         onlyOwner
     {
+        if(_collectionAddress == address(0)) revert ZeroAddress();
         feeInfo.collectionAddress = _collectionAddress;
         emit CollectorChanged(
             address(this),
@@ -74,6 +79,7 @@ contract BullaManager is IBullaManager {
 
     //Set threshold of BULLA tokens owned that are required to receive reduced fee
     function setbullaThreshold(uint32 _threshold) external override onlyOwner {
+        if(_threshold == 0) revert ValueMustBeGreaterThanZero();
         feeInfo.bullaTokenThreshold = _threshold;
         emit FeeThresholdChanged(
             address(this),
@@ -89,6 +95,7 @@ contract BullaManager is IBullaManager {
         override
         onlyOwner
     {
+        if(reducedFeeBasisPoints == 0) revert ValueMustBeGreaterThanZero();
         uint32 oldFee = feeInfo.reducedFeeBasisPoints;
         feeInfo.reducedFeeBasisPoints = reducedFeeBasisPoints;
         emit FeeChanged(
@@ -100,11 +107,12 @@ contract BullaManager is IBullaManager {
     }
 
     //set the contract address of BULLA ERC20 token
-    function setBullaTokenAddress(address payable _bullaTokenAddress)
+    function setBullaTokenAddress(address _bullaTokenAddress)
         external
         override
         onlyOwner
     {
+        if(_bullaTokenAddress == address(0)) revert ZeroAddress();
         bullaToken = IERC20(_bullaTokenAddress);
         emit BullaTokenChanged(
             address(this),
