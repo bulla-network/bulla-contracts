@@ -66,4 +66,6 @@ interface IBullaManager {
         external
         view
         returns (uint32, address);
+    
+    function getTransactionFee(address _holder, uint paymentAmount) external view returns(address sendFeesTo, uint transactionFee);
 }

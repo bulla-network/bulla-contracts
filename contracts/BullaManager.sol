@@ -141,4 +141,10 @@ contract BullaManager is IBullaManager {
 
         return (fee, feeInfo.collectionAddress);
     }
+
+    function getTransactionFee(address _holder, uint paymentAmount) external view override returns(address sendFeesTo, uint transactionFee){
+        (uint32 fee, address collectionAddress ) = getFeeInfo(_holder);
+        sendFeesTo = collectionAddress;
+        transactionFee = fee > 0 ? (paymentAmount * fee) / 10000 : 0;
+    }
 }
