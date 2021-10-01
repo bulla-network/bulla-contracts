@@ -20,12 +20,12 @@ error NotTokenOwner(address sender);
 error NotCreditorOrDebtor(address sender);
 error OwnerNotCreditor(address sender);
 error ClaimCompleted();
+error ClaimNotPending();
 error IncorrectValue(uint256 value, uint256 expectedValue);
 error InsufficientBalance(uint256 senderBalance);
 error InsufficientAllowance(uint256 senderAllowance);
 error RepayingTooMuch(uint256 amount, uint256 expectedAmount);
 error ValueMustBeGreaterThanZero();
-error StatusNotPending(Status status);
 
 contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
     using SafeERC20 for IERC20;
@@ -59,6 +59,13 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
             claimTokens[tokenId].status != Status.Pending &&
             claimTokens[tokenId].status != Status.Repaying
         ) revert ClaimCompleted();
+        _;
+    }
+
+    modifier onlyPendingClaim(uint256 tokenId) {
+        if (
+            claimTokens[tokenId].status != Status.Pending
+        ) revert ClaimNotPending();
         _;
     }
 
@@ -185,10 +192,8 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
         external
         override
         onlyDebtor(tokenId)
+        onlyPendingClaim(tokenId)
     {
-        if (claimTokens[tokenId].status != Status.Pending)
-            revert StatusNotPending(claimTokens[tokenId].status);
-
         claimTokens[tokenId].status = Status.Rejected;
         emit ClaimRejected(bullaManager, tokenId, block.timestamp);
     }
@@ -197,10 +202,8 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
         external
         override
         onlyTokenOwner(tokenId)
+        onlyPendingClaim(tokenId)
     {
-        if (claimTokens[tokenId].status != Status.Pending)
-            revert StatusNotPending(claimTokens[tokenId].status);
-
         claimTokens[tokenId].status = Status.Rescinded;
         emit ClaimRescinded(bullaManager, tokenId, block.timestamp);
     }

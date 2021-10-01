@@ -230,9 +230,9 @@ describe("Bulla Claim ERC721", function () {
             await expect(bullaClaimERC721.connect(debtor).rejectClaim(tokenId))
                 .to.emit(bullaClaimERC721, "ClaimRejected");
             await expect(bullaClaimERC721.connect(debtor).rejectClaim(tokenId))
-                .to.be.revertedWith("StatusNotPending(3)");
+                .to.be.revertedWith("ClaimNotPending()");
             await expect(bullaClaimERC721.connect(creditor).rescindClaim(tokenId))
-                .to.be.revertedWith("StatusNotPending(3)");
+                .to.be.revertedWith("ClaimNotPending()");
 
             let claim = await bullaClaimERC721.getClaim(tokenId);
             expect(claim.status).to.equal(3);
@@ -253,9 +253,9 @@ describe("Bulla Claim ERC721", function () {
             await expect(bullaClaimERC721.connect(creditor).rescindClaim(tokenId))
                 .to.emit(bullaClaimERC721, "ClaimRescinded");
             await expect(bullaClaimERC721.connect(creditor).rescindClaim(tokenId))
-                .to.be.revertedWith("StatusNotPending(4)");
+                .to.be.revertedWith("ClaimNotPending()");
             await expect(bullaClaimERC721.connect(debtor).rejectClaim(tokenId))
-                .to.be.revertedWith("StatusNotPending(4)");
+                .to.be.revertedWith("ClaimNotPending()");
 
             let claim = await bullaClaimERC721.getClaim(tokenId);
             expect(claim.status).to.equal(4);

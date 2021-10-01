@@ -9,3 +9,4 @@ coverage/
 /deploy_info
 /deployments
 yarn.lock
+contracts/artifacts
