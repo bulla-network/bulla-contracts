@@ -10,7 +10,7 @@ const dateLabel = (date: Date) => date.toISOString().replace(/\D/g, "");
 const toBytes32 = (stringVal: string) => ethers.utils.formatBytes32String(stringVal);
 const toEther = (wei: BigNumberish) => ethers.utils.formatEther(wei);
 
-const deployCreator = async function () {
+export const deployCreator = async function () {
     const { deployments, getNamedAccounts, getChainId } = hre;
     const { deploy, log } = deployments;
     const { deployer } = await getNamedAccounts();
@@ -25,6 +25,7 @@ const deployCreator = async function () {
         ],
         log: true,
     });
+
     console.log({managerAddress, gasUsed:Number( managerReceipt?.gasUsed || 0)});
 
     const { address: implementAddress, receipt: implementReceipt } = await deploy("BullaClaimNative", {
