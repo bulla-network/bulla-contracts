@@ -9,7 +9,6 @@ import "./interfaces/IBullaManager.sol";
 import "./interfaces/IBullaClaim.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "hardhat/console.sol";
 
 error ZeroAddress();
 error PastDueDate();

@@ -106,9 +106,6 @@ describe("Bulla Claim ERC721", function () {
         // Check Claim's State
         const claim = await bullaClaimERC721.getClaim(tokenId);
         expect(await bullaClaimERC721.ownerOf(tokenId)).to.equal(creditor);
-        // console.log(await bullaClaimERC721.ownerOf(tokenId));
-        // console.log(creditor);
-        // console.log(debtor);
         expect(claim.debtor).to.equal(debtor); 
         expect(claim.claimAmount).to.equal(claimAmount); 
         expect(claim.dueBy).to.equal(dueBy); 
