@@ -1,16 +1,12 @@
 //SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.7;
 import "./BullaClaimERC721.sol";
-// import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/access/IAccessControl.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
 import "./BullaBanker.sol";
-
-bytes32 constant ROLE_OWNER = keccak256("ROLE_OWNER");
-bytes32 constant ROLE_ADMIN = keccak256("ROLE_ADMIN");
-bytes32 constant ROLE_MEMBER = keccak256("ROLE_MEMBER");
 
 interface IBullaDao {
     enum DaoStatus {
@@ -18,19 +14,26 @@ interface IBullaDao {
         Paused,
         Inactive
     }
-
-    struct paymentInfo {
+    enum Role {
+        Owner,
+        Admin,
+        Member
+    }
+    struct PaymentInfo {
         address member;
         uint256 amount;
     }
-
+    struct Member {
+        Role role;
+        bool active;
+    }
     struct Expense {
-        uint256[] claimIds;
-        address owner;
+        uint256 claimId;
+        PaymentInfo paymentInfo;
     }
     error NotOwnerOrMember(address);
-    error NotOwner(address);
-    error CannotUpdateOwnerRole();
+    error NotAdmin(address);
+    error CannotUpdateOwner();
     error NotMember();
     error CannotRenounceOwnership();
     error NotExpenseOwner(address);
@@ -52,19 +55,19 @@ interface IBullaDao {
     event MemberAdded(
         address indexed daoAddress,
         address indexed memberAddress,
-        bytes32 indexed role,
+        Role indexed role,
         uint256 blocktime
     );
     event MemberRemoved(
         address indexed daoAddress,
         address indexed memberAddress,
-        bytes32 indexed role,
+        Role indexed role,
         uint256 blocktime
     );
     event MemberRoleUpdated(
         address indexed daoAddress,
         address indexed memberAddress,
-        bytes32 indexed role,
+        Role indexed role,
         uint256 blocktime
     );
     event DaoExpenseCreated(
@@ -78,20 +81,27 @@ interface IBullaDao {
     );
 }
 
-enum Role {
-    Owner,
-    Admin,
-    Member
-}
-
-contract BullaDao is Ownable, AccessControl, IBullaDao {
+contract BullaDao is Ownable, IBullaDao {
     DaoStatus daoStatus;
     bytes32 public name;
     //** an ipfs hash for any relevant DAO details/agreements */
     Multihash public details;
     address private _factory;
     address private _bankerAddress;
-    mapping(address => bool) membership;
+    mapping(address => Member) members;
+
+    modifier onlyAdmin() {
+        if (
+            members[msg.sender].role == Role.Admin ||
+            members[msg.sender].role == Role.Owner
+        ) revert NotOwnerOrMember(msg.sender);
+        _;
+    }
+
+    modifier onlyMember() {
+        if (members[msg.sender].active == true) revert NotMember();
+        _;
+    }
 
     constructor(
         address bankerAddress,
@@ -99,20 +109,21 @@ contract BullaDao is Ownable, AccessControl, IBullaDao {
         address _owner,
         Multihash memory _details
     ) {
-        // daoStatus = DaoStatus.Active;
+        daoStatus = DaoStatus.Active;
         _factory = msg.sender;
         name = _name;
         _bankerAddress = bankerAddress;
         details = _details;
 
         transferOwnership(_owner);
-        membership[_owner] = true;
-        _setupRole(DEFAULT_ADMIN_ROLE, _owner);
+        members[_owner].role = Role.Owner;
+        members[_owner].active = true;
+
         emit DaoCreated(address(this), _name, msg.sender, block.timestamp);
         emit MemberAdded(
             address(this),
             msg.sender,
-            ROLE_OWNER,
+            Role.Owner,
             block.timestamp
         );
         emit DaoDetailsUpdated(
@@ -123,7 +134,7 @@ contract BullaDao is Ownable, AccessControl, IBullaDao {
         );
     }
 
-    function removeMember(address member) public onlyRole(ROLE_ADMIN) {
+    function removeMember(address member) public {
         // if you are an owner, you cannot remove yourself, but you can remove anyone else.
         // if you are an admin, you can remove members only.
         // if you are an admin or a member, you can remove yourself. (essentially leave)
@@ -132,22 +143,47 @@ contract BullaDao is Ownable, AccessControl, IBullaDao {
         // emit MemberRemoved(address(this), member,block.timestamp);
     }
 
-    // function updateMemberRole(address member, Role _role)
-    //     public
-    //     onlyRole(ROLE_ADMIN)
-    // {
+    function addMember(Role role, address account) public {
+        members[account].role = role;
+        members[account].active = true;
+        emit MemberAdded(address(this), account, role, block.timestamp);
+    }
 
-    //     Role senderRole = members[msg.sender];
-    //     if (memberRole == address(0)) revert NotMember();
-    //     if (memberRole == Role.Owner && senderRole != Role.Owner)
-    //         revert CannotUpdateOwnerRole();
-    //     members[member] = _role;
+    function updateMemberRole(address member, Role _role) public onlyAdmin {
+        if (members[member].active != true) revert NotMember();
+        if (members[member].role == Role.Owner) revert CannotUpdateOwner();
+        members[member].role = _role;
 
-    //     emit MemberRoleUpdated(address(this), member, _role, block.timestamp);
-    // }
+        emit MemberRoleUpdated(address(this), member, _role, block.timestamp);
+    }
+
+    function transferOwnership(address newOwner)
+        public
+        override(Ownable)
+        onlyOwner
+    {
+        if (members[newOwner].active != true) revert NotMember();
+        super.transferOwnership(newOwner);
+        members[msg.sender].role = Role.Admin;
+        members[newOwner].role = Role.Owner;
+
+        emit MemberRoleUpdated(
+            address(this),
+            msg.sender,
+            Role.Admin,
+            block.timestamp
+        );
+        emit MemberRoleUpdated(
+            address(this),
+            newOwner,
+            Role.Owner,
+            block.timestamp
+        );
+    }
 
     function updateDetails(Multihash calldata _details) public onlyOwner {
         details = _details;
+
         emit DaoDetailsUpdated(
             address(this),
             msg.sender,
@@ -156,59 +192,45 @@ contract BullaDao is Ownable, AccessControl, IBullaDao {
         );
     }
 
-    function removeMember(bytes32 role, address member)
-        public
-        onlyRole(ROLE_ADMIN)
-    {}
-
-    function revokeRole(bytes32 role, address account)
-        public
-        override(AccessControl)
-        onlyOwner
-        onlyRole(ROLE_ADMIN)
-    {
-        membership[account] = false;
-        super.revokeRole(role, account);
-        emit MemberRemoved(address(this), account, role, block.timestamp);
-    }
-
-    function renounceRole(bytes32 role, address account)
-        public
-        override(AccessControl)
-    {
-        membership[account] = false;
-        super.renounceRole(role, account);
-        emit MemberRemoved(address(this), msg.sender, role, block.timestamp);
-    }
-
-    function addMember(bytes32 role, address account)
-        public
-        onlyRole(ROLE_ADMIN)
-    {
-        membership[account] = true;
-        super.grantRole(role, account);
-        emit MemberAdded(address(this), account, role, block.timestamp);
-    }
-
-    function grantRole(bytes32 role, address account)
-        public
-        pure
-        override(AccessControl)
-    {
-        revert("ModifiedAccessControl: use addMember or updateRole");
-    }
-
-    function renounceOwnership() public view override(Ownable) onlyOwner {
-        revert("ModifiedAccessControl: use transferOwnership");
-    }
-
     function deleteDao() public onlyOwner {
         // check expenses are closed?... somehow
     }
 
-    // function leaveDao() public onlyMember {
-    //     membership[msg.sender] = false;
-    // }
+    function renounceOwnership() public view override(Ownable) onlyOwner {
+        revert CannotRenounceOwnership();
+    }
+
+    function leaveDao() public onlyMember {
+        emit MemberRemoved(
+            address(this),
+            msg.sender,
+            members[msg.sender].role,
+            block.timestamp
+        );
+        delete members[msg.sender];
+    }
+
+    function createExpense(
+        uint256 totalAmount,
+        PaymentInfo[] memory paymentSplit,
+        address creditor,
+        string memory description,
+        uint256 dueBy,
+        address claimToken,
+        Multihash calldata _attachment
+    ) public onlyMember {
+        BullaBanker bullaBanker = BullaBanker(_bankerAddress);
+        bullaBanker.createBullaClaim(
+            totalAmount,
+            creditor,
+            address(this),
+            description,
+            name,
+            dueBy,
+            claimToken,
+            _attachment
+        );
+    }
 
     // /**
     //  * @param totalAmount the totalAmount of the claim in wei
@@ -221,7 +243,7 @@ contract BullaDao is Ownable, AccessControl, IBullaDao {
     //  */
     // function createExpense(
     //     uint256 totalAmount,
-    //     paymentInfo[] paymentSplit,
+    //     PaymentInfo[] paymentSplit,
     //     address creditor,
     //     string memory description,
     //     uint256 dueBy,
