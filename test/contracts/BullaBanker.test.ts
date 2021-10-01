@@ -43,14 +43,8 @@ describe("Bulla Banker", function () {
         ])) as BullaClaimERC721;
 
         bullaBanker = (await deployContract(owner, BullaBankerMock, [
-            bullaManager.address,
             bullaClaimERC721.address,
         ])) as BullaBanker;
-    });
-    describe("Initialize", function () {
-        it("should set bulla manager for bulla banker", async function () {
-            expect(await bullaBanker.bullaManager()).to.equal(bullaManager.address);
-        });
     });
     describe("Create Standard Claim", function () {
         const creditorTag = utils.formatBytes32String("creditor tag");

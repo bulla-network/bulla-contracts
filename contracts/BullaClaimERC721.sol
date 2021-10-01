@@ -9,6 +9,7 @@ import "./interfaces/IBullaManager.sol";
 import "./interfaces/IBullaClaim.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
+import "hardhat/console.sol";
 
 error ZeroAddress();
 error PastDueDate();
@@ -96,7 +97,7 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
         
         tokenIds.increment();
         uint256 newTokenId = tokenIds.current();
-        _mint(creditor, newTokenId);
+        _safeMint(creditor, newTokenId);
 
         Claim memory newClaim;
         newClaim.debtor = debtor;
@@ -129,16 +130,18 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
         onlyIncompleteClaim(tokenId)
     {
         if (paymentAmount == 0) revert ValueMustBeGreaterThanZero();
-        if (claimTokens[tokenId].debtor == address(0)) revert TokenIdNoExist();
+        if (!_exists(tokenId)) revert TokenIdNoExist();
 
         Claim memory claim = getClaim(tokenId);
+        address creditor = ownerOf(tokenId);
 
         uint amountToRepay = claim.claimAmount - claim.paidAmount;
         uint totalPayment = paymentAmount >= amountToRepay ? amountToRepay : paymentAmount;
         claim.paidAmount + totalPayment == claim.claimAmount
             ? claim.status = Status.Paid
             : claim.status = Status.Repaying;
-        
+        claimTokens[tokenId].paidAmount += totalPayment;
+        claimTokens[tokenId].status = claim.status;
         if (claim.status == Status.Paid) _burn(tokenId);
 
         (address collectionAddress, uint transactionFee) = IBullaManager(bullaManager).getTransactionFee(
@@ -148,8 +151,8 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
 
         IERC20(claim.claimToken).safeTransferFrom(
             msg.sender,
-            ownerOf(tokenId),
-            paymentAmount - transactionFee
+            creditor,
+            totalPayment - transactionFee
         );
 
         if (transactionFee > 0) {
