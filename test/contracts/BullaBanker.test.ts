@@ -46,7 +46,7 @@ describe("Bulla Banker", function () {
             bullaClaimERC721.address,
         ])) as BullaBanker;
     });
-    describe("Create Standard Claim", function () {
+    describe("Assigning Tags", function () {
         const creditorTag = utils.formatBytes32String("creditor tag");
         const debtorTag = utils.formatBytes32String("debtor tag");
         const someMultihash = {
@@ -55,8 +55,22 @@ describe("Bulla Banker", function () {
             size: 0,
         };
 
-        this.beforeEach(async function () {
-            await bullaBanker
+        it("should emit update tag when creating a claim", async function () {
+            let dueBy = (await (await ethers.provider.getBlock('latest')).timestamp) + 100;
+            await expect(bullaBanker
+                .connect(notOwner)
+                .createBullaClaim(
+                    claimAmount,
+                    creditor.address,
+                    debtor.address,
+                    "test",
+                    creditorTag,
+                    dueBy,
+                    erc20Contract.address,
+                    someMultihash
+                )).to.be.revertedWith(`NotCreditorOrDebtor("${notOwner.address}")`);
+
+            await expect(await bullaBanker
                 .connect(creditor)
                 .createBullaClaim(
                     claimAmount,
@@ -64,24 +78,67 @@ describe("Bulla Banker", function () {
                     debtor.address,
                     "test",
                     creditorTag,
-                    utils.hexlify(60 * 1000),
+                    dueBy,
                     erc20Contract.address,
                     someMultihash
+                )).to.emit(bullaBanker, "BullaTagUpdated")
+                .withArgs(
+                    bullaManager.address,
+                    1,
+                    creditor.address,
+                    creditorTag,
+                    (await (await ethers.provider.getBlock('latest')).timestamp)
                 );
-        });
-        it("should set creditor wallet as owner of token #1", async function () {
+
             const owner = await bullaClaimERC721.ownerOf(1);
             expect(owner).to.equal(creditor.address);
         });
-        it("should add debtor tag when debtor updates tags", async function () {
-            await bullaBanker.connect(debtor).updateBullaTag(1, debtorTag);
-            expect((await bullaBanker.bullaTags(1)).debtorTag).to.equal(debtorTag);
-        });
-        it("should revert if update tag when not creditor or debtor", async function () {
-            //await bullaBanker.connect(creditor).updateBullaTag(1, creditorTag);
-            await expect(bullaBanker.connect(notOwner).updateBullaTag(1, creditorTag)).to.be.revertedWith(
-                "NotCreditorOrDebtor"
-            );
+
+        it("should emit update tag when updating a tag", async function () {
+            const randomId = 12;
+            await expect(bullaBanker.connect(notOwner).updateBullaTag(randomId, creditorTag))
+                .to.be.revertedWith(
+                    "ERC721: owner query for nonexistent token"
+                );
+
+            let dueBy = (await (await ethers.provider.getBlock('latest')).timestamp) + 100;
+            await expect(await bullaBanker
+                .connect(creditor)
+                .createBullaClaim(
+                    claimAmount,
+                    creditor.address,
+                    debtor.address,
+                    "test",
+                    creditorTag,
+                    dueBy,
+                    erc20Contract.address,
+                    someMultihash
+                )).to.emit(bullaBanker, "BullaTagUpdated")
+
+            await expect(bullaBanker.connect(notOwner).updateBullaTag(1, creditorTag))
+                .to.be.revertedWith(
+                    `NotCreditorOrDebtor("${notOwner.address}")`
+                );
+
+            await expect(await bullaBanker.connect(creditor).updateBullaTag(1, creditorTag))
+                .to.emit(bullaBanker, "BullaTagUpdated")
+                .withArgs(
+                    bullaManager.address,
+                    1,
+                    creditor.address,
+                    creditorTag,
+                    (await (await ethers.provider.getBlock('latest')).timestamp)
+                );
+
+            await expect(await bullaBanker.connect(debtor).updateBullaTag(1, debtorTag))
+                .to.emit(bullaBanker, "BullaTagUpdated")
+                .withArgs(
+                    bullaManager.address,
+                    1,
+                    debtor.address,
+                    debtorTag,
+                    (await (await ethers.provider.getBlock('latest')).timestamp)
+                );
         });
     });
 });

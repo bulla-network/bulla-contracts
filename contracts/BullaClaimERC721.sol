@@ -81,19 +81,19 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
         address claimToken,
         Multihash calldata attachment
     ) external override returns (uint256) {
-        if(creditor == address(0) || debtor ==  address(0)){
+        if (creditor == address(0) || debtor == address(0)) {
             revert ZeroAddress();
         }
-        if(claimAmount == 0){
+        if (claimAmount == 0) {
             revert ValueMustBeGreaterThanZero();
         }
-        if(dueBy < block.timestamp){
+        if (dueBy < block.timestamp) {
             revert PastDueDate();
         }
-        if(!claimToken.isContract()){
+        if (!claimToken.isContract()) {
             revert ClaimTokenNotContract();
         }
-        
+
         tokenIds.increment();
         uint256 newTokenId = tokenIds.current();
         _safeMint(creditor, newTokenId);
@@ -134,8 +134,10 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
         Claim memory claim = getClaim(tokenId);
         address creditor = ownerOf(tokenId);
 
-        uint amountToRepay = claim.claimAmount - claim.paidAmount;
-        uint totalPayment = paymentAmount >= amountToRepay ? amountToRepay : paymentAmount;
+        uint256 amountToRepay = claim.claimAmount - claim.paidAmount;
+        uint256 totalPayment = paymentAmount >= amountToRepay
+            ? amountToRepay
+            : paymentAmount;
         claim.paidAmount + totalPayment == claim.claimAmount
             ? claim.status = Status.Paid
             : claim.status = Status.Repaying;
@@ -143,10 +145,9 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
         claimTokens[tokenId].status = claim.status;
         if (claim.status == Status.Paid) _burn(tokenId);
 
-        (address collectionAddress, uint transactionFee) = IBullaManager(bullaManager).getTransactionFee(
-            msg.sender,
-            totalPayment
-        );
+        (address collectionAddress, uint256 transactionFee) = IBullaManager(
+            bullaManager
+        ).getTransactionFee(msg.sender, totalPayment);
 
         IERC20(claim.claimToken).safeTransferFrom(
             msg.sender,
