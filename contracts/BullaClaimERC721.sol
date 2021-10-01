@@ -26,7 +26,6 @@ error InsufficientBalance(uint256 senderBalance);
 error InsufficientAllowance(uint256 senderAllowance);
 error RepayingTooMuch(uint256 amount, uint256 expectedAmount);
 error ValueMustBeGreaterThanZero();
-error StatusNotPending(Status status);
 
 contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
     using SafeERC20 for IERC20;
@@ -57,7 +56,7 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
 
     modifier onlyIncompleteClaim(uint256 tokenId) {
         if (
-            claimTokens[tokenId].status != Status.Pending ||
+            claimTokens[tokenId].status != Status.Pending &&
             claimTokens[tokenId].status != Status.Repaying
         ) revert ClaimCompleted();
         _;
@@ -89,22 +88,22 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
         address claimToken,
         Multihash calldata attachment
     ) external override returns (uint256) {
-        if(creditor == address(0) || debtor ==  address(0)){
+        if (creditor == address(0) || debtor == address(0)) {
             revert ZeroAddress();
         }
-        if(claimAmount == 0){
+        if (claimAmount == 0) {
             revert ValueMustBeGreaterThanZero();
         }
-        if(dueBy < block.timestamp){
+        if (dueBy < block.timestamp) {
             revert PastDueDate();
         }
-        if(!claimToken.isContract()){
+        if (!claimToken.isContract()) {
             revert ClaimTokenNotContract();
         }
-        
+
         tokenIds.increment();
         uint256 newTokenId = tokenIds.current();
-        _mint(creditor, newTokenId);
+        _safeMint(creditor, newTokenId);
 
         Claim memory newClaim;
         newClaim.debtor = debtor;
@@ -137,27 +136,30 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
         onlyIncompleteClaim(tokenId)
     {
         if (paymentAmount == 0) revert ValueMustBeGreaterThanZero();
-        if (claimTokens[tokenId].debtor == address(0)) revert TokenIdNoExist();
+        if (!_exists(tokenId)) revert TokenIdNoExist();
 
         Claim memory claim = getClaim(tokenId);
+        address creditor = ownerOf(tokenId);
 
-        uint amountToRepay = claim.claimAmount - claim.paidAmount;
-        uint totalPayment = paymentAmount >= amountToRepay ? amountToRepay : paymentAmount;
+        uint256 amountToRepay = claim.claimAmount - claim.paidAmount;
+        uint256 totalPayment = paymentAmount >= amountToRepay
+            ? amountToRepay
+            : paymentAmount;
         claim.paidAmount + totalPayment == claim.claimAmount
             ? claim.status = Status.Paid
             : claim.status = Status.Repaying;
-        
+        claimTokens[tokenId].paidAmount += totalPayment;
+        claimTokens[tokenId].status = claim.status;
         if (claim.status == Status.Paid) _burn(tokenId);
 
-        (address collectionAddress, uint transactionFee) = IBullaManager(bullaManager).getTransactionFee(
-            msg.sender,
-            totalPayment
-        );
+        (address collectionAddress, uint256 transactionFee) = IBullaManager(
+            bullaManager
+        ).getTransactionFee(msg.sender, totalPayment);
 
         IERC20(claim.claimToken).safeTransferFrom(
             msg.sender,
-            ownerOf(tokenId),
-            paymentAmount - transactionFee
+            creditor,
+            totalPayment - transactionFee
         );
 
         if (transactionFee > 0) {
