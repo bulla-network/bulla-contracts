@@ -37,12 +37,6 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
     address public override bullaManager;
     mapping(uint256 => Claim) private claimTokens;
 
-    event BullaManagerSet(
-        address indexed prevBullaManager,
-        address indexed newBullaManager,
-        uint256 blocktime
-    );
-
     modifier onlyTokenOwner(uint256 tokenId) {
         if (ownerOf(tokenId) != msg.sender) revert NotCreditor(msg.sender);
         _;
@@ -122,11 +116,11 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
             debtor,
             claimToken,
             description,
+            attachment,
             claimAmount,
             dueBy,
             block.timestamp
         );
-
         return newTokenId;
     }
 
@@ -150,8 +144,7 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
             : claim.status = Status.Repaying;
         claimTokens[tokenId].paidAmount += totalPayment;
         claimTokens[tokenId].status = claim.status;
-        if (claim.status == Status.Paid) _burn(tokenId);
-
+ 
         (address collectionAddress, uint256 transactionFee) = IBullaManager(
             bullaManager
         ).getTransactionFee(msg.sender, totalPayment);
@@ -208,23 +201,8 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
         emit ClaimRescinded(bullaManager, tokenId, block.timestamp);
     }
 
-    function updateMultihash(
-        uint256 tokenId,
-        bytes32 hash,
-        uint8 hashFunction,
-        uint8 size
-    ) external override {
-        if (ownerOf(tokenId) != msg.sender) revert NotTokenOwner(msg.sender);
-
-        claimTokens[tokenId].attachment = Multihash(hash, hashFunction, size);
-        emit MultihashAdded(
-            bullaManager,
-            tokenId,
-            claimTokens[tokenId].debtor,
-            ownerOf(tokenId),
-            claimTokens[tokenId].attachment,
-            block.timestamp
-        );
+    function burn(uint256 tokenId) external onlyTokenOwner(tokenId) {
+        _burn(tokenId);
     }
 
     function getClaim(uint256 tokenId)
