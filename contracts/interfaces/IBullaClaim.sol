@@ -37,7 +37,7 @@ interface IBullaClaim {
         address indexed debtor,
         address claimToken,
         string description,
-        Multihash ipfsHash,
+        Multihash attachment,
         uint256 claimAmount,
         uint256 dueBy,
         uint256 blocktime
