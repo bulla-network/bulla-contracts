@@ -4,8 +4,6 @@ pragma solidity ^0.8.7;
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./IBullaManager.sol";
 
-//https://medium.com/temporal-cloud/efficient-usable-and-cheap-storage-of-ipfs-hashes-in-solidity-smart-contracts-eb3bef129eba
-//structure for storing IPFS hash that may hold documents
 struct Multihash {
     bytes32 hash;
     uint8 hashFunction;
@@ -39,6 +37,7 @@ interface IBullaClaim {
         address indexed debtor,
         address claimToken,
         string description,
+        Multihash ipfsHash,
         uint256 claimAmount,
         uint256 dueBy,
         uint256 blocktime
@@ -74,12 +73,9 @@ interface IBullaClaim {
         uint256 blocktime
     );
 
-    event MultihashAdded(
-        address bullaManager,
-        uint256 indexed tokenId,
-        address indexed debtor,
-        address indexed creditor,
-        Multihash ipfsHash,
+    event BullaManagerSet(
+        address indexed prevBullaManager,
+        address indexed newBullaManager,
         uint256 blocktime
     );
 
@@ -93,13 +89,6 @@ interface IBullaClaim {
         Multihash calldata attachment
     ) external returns (uint256 newTokenId);
 
-    function updateMultihash(
-        uint256 tokenId,
-        bytes32 hash,
-        uint8 hashFunction,
-        uint8 size
-    ) external;
-
     function payClaim(uint256 tokenId, uint256 paymentAmount) external;
 
     function rejectClaim(uint256 tokenId) external;
@@ -107,4 +96,6 @@ interface IBullaClaim {
     function rescindClaim(uint256 tokenId) external;
 
     function getClaim(uint256 tokenId) external view returns (Claim calldata);
+
+    function bullaManager() external view returns (address);
 }

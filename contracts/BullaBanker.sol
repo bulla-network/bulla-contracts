@@ -5,22 +5,14 @@ import "@openzeppelin/contracts/proxy/Clones.sol";
 import "./interfaces/IBullaClaim.sol";
 import "./BullaClaimERC721.sol";
 
-struct BullaTag {
-    bytes32 creditorTag;
-    bytes32 debtorTag;
-}
-
 contract BullaBanker {
-    address public bullaManager;
     address public bullaClaimERC721;
-    mapping(uint256 => BullaTag) public bullaTags;
 
     event BullaTagUpdated(
         address indexed bullaManager,
         uint256 indexed tokenId,
         address indexed updatedBy,
-        bytes32 creditorTag,
-        bytes32 debtorTag,
+        bytes32 tag,
         uint256 blocktime
     );
 
@@ -31,11 +23,10 @@ contract BullaBanker {
         uint256 blocktime
     );
 
-    constructor(address _bullaManager, address _bullaClaimERC721) {
-        bullaManager = _bullaManager;
+    constructor(address _bullaClaimERC721) {
         bullaClaimERC721 = _bullaClaimERC721;
         emit BullaBankerCreated(
-            bullaManager,
+            IBullaClaim(_bullaClaimERC721).bullaManager(),
             bullaClaimERC721,
             address(this),
             block.timestamp
@@ -51,51 +42,48 @@ contract BullaBanker {
         uint256 dueBy,
         address claimToken,
         Multihash calldata attachment
-    ) public {
-        uint256 newTokenId = BullaClaimERC721(bullaClaimERC721).createClaim(
-            creditor,
-            debtor,
-            description,
-            claimAmount,
-            dueBy,
-            claimToken,
-            attachment
-        );
+    ) public returns (uint256) {
+        if (msg.sender != creditor && msg.sender != debtor)
+            revert NotCreditorOrDebtor(msg.sender);
 
-        BullaTag memory newTag;
-        if (msg.sender == creditor) newTag.creditorTag = bullaTag;
-        if (msg.sender == debtor) newTag.debtorTag = bullaTag;
-        bullaTags[newTokenId] = newTag;
+        address _bullaClaimERC721Address = bullaClaimERC721;
+        uint256 newTokenId = BullaClaimERC721(_bullaClaimERC721Address)
+            .createClaim(
+                creditor,
+                debtor,
+                description,
+                claimAmount,
+                dueBy,
+                claimToken,
+                attachment
+            );
 
         emit BullaTagUpdated(
-            bullaManager,
+            IBullaClaim(_bullaClaimERC721Address).bullaManager(),
             newTokenId,
             msg.sender,
-            newTag.creditorTag,
-            newTag.debtorTag,
+            bullaTag,
             block.timestamp
         );
+        return newTokenId;
     }
 
     function updateBullaTag(uint256 tokenId, bytes32 newTag) public {
-        BullaClaimERC721 _bullaClaimERC721 = BullaClaimERC721(bullaClaimERC721);
+        address _bullaClaimERC721Address = bullaClaimERC721;
+        BullaClaimERC721 _bullaClaimERC721 = BullaClaimERC721(
+            _bullaClaimERC721Address
+        );
 
-        Claim memory bullaClaim = _bullaClaimERC721.getClaim(tokenId);
         address claimOwner = _bullaClaimERC721.ownerOf(tokenId);
-
+        Claim memory bullaClaim = _bullaClaimERC721.getClaim(tokenId);
         if (msg.sender != claimOwner && msg.sender != bullaClaim.debtor)
             revert NotCreditorOrDebtor(msg.sender);
 
-        if (msg.sender == claimOwner) bullaTags[tokenId].creditorTag = newTag;
-        if (msg.sender == bullaClaim.debtor)
-            bullaTags[tokenId].debtorTag = newTag;
-
         emit BullaTagUpdated(
-            bullaManager,
+            IBullaClaim(_bullaClaimERC721Address).bullaManager(),
             tokenId,
             msg.sender,
-            bullaTags[tokenId].creditorTag,
-            bullaTags[tokenId].debtorTag,
+            newTag,
             block.timestamp
         );
     }

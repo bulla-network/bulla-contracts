@@ -70,11 +70,11 @@ interface IBullaDao {
         Role indexed role,
         uint256 blocktime
     );
-    event DaoExpenseCreated(
+    event ExpenseCreated(
         address indexed daoAddress,
         address[] indexed debtors,
-        uint256[] claimIds,
-        uint256 expenseId,
+        uint256 indexed claimId,
+        PaymentInfo[] paymentSplit,
         address creditor,
         Multihash attachment,
         uint256 blocktime
@@ -84,11 +84,12 @@ interface IBullaDao {
 contract BullaDao is Ownable, IBullaDao {
     DaoStatus daoStatus;
     bytes32 public name;
-    //** an ipfs hash for any relevant DAO details/agreements */
     Multihash public details;
     address private _factory;
     address private _bankerAddress;
     mapping(address => Member) members;
+    /** tokenId to a mapping of addresses to wei amount */
+    mapping(uint256 => mapping(address => uint256)) paymentSplits;
 
     modifier onlyAdmin() {
         if (
@@ -192,10 +193,6 @@ contract BullaDao is Ownable, IBullaDao {
         );
     }
 
-    function deleteDao() public onlyOwner {
-        // check expenses are closed?... somehow
-    }
-
     function renounceOwnership() public view override(Ownable) onlyOwner {
         revert CannotRenounceOwnership();
     }
@@ -212,7 +209,7 @@ contract BullaDao is Ownable, IBullaDao {
 
     function createExpense(
         uint256 totalAmount,
-        PaymentInfo[] memory paymentSplit,
+        PaymentInfo[] memory _paymentSplit,
         address creditor,
         string memory description,
         uint256 dueBy,
@@ -220,7 +217,7 @@ contract BullaDao is Ownable, IBullaDao {
         Multihash calldata _attachment
     ) public onlyMember {
         BullaBanker bullaBanker = BullaBanker(_bankerAddress);
-        bullaBanker.createBullaClaim(
+        uint256 tokenId = bullaBanker.createBullaClaim(
             totalAmount,
             creditor,
             address(this),
@@ -230,81 +227,25 @@ contract BullaDao is Ownable, IBullaDao {
             claimToken,
             _attachment
         );
+        address[] memory _debtors;
+        for (uint256 i = 0; i < _paymentSplit.length; i++) {
+            paymentSplits[tokenId][_paymentSplit[i].member] = _paymentSplit[i]
+                .amount;
+            _debtors[i] = _paymentSplit[i].member;
+        }
+        emit ExpenseCreated(
+            address(this),
+            _debtors,
+            tokenId,
+            _paymentSplit,
+            creditor,
+            _attachment,
+            block.timestamp
+        );
     }
 
-    // /**
-    //  * @param totalAmount the totalAmount of the claim in wei
-    //  * @param paymentSplit an array of structs containing a debtor address and an amount to pay
-    //  * @param creditor to whom the funds will be routed to
-    //  * @param description the description of the expense
-    //  * @param dueBy the dueBy date of the expense
-    //  * @param claimToken the token with which the creditor will be compensitated in
-    //  * @param _attachment a IPFS hash in multihash format relevant for the receipt
-    //  */
-    // function createExpense(
-    //     uint256 totalAmount,
-    //     PaymentInfo[] paymentSplit,
-    //     address creditor,
-    //     string memory description,
-    //     uint256 dueBy,
-    //     address claimToken,
-    //     Multihash calldata _attachment
-    // ) public onlyMembers {
-    //     BullaBanker bullaBanker = BullaBanker(_bankerAddress);
-    //     uint256[] claimIds;
-    //     address[] debtors;
-    //     for (uint256 index = 0; index < paymentSplit.length; index++) {
-    //         if(members[paymentSplit[index].address] == address(0)) revert NotMember();
-
-    //         uint256 claimId = bullaBanker.createBullaClaim(
-    //             paymentSplit[index].address,
-    //             creditor,
-    //             paymentSplit[index].member,
-    //             description,
-    //             name,
-    //             dueBy,
-    //             claimToken,
-    //             _attachment
-    //         );
-    //         claimIds.push(claimId);
-    //         debtors.push(paymentSplit[index].address);
-    //     }
-    //     expenses[expenseCount.current].claimIds = claimIds;
-
-    //     emit DaoExpenseCreated(
-    //         address(this),
-    //         debtors,
-    //         claimIds,
-    //         expenseCount.current,
-    //         creditor,
-    //         _attachment,
-    //         block.timestamp
-    //     );
-
-    //     expenseCount.increment();
-    // }
-
-    // function deleteExpense(uint256 expenseId) public onlyExpenseOwner(expenseId) {
-    //     // _checkIfActive();
-    //     Expense expense = expenses[expenseId];
-    //     if(expense = address(0)) revert ExpenseDoesNotExist(expenseId);
-    //     BullaClaimERC721 bullaClaimERC721 = BullaClaimERC721(BullaBanker(_bankerAddress).bullaClaimERC721);
-
-    //     for (uint256 index = 0; index < expense.claimIds.length; index++) {
-    //         uint256 claimId = expense.claimIds[index];
-    //         Claim claim = bullaClaimERC721.getClaim(claimId);
-    //         if(claim.status == Status.Repaying || claim.status == Status.Paid) revert ExpenseInProgress(expenseId);
-    //     }
-    //     for (uint256 index = 0; index < expense.claimIds.length; index++) {
-    //         uint256 claimId = expense.claimIds[index];
-    //         Claim claim = bullaClaimERC721.getClaim(claimId);
-    //         bullaClaimERC721.rescind(claimId);
-    //     }
-    //     delete expenses[expenseId];
-    //     expenseCount.decrement();
-    // }
-
-    // function _checkIfActive() internal {
-    //     if(daoStatus == DauStatus.Paused || daoStatus == DauStatus.Inactive) revert DaoIsNotActive(dauStatus);
-    // }
+    function _checkIfActive() internal view {
+        if (daoStatus == DaoStatus.Paused || daoStatus == DaoStatus.Inactive)
+            revert DaoIsNotActive(daoStatus);
+    }
 }

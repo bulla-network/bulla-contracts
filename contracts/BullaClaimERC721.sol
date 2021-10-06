@@ -7,34 +7,35 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interfaces/IBullaManager.sol";
 import "./interfaces/IBullaClaim.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 
+error ZeroAddress();
+error PastDueDate();
+error TokenIdNoExist();
+error ClaimTokenNotContract();
 error NotCreditor(address sender);
 error NotDebtor(address sender);
 error NotTokenOwner(address sender);
 error NotCreditorOrDebtor(address sender);
 error OwnerNotCreditor(address sender);
 error ClaimCompleted();
+error ClaimNotPending();
 error IncorrectValue(uint256 value, uint256 expectedValue);
 error InsufficientBalance(uint256 senderBalance);
 error InsufficientAllowance(uint256 senderAllowance);
 error RepayingTooMuch(uint256 amount, uint256 expectedAmount);
 error ValueMustBeGreaterThanZero();
-error StatusNotPending(Status status);
 
 contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
     using SafeERC20 for IERC20;
     using Counters for Counters.Counter;
+    using Address for address;
 
     Counters.Counter private tokenIds;
 
-    address public bullaManager;
+    address public override bullaManager;
     mapping(uint256 => Claim) private claimTokens;
-
-    event BullaManagerSet(
-        address indexed prevBullaManager,
-        address indexed newBullaManager,
-        uint256 blocktime
-    );
 
     modifier onlyTokenOwner(uint256 tokenId) {
         if (ownerOf(tokenId) != msg.sender) revert NotCreditor(msg.sender);
@@ -52,6 +53,13 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
             claimTokens[tokenId].status != Status.Pending &&
             claimTokens[tokenId].status != Status.Repaying
         ) revert ClaimCompleted();
+        _;
+    }
+
+    modifier onlyPendingClaim(uint256 tokenId) {
+        if (
+            claimTokens[tokenId].status != Status.Pending
+        ) revert ClaimNotPending();
         _;
     }
 
@@ -74,9 +82,22 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
         address claimToken,
         Multihash calldata attachment
     ) external override returns (uint256) {
+        if (creditor == address(0) || debtor == address(0)) {
+            revert ZeroAddress();
+        }
+        if (claimAmount == 0) {
+            revert ValueMustBeGreaterThanZero();
+        }
+        if (dueBy < block.timestamp) {
+            revert PastDueDate();
+        }
+        if (!claimToken.isContract()) {
+            revert ClaimTokenNotContract();
+        }
+
         tokenIds.increment();
         uint256 newTokenId = tokenIds.current();
-        _mint(creditor, newTokenId);
+        _safeMint(creditor, newTokenId);
 
         Claim memory newClaim;
         newClaim.debtor = debtor;
@@ -95,11 +116,11 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
             debtor,
             claimToken,
             description,
+            attachment,
             claimAmount,
             dueBy,
             block.timestamp
         );
-
         return newTokenId;
     }
 
@@ -108,38 +129,39 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
         override
         onlyIncompleteClaim(tokenId)
     {
-        Claim memory claim = claimTokens[tokenId];
-
-        IERC20 claimToken = IERC20(claim.claimToken);
-        uint256 senderBalance = claimToken.balanceOf(msg.sender);
-
-        if (senderBalance < claim.claimAmount - claim.paidAmount)
-            revert InsufficientBalance(senderBalance);
-
-        if (claim.paidAmount + paymentAmount > claim.claimAmount)
-            revert RepayingTooMuch(
-                paymentAmount,
-                claim.claimAmount - claim.paidAmount
-            );
-
-        IBullaManager managerContract = IBullaManager(bullaManager);
         if (paymentAmount == 0) revert ValueMustBeGreaterThanZero();
-        (uint32 fee, address collectionAddress) = managerContract.getFeeInfo(
-            msg.sender
-        );
+        if (!_exists(tokenId)) revert TokenIdNoExist();
 
-        uint256 transactionFee = fee > 0 ? (paymentAmount * fee) / 10000 : 0;
+        Claim memory claim = getClaim(tokenId);
+        address creditor = ownerOf(tokenId);
 
-        claim.paidAmount += paymentAmount;
-        claim.paidAmount == claim.claimAmount
+        uint256 amountToRepay = claim.claimAmount - claim.paidAmount;
+        uint256 totalPayment = paymentAmount >= amountToRepay
+            ? amountToRepay
+            : paymentAmount;
+        claim.paidAmount + totalPayment == claim.claimAmount
             ? claim.status = Status.Paid
             : claim.status = Status.Repaying;
+        claimTokens[tokenId].paidAmount += totalPayment;
+        claimTokens[tokenId].status = claim.status;
+ 
+        (address collectionAddress, uint256 transactionFee) = IBullaManager(
+            bullaManager
+        ).getTransactionFee(msg.sender, totalPayment);
 
-        claimToken.safeTransferFrom(
+        IERC20(claim.claimToken).safeTransferFrom(
             msg.sender,
-            ownerOf(tokenId),
-            paymentAmount - transactionFee
+            creditor,
+            totalPayment - transactionFee
         );
+
+        if (transactionFee > 0) {
+            IERC20(claim.claimToken).safeTransferFrom(
+                msg.sender,
+                collectionAddress,
+                transactionFee
+            );
+        }
 
         emit ClaimPayment(
             bullaManager,
@@ -149,14 +171,6 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
             paymentAmount,
             block.timestamp
         );
-        if (transactionFee > 0) {
-            claimToken.safeTransferFrom(
-                msg.sender,
-                collectionAddress,
-                transactionFee
-            );
-        }
-
         emit FeePaid(
             bullaManager,
             tokenId,
@@ -165,19 +179,14 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
             transactionFee,
             block.timestamp
         );
-
-        //DO I WANT TO DO THIS? @adamgall @christopherdancy
-        if (claim.status == Status.Paid) _burn(tokenId);
     }
 
     function rejectClaim(uint256 tokenId)
         external
         override
         onlyDebtor(tokenId)
+        onlyPendingClaim(tokenId)
     {
-        if (claimTokens[tokenId].status != Status.Pending)
-            revert StatusNotPending(claimTokens[tokenId].status);
-
         claimTokens[tokenId].status = Status.Rejected;
         emit ClaimRejected(bullaManager, tokenId, block.timestamp);
     }
@@ -186,35 +195,18 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
         external
         override
         onlyTokenOwner(tokenId)
+        onlyPendingClaim(tokenId)
     {
-        if (claimTokens[tokenId].status != Status.Pending)
-            revert StatusNotPending(claimTokens[tokenId].status);
-
         claimTokens[tokenId].status = Status.Rescinded;
         emit ClaimRescinded(bullaManager, tokenId, block.timestamp);
     }
 
-    function updateMultihash(
-        uint256 tokenId,
-        bytes32 hash,
-        uint8 hashFunction,
-        uint8 size
-    ) external override {
-        if (ownerOf(tokenId) != msg.sender) revert NotTokenOwner(msg.sender);
-
-        claimTokens[tokenId].attachment = Multihash(hash, hashFunction, size);
-        emit MultihashAdded(
-            bullaManager,
-            tokenId,
-            claimTokens[tokenId].debtor,
-            ownerOf(tokenId),
-            claimTokens[tokenId].attachment,
-            block.timestamp
-        );
+    function burn(uint256 tokenId) external onlyTokenOwner(tokenId) {
+        _burn(tokenId);
     }
 
     function getClaim(uint256 tokenId)
-        external
+        public
         view
         override
         returns (Claim memory)
