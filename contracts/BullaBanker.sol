@@ -12,7 +12,7 @@ contract BullaBanker {
         address indexed bullaManager,
         uint256 indexed tokenId,
         address indexed updatedBy,
-        bytes32 Tag,
+        bytes32 tag,
         uint256 blocktime
     );
 
@@ -42,7 +42,7 @@ contract BullaBanker {
         uint256 dueBy,
         address claimToken,
         Multihash calldata attachment
-    ) public {
+    ) public returns (uint256) {
         if (msg.sender != creditor && msg.sender != debtor)
             revert NotCreditorOrDebtor(msg.sender);
 
@@ -65,6 +65,7 @@ contract BullaBanker {
             bullaTag,
             block.timestamp
         );
+        return newTokenId;
     }
 
     function updateBullaTag(uint256 tokenId, bytes32 newTag) public {
