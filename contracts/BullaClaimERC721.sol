@@ -114,11 +114,9 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
             msg.sender,
             creditor,
             debtor,
-            claimToken,
+            tx.origin,
             description,
-            attachment,
-            claimAmount,
-            dueBy,
+            newClaim,
             block.timestamp
         );
         return newTokenId;
