@@ -1,5 +1,3 @@
-// hardhat.config.ts
-//https://rahulsethuram.medium.com/the-new-solidity-dev-stack-buidler-ethers-waffle-typescript-tutorial-f07917de48ae
 require("dotenv").config({ path: "./.env" });
 import { HardhatUserConfig } from "hardhat/types";
 import "@nomiclabs/hardhat-ethers";
@@ -45,10 +43,21 @@ const config: HardhatUserConfig = {
       accounts: [DEPLOY_PK],
       chainId: 30,
     },
-    celo_testnet: {
-      url: `https://alfajores-forno.celo-testnet.org`,
+    polygon: {
+      url: "https://polygon-rpc.com/",
       accounts: [DEPLOY_PK],
-      chainId: 44787,
+      chainId: 137,
+      gasPrice: 80000000000,
+    },
+    avalanche_cChain: {
+      url: "https://api.avax.network/ext/bc/C/rpc",
+      accounts: [DEPLOY_PK],
+      chainId: 43114,
+    },
+    celo: {
+      url: `https://forno.celo.org`,
+      accounts: [DEPLOY_PK],
+      chainId: 42220,
     },
   },
   namedAccounts: {
@@ -57,6 +66,8 @@ const config: HardhatUserConfig = {
       4: DEPLOYER_ADDRESS,
       100: DEPLOYER_ADDRESS,
       44787: DEPLOYER_ADDRESS,
+      137: DEPLOYER_ADDRESS,
+      43114: DEPLOYER_ADDRESS,
       30: DEPLOYER_ADDRESS,
     },
   },
