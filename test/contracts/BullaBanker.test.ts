@@ -39,7 +39,7 @@ describe("Bulla Banker", function () {
         ])) as BullaManager;
 
         bullaClaimERC721 = (await deployContract(owner, BullaClaimERC721Mock, [
-            bullaManager.address,
+            bullaManager.address, "ipfs.io/ipfs/"
         ])) as BullaClaimERC721;
 
         bullaBanker = (await deployContract(owner, BullaBankerMock, [
