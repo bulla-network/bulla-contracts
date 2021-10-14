@@ -89,6 +89,17 @@ interface IBullaClaim {
         Multihash calldata attachment
     ) external returns (uint256 newTokenId);
 
+    function createClaimWithURI(
+        address creditor,
+        address debtor,
+        string memory description,
+        uint256 claimAmount,
+        uint256 dueBy,
+        address claimToken,
+        Multihash calldata attachment,
+        string calldata _tokenUri
+    ) external returns (uint256 newTokenId);
+
     function payClaim(uint256 tokenId, uint256 paymentAmount) external;
 
     function rejectClaim(uint256 tokenId) external;

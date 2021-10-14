@@ -93,7 +93,7 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
         emit BullaManagerSet(prevBullaManager, bullaManager, block.timestamp);
     }
 
-    function createClaim(
+    function _createClaim(
         address creditor,
         address debtor,
         string memory description,
@@ -101,7 +101,7 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
         uint256 dueBy,
         address claimToken,
         Multihash calldata attachment
-    ) public override returns (uint256) {
+    ) internal returns (uint256) {
         if (creditor == address(0) || debtor == address(0)) {
             revert ZeroAddress();
         }
@@ -144,6 +144,27 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
         return newTokenId;
     }
 
+    function createClaim(
+        address creditor,
+        address debtor,
+        string memory description,
+        uint256 claimAmount,
+        uint256 dueBy,
+        address claimToken,
+        Multihash calldata attachment
+    ) external override returns (uint256) {
+        uint256 _tokenId = _createClaim(
+            creditor,
+            debtor,
+            description,
+            claimAmount,
+            dueBy,
+            claimToken,
+            attachment
+        );
+        return _tokenId;
+    }
+
     function createClaimWithURI(
         address creditor,
         address debtor,
@@ -153,8 +174,8 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
         address claimToken,
         Multihash calldata attachment,
         string calldata _tokenUri
-    ) external returns (uint256) {
-        uint256 _tokenId = createClaim(
+    ) external override returns (uint256) {
+        uint256 _tokenId = _createClaim(
             creditor,
             debtor,
             description,
