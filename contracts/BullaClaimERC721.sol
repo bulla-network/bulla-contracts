@@ -269,6 +269,10 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
         _burn(tokenId);
     }
 
+    function nextClaimId() external view returns(uint256) {
+        return tokenIds.current() + 1;
+    }
+
     function getClaim(uint256 tokenId)
         public
         view

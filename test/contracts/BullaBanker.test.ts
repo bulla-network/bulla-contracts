@@ -60,27 +60,33 @@ describe("Bulla Banker", function () {
             await expect(bullaBanker
                 .connect(notOwner)
                 .createBullaClaim(
-                    claimAmount,
-                    creditor.address,
-                    debtor.address,
-                    "test",
+                    {
+                        claimAmount,
+                        creditor: creditor.address,
+                        debtor:debtor.address,
+                        attachment: someMultihash,
+                        claimToken: erc20Contract.address,
+                        dueBy,
+                        description: "test"
+                    },
                     creditorTag,
-                    dueBy,
-                    erc20Contract.address,
-                    someMultihash
+                    'testURI'
                 )).to.be.revertedWith(`NotCreditorOrDebtor("${notOwner.address}")`);
 
             await expect(await bullaBanker
                 .connect(creditor)
                 .createBullaClaim(
-                    claimAmount,
-                    creditor.address,
-                    debtor.address,
-                    "test",
+                    {
+                        claimAmount,
+                        creditor: creditor.address,
+                        debtor:debtor.address,
+                        attachment: someMultihash,
+                        claimToken: erc20Contract.address,
+                        dueBy,
+                        description: "test"
+                    },
                     creditorTag,
-                    dueBy,
-                    erc20Contract.address,
-                    someMultihash
+                    'testURI'
                 )).to.emit(bullaBanker, "BullaTagUpdated")
                 .withArgs(
                     bullaManager.address,
@@ -105,14 +111,17 @@ describe("Bulla Banker", function () {
             await expect(await bullaBanker
                 .connect(creditor)
                 .createBullaClaim(
-                    claimAmount,
-                    creditor.address,
-                    debtor.address,
-                    "test",
+                    {
+                        claimAmount,
+                        creditor: creditor.address,
+                        debtor:debtor.address,
+                        attachment: someMultihash,
+                        claimToken: erc20Contract.address,
+                        dueBy,
+                        description: "test"
+                    },
                     creditorTag,
-                    dueBy,
-                    erc20Contract.address,
-                    someMultihash
+                    'testURI'
                 )).to.emit(bullaBanker, "BullaTagUpdated")
 
             await expect(bullaBanker.connect(notOwner).updateBullaTag(1, creditorTag))
