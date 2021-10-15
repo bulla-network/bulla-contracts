@@ -1,6 +1,6 @@
 {
   "name": "@bulla-network/contracts",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "license": "MIT",
   "files": [
     "contracts/interfaces",
@@ -15,10 +15,12 @@
     "run-node": "npx hardhat node --fork https://rpc.xdaichain.com",
     "dev": "npx hardhat node",
     "deploy:hardhat": "npx hardhat run --network localhost scripts/deploy-hardhat.ts",
-    "deploy:rinkeby": "npx hardhat run --network rinkeby scripts/deploy-v1.ts",
-    "deploy:xdai": "npx hardhat run --network xdai scripts/deploy-v1.ts",
-    "deploy:rsk": "npx hardhat run --network rsk scripts/deploy-v1.ts",
-    "deploy:celo": "npx hardhat run --network celo scripts/deploy-v1.ts"
+    "deploy:rinkeby": "npx hardhat run --network rinkeby scripts/deploy-erc721.ts",
+    "deploy:xdai": "npx hardhat run --network xdai scripts/deploy-erc721.ts",
+    "deploy:avalanche": "npx hardhat run --network avalanche_cChain scripts/deploy-erc721.ts",
+    "deploy:polygon": "npx hardhat run --network polygon scripts/deploy-erc721.ts",
+    "deploy:rsk": "npx hardhat run --network rsk scripts/deploy-erc721.ts",
+    "deploy:celo": "npx hardhat run --network celo scripts/deploy-erc721.ts"
   },
   "dependencies": {
     "@types/node": "^16.9.1",

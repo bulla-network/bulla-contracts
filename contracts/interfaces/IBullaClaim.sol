@@ -32,14 +32,12 @@ interface IBullaClaim {
     event ClaimCreated(
         address bullaManager,
         uint256 tokenId,
-        address indexed origin,
+        address indexed parent,
         address indexed creditor,
         address indexed debtor,
-        address claimToken,
+        address origin,
         string description,
-        Multihash ipfsHash,
-        uint256 claimAmount,
-        uint256 dueBy,
+        Claim claim,
         uint256 blocktime
     );
 
