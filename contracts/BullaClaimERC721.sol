@@ -28,21 +28,10 @@ error RepayingTooMuch(uint256 amount, uint256 expectedAmount);
 error ValueMustBeGreaterThanZero();
 
 abstract contract BullaClaimERC721URI is Ownable, ERC721URIStorage {
-    modifier onlyTokenOwner(uint256 tokenId) {
-        if (ownerOf(tokenId) != msg.sender) revert NotCreditor(msg.sender);
-        _;
-    }
     string public baseURI;
 
     function setBaseURI(string memory baseURI_) public onlyOwner {
         baseURI = baseURI_;
-    }
-
-    function setTokenURI(uint256 tokenId, string memory tokenURI)
-        external
-        onlyTokenOwner(tokenId)
-    {
-        _setTokenURI(tokenId, tokenURI);
     }
 
     function _baseURI() internal view override returns (string memory) {
@@ -60,6 +49,11 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
     address public override bullaManager;
     mapping(uint256 => Claim) private claimTokens;
 
+    modifier onlyTokenOwner(uint256 tokenId) {
+        if (ownerOf(tokenId) != msg.sender) revert NotCreditor(msg.sender);
+        _;
+    }
+    
     modifier onlyDebtor(uint256 tokenId) {
         if (claimTokens[tokenId].debtor != msg.sender)
             revert NotDebtor(msg.sender);
@@ -134,11 +128,9 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
             msg.sender,
             creditor,
             debtor,
-            claimToken,
+            tx.origin,
             description,
-            attachment,
-            claimAmount,
-            dueBy,
+            newClaim,
             block.timestamp
         );
         return newTokenId;
@@ -269,7 +261,7 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
         _burn(tokenId);
     }
 
-    function nextClaimId() external view returns(uint256) {
+    function nextClaimId() external view returns (uint256) {
         return tokenIds.current() + 1;
     }
 

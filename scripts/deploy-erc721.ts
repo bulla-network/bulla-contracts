@@ -24,7 +24,7 @@ const deployCreator = async function () {
   const { address: ERC721Address } = await deploy("BullaClaimERC721", {
     from: deployer,
     log: true,
-    args: [managerAddress],
+    args: [managerAddress, "https://ipfs.io/ipfs/"],
   });
 
   const { address: bankerAddress, receipt: bankerReceipt } = await deploy(
