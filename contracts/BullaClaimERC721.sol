@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.7;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -27,7 +27,19 @@ error InsufficientAllowance(uint256 senderAllowance);
 error RepayingTooMuch(uint256 amount, uint256 expectedAmount);
 error ValueMustBeGreaterThanZero();
 
-contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
+abstract contract BullaClaimERC721URI is Ownable, ERC721URIStorage {
+    string public baseURI;
+
+    function setBaseURI(string memory baseURI_) public onlyOwner {
+        baseURI = baseURI_;
+    }
+
+    function _baseURI() internal view override returns (string memory) {
+        return baseURI;
+    }
+}
+
+contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
     using SafeERC20 for IERC20;
     using Counters for Counters.Counter;
     using Address for address;
@@ -41,7 +53,7 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
         if (ownerOf(tokenId) != msg.sender) revert NotCreditor(msg.sender);
         _;
     }
-
+    
     modifier onlyDebtor(uint256 tokenId) {
         if (claimTokens[tokenId].debtor != msg.sender)
             revert NotDebtor(msg.sender);
@@ -57,14 +69,16 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
     }
 
     modifier onlyPendingClaim(uint256 tokenId) {
-        if (
-            claimTokens[tokenId].status != Status.Pending
-        ) revert ClaimNotPending();
+        if (claimTokens[tokenId].status != Status.Pending)
+            revert ClaimNotPending();
         _;
     }
 
-    constructor(address _bullaManager) ERC721("BullaClaim721", "CLAIM") {
-        setBullaManager(_bullaManager);
+    constructor(address bullaManager_, string memory baseURI_)
+        ERC721("BullaClaim721", "CLAIM")
+    {
+        setBullaManager(bullaManager_);
+        setBaseURI(baseURI_);
     }
 
     function setBullaManager(address _bullaManager) public onlyOwner {
@@ -73,7 +87,7 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
         emit BullaManagerSet(prevBullaManager, bullaManager, block.timestamp);
     }
 
-    function createClaim(
+    function _createClaim(
         address creditor,
         address debtor,
         string memory description,
@@ -81,7 +95,7 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
         uint256 dueBy,
         address claimToken,
         Multihash calldata attachment
-    ) external override returns (uint256) {
+    ) internal returns (uint256) {
         if (creditor == address(0) || debtor == address(0)) {
             revert ZeroAddress();
         }
@@ -122,6 +136,50 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
         return newTokenId;
     }
 
+    function createClaim(
+        address creditor,
+        address debtor,
+        string memory description,
+        uint256 claimAmount,
+        uint256 dueBy,
+        address claimToken,
+        Multihash calldata attachment
+    ) external override returns (uint256) {
+        uint256 _tokenId = _createClaim(
+            creditor,
+            debtor,
+            description,
+            claimAmount,
+            dueBy,
+            claimToken,
+            attachment
+        );
+        return _tokenId;
+    }
+
+    function createClaimWithURI(
+        address creditor,
+        address debtor,
+        string memory description,
+        uint256 claimAmount,
+        uint256 dueBy,
+        address claimToken,
+        Multihash calldata attachment,
+        string calldata _tokenUri
+    ) external override returns (uint256) {
+        uint256 _tokenId = _createClaim(
+            creditor,
+            debtor,
+            description,
+            claimAmount,
+            dueBy,
+            claimToken,
+            attachment
+        );
+        _setTokenURI(_tokenId, _tokenUri);
+        return _tokenId;
+    }
+
     function payClaim(uint256 tokenId, uint256 paymentAmount)
         external
         override
@@ -142,7 +200,7 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
             : claim.status = Status.Repaying;
         claimTokens[tokenId].paidAmount += totalPayment;
         claimTokens[tokenId].status = claim.status;
- 
+
         (address collectionAddress, uint256 transactionFee) = IBullaManager(
             bullaManager
         ).getTransactionFee(msg.sender, totalPayment);
@@ -201,6 +259,10 @@ contract BullaClaimERC721 is Ownable, IBullaClaim, ERC721 {
 
     function burn(uint256 tokenId) external onlyTokenOwner(tokenId) {
         _burn(tokenId);
+    }
+
+    function nextClaimId() external view returns (uint256) {
+        return tokenIds.current() + 1;
     }
 
     function getClaim(uint256 tokenId)

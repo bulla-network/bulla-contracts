@@ -22,6 +22,16 @@ contract BullaBanker {
         address bullaBanker,
         uint256 blocktime
     );
+    
+    struct ClaimParams {
+        uint256 claimAmount;
+        address creditor;
+        address debtor;
+        string description;
+        uint256 dueBy;
+        address claimToken;
+        Multihash attachment;
+    }
 
     constructor(address _bullaClaimERC721) {
         bullaClaimERC721 = _bullaClaimERC721;
@@ -34,28 +44,24 @@ contract BullaBanker {
     }
 
     function createBullaClaim(
-        uint256 claimAmount,
-        address creditor,
-        address debtor,
-        string memory description,
+        ClaimParams calldata claim,
         bytes32 bullaTag,
-        uint256 dueBy,
-        address claimToken,
-        Multihash calldata attachment
+        string calldata _tokenUri
     ) public returns (uint256) {
-        if (msg.sender != creditor && msg.sender != debtor)
+        if (msg.sender != claim.creditor && msg.sender != claim.debtor)
             revert NotCreditorOrDebtor(msg.sender);
 
         address _bullaClaimERC721Address = bullaClaimERC721;
         uint256 newTokenId = BullaClaimERC721(_bullaClaimERC721Address)
-            .createClaim(
-                creditor,
-                debtor,
-                description,
-                claimAmount,
-                dueBy,
-                claimToken,
-                attachment
+            .createClaimWithURI(
+                claim.creditor,
+                claim.debtor,
+                claim.description,
+                claim.claimAmount,
+                claim.dueBy,
+                claim.claimToken,
+                claim.attachment,
+                _tokenUri
             );
 
         emit BullaTagUpdated(
