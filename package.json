@@ -18,6 +18,7 @@
     "deploy:rinkeby": "npx hardhat run --network rinkeby scripts/deploy-erc721.ts",
     "deploy:xdai": "npx hardhat run --network xdai scripts/deploy-erc721.ts",
     "deploy:avalanche": "npx hardhat run --network avalanche_cChain scripts/deploy-erc721.ts",
+    "deploy:harmony_testnet": "npx hardhat run --network harmony_testnet scripts/deploy-erc721.ts",
     "deploy:polygon": "npx hardhat run --network polygon scripts/deploy-erc721.ts",
     "deploy:rsk": "npx hardhat run --network rsk scripts/deploy-erc721.ts",
     "deploy:celo": "npx hardhat run --network celo scripts/deploy-erc721.ts"

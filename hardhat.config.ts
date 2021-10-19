@@ -49,6 +49,11 @@ const config: HardhatUserConfig = {
       chainId: 137,
       gasPrice: 80000000000,
     },
+    harmony_testnet: {
+      url: "https://api.s0.b.hmny.io",
+      accounts: [DEPLOY_PK],
+      chainId: 1666700000,
+    },
     avalanche_cChain: {
       url: "https://api.avax.network/ext/bc/C/rpc",
       accounts: [DEPLOY_PK],
