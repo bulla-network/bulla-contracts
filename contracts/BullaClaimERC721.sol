@@ -223,6 +223,7 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
             bullaManager,
             tokenId,
             claim.debtor,
+            tx.origin,
             msg.sender,
             paymentAmount,
             block.timestamp

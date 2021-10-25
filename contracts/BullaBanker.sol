@@ -22,7 +22,7 @@ contract BullaBanker {
         address bullaBanker,
         uint256 blocktime
     );
-    
+
     struct ClaimParams {
         uint256 claimAmount;
         address creditor;
@@ -72,6 +72,28 @@ contract BullaBanker {
             block.timestamp
         );
         return newTokenId;
+    }
+
+    function createBatch(
+        bytes32 tag,
+        ClaimParams[] calldata claims,
+        string[] calldata tokenURIs
+    ) public {
+        require(
+            claims.length == tokenURIs.length,
+            "BATCHBULLA: Token URIs not equal"
+        );
+        require(claims.length > 0, "BATCHBULLA: zero claims");
+        require(tokenURIs.length > 0, "BATCHBULLA: zero tokenURIs");
+        require(claims.length <= 20, "BATCHBULLA: too many claims");
+
+        for (uint256 i = 0; i < claims.length; i++) {
+            createBullaClaim(
+                claims[i],
+                tag,
+                tokenURIs[i]
+            );
+        }
     }
 
     function updateBullaTag(uint256 tokenId, bytes32 newTag) public {
