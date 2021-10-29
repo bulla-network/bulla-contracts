@@ -54,6 +54,11 @@ const config: HardhatUserConfig = {
       accounts: [DEPLOY_PK],
       chainId: 1666700000,
     },
+    harmony: {
+      url: "https://a.api.s0.t.hmny.io",
+      accounts: [DEPLOY_PK],
+      chainId: 1666600000,
+    },
     avalanche_cChain: {
       url: "https://api.avax.network/ext/bc/C/rpc",
       accounts: [DEPLOY_PK],
@@ -72,6 +77,8 @@ const config: HardhatUserConfig = {
       100: DEPLOYER_ADDRESS,
       44787: DEPLOYER_ADDRESS,
       137: DEPLOYER_ADDRESS,
+      1666600000: DEPLOYER_ADDRESS,
+      1666700000: DEPLOYER_ADDRESS,
       43114: DEPLOYER_ADDRESS,
       30: DEPLOYER_ADDRESS,
     },

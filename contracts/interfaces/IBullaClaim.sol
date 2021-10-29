@@ -31,8 +31,8 @@ struct Claim {
 interface IBullaClaim {
     event ClaimCreated(
         address bullaManager,
-        uint256 tokenId,
-        address indexed parent,
+        uint256 indexed tokenId,
+        address parent,
         address indexed creditor,
         address indexed debtor,
         address origin,
@@ -46,6 +46,7 @@ interface IBullaClaim {
         uint256 indexed tokenId,
         address indexed debtor,
         address paidBy,
+        address paidByOrigin,
         uint256 paymentAmount,
         uint256 blocktime
     );
