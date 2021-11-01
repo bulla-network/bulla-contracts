@@ -1,0 +1,33 @@
+{
+  "compiler": { "version": "0.8.7+commit.e28d00a7" },
+  "language": "Solidity",
+  "output": {
+    "abi": [],
+    "devdoc": {
+      "details": "Collection of functions related to the address type",
+      "kind": "dev",
+      "methods": {},
+      "version": 1
+    },
+    "userdoc": { "kind": "user", "methods": {}, "version": 1 }
+  },
+  "settings": {
+    "compilationTarget": { "BullaClaimERC721_flat.sol": "Address" },
+    "evmVersion": "london",
+    "libraries": {},
+    "metadata": { "bytecodeHash": "ipfs" },
+    "optimizer": { "enabled": false, "runs": 200 },
+    "remappings": []
+  },
+  "sources": {
+    "BullaClaimERC721_flat.sol": {
+      "keccak256": "0xd2d4f2dcc8f2f3a82fae13459e96ba461a582f93a8e8dcd9eda4bc64972c66fa",
+      "license": "MIT",
+      "urls": [
+        "bzz-raw://1cfdf35e4ecec542360c5daead0e6766373c5760079a11a8ca44fc5cc2416f4b",
+        "dweb:/ipfs/QmQv8wgS4osfQihjBFGyNV5TbWDYdj3LgYpaDVBpBxGbUo"
+      ]
+    }
+  },
+  "version": 1
+}
