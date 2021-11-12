@@ -4,3 +4,9 @@
 .env
 /cache
 coverage/
+.vscode
+.archive
+/deploy_info
+/deployments
+yarn.lock
+contracts/artifacts
