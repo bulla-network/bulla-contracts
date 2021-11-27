@@ -15,6 +15,7 @@
     "run-node": "npx hardhat node --fork https://rpc.xdaichain.com",
     "dev": "npx hardhat node",
     "deploy:hardhat": "npx hardhat run --network localhost scripts/deploy-hardhat.ts",
+    "deploy:loan": "npx hardhat run --network localhost scripts/deploy-loan.ts",
     "deploy:rinkeby": "npx hardhat run --network rinkeby scripts/deploy-erc721.ts",
     "deploy:xdai": "npx hardhat run --network xdai scripts/deploy-erc721.ts",
     "deploy:avalanche": "npx hardhat run --network avalanche_cChain scripts/deploy-erc721.ts",
