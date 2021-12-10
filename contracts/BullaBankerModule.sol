@@ -1,14 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.7;
 import "@gnosis.pm/zodiac/contracts/core/Module.sol";
+import "@gnosis.pm/safe-contracts/contracts/base/OwnerManager.sol";
 import "./BullaBanker.sol";
 
 /// @title BullaBankerModule
 /// @author Colin Nielsen
-/// @notice A gnosis module for BullaBanker allowing permissionless use of basic BullaBanker functions
+/// @notice A gnosis module for BullaBanker allowing permissionless use of basic BullaClaim and BullaBanker
+///     functions (e.g. createClaim, payClaim, updateTag, rejectClaim, rescindClaim) for the signers of a safe
 
 contract BullaBankerModule is Module {
-    string public constant VERSION = "0.0.1";
+    string public constant VERSION = "0.0.11-gnosis-alpha";
     address public bullaBanker;
     address public bullaClaim;
 
@@ -18,6 +20,15 @@ contract BullaBankerModule is Module {
         address indexed moduleAddress,
         address indexed initiator
     );
+
+    /// checks the avatar of the module (will be the gnosis safe) and ensures the calling account is a signer on the safe.
+    modifier onlySigner() {
+        require(
+            OwnerManager(avatar).isOwner(msg.sender),
+            "BULLAMODULE: Not safe owner"
+        );
+        _;
+    }
 
     /// @dev Initialize function, will be triggered when a new proxy is deployed
     /// @param _safe Address of the safe
@@ -53,7 +64,7 @@ contract BullaBankerModule is Module {
         BullaBanker.ClaimParams calldata _claim,
         bytes32 _bullaTag,
         string calldata _tokenUri
-    ) external {
+    ) external onlySigner {
         //0xa1001a60  =>  createBullaClaim((uint256,address,address,string,uint256,address,(bytes32,uint8,uint8)),bytes32,string)
         bytes memory data = abi.encodeWithSelector(
             0xa1001a60,
@@ -67,7 +78,10 @@ contract BullaBankerModule is Module {
         );
     }
 
-    function updateBullaTag(uint256 _tokenId, bytes32 _bullaTag) external {
+    function updateBullaTag(uint256 _tokenId, bytes32 _bullaTag)
+        external
+        onlySigner
+    {
         //0x4fbb8987  =>  updateBullaTag(uint256 tokenId, bytes32 newTag)
         bytes memory data = abi.encodeWithSelector(
             0x4fbb8987,
@@ -80,7 +94,7 @@ contract BullaBankerModule is Module {
         );
     }
 
-    function rejectClaim(uint256 _tokenId) external {
+    function rejectClaim(uint256 _tokenId) external onlySigner {
         //0x20341101  =>  rejectClaim(uint256 tokenId)
         bytes memory data = abi.encodeWithSelector(0x20341101, _tokenId);
         require(
@@ -89,25 +103,25 @@ contract BullaBankerModule is Module {
         );
     }
 
-    function rescindClaim(uint256 _tokenId) external {
+    function rescindClaim(uint256 _tokenId) external onlySigner {
         //0xe8042ce5  =>  rescindClaim(uint256 tokenId)
         bytes memory data = abi.encodeWithSelector(0xe8042ce5, _tokenId);
         require(
             exec(bullaClaim, 0, data, Enum.Operation.Call),
-            "BULLAMODULE: Rescind Failed"
+            "BULLAMODULE: Rescind failed"
         );
     }
 
-    function approve(address _token, uint256 amount) external {
+    function approve(address _token, uint256 _amount) external onlySigner {
         //0x095ea7b3  =>  approve(address,uint256)
         bytes memory data = abi.encodeWithSelector(
             0x095ea7b3,
             address(bullaClaim),
-            amount
+            _amount
         );
         require(
             exec(_token, 0, data, Enum.Operation.Call),
-            "BULLAMODULE: Approve Failed"
+            "BULLAMODULE: Approve failed"
         );
     }
 }
