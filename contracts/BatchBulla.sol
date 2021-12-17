@@ -4,6 +4,7 @@ import "./interfaces/IBullaClaim.sol";
 import "./BullaBanker.sol";
 
 contract BatchBulla {
+    uint8 private batchSize;
     address public bullaBanker;
     address public bullaClaim;
 
@@ -14,12 +15,17 @@ contract BatchBulla {
 
     modifier batchGuard(uint256 a, uint256 b) {
         require(a == b, "BATCHBULLA: parameters not equal");
-        require(a < 20, "BATCHBULLA: limit 20 operations");
+        require(a < batchSize, "BATCHBULLA: batch size exceeded");
         require(a > 0, "BATCHBULLA: zero amount parameters");
         _;
     }
 
-    constructor(address _bullaBanker, address _bullaClaim) {
+    constructor(
+        uint8 maxOperations,
+        address _bullaBanker,
+        address _bullaClaim
+    ) {
+        maxOperations = maxOperations;
         bullaBanker = _bullaBanker;
         bullaClaim = _bullaClaim;
     }
