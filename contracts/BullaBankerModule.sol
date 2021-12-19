@@ -5,7 +5,7 @@ import "@gnosis.pm/safe-contracts/contracts/base/OwnerManager.sol";
 import "./BullaBanker.sol";
 
 /// @title BullaBankerModule
-/// @author Colin Nielsen
+/// @author @colinnielsen
 /// @notice A gnosis module for BullaBanker allowing permissionless use of basic BullaClaim and BullaBanker
 ///     functions (e.g. createClaim, payClaim, updateTag, rejectClaim, rescindClaim) for the signers of a safe
 

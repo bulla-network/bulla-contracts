@@ -1,29 +1,29 @@
+import "@nomiclabs/hardhat-ethers";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
 import chai, { expect } from "chai";
 import { solidity } from "ethereum-waffle";
-import hre, { deployments, ethers } from "hardhat";
-import "@nomiclabs/hardhat-ethers";
-import { declareSignerWithAddress } from "../test-utils";
-import { BullaToken__factory } from "../../typechain/factories/BullaToken__factory";
-import { BullaManager__factory } from "../../typechain/factories/BullaManager__factory";
-import { BullaClaimERC721__factory } from "../../typechain/factories/BullaClaimERC721__factory";
-import { BullaBanker__factory } from "../../typechain/factories/BullaBanker__factory";
-import { BullaBankerModule__factory } from "../../typechain/factories/BullaBankerModule__factory";
-import { TestSafe__factory } from "../../typechain/factories/TestSafe__factory";
 import { utils } from "ethers";
-import { BullaBankerModule } from "../../typechain/BullaBankerModule";
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
+import hre, { deployments, ethers } from "hardhat";
 import { BullaBanker } from "../../typechain/BullaBanker";
+import { BullaBankerModule } from "../../typechain/BullaBankerModule";
+import { BullaBankerModule__factory } from "../../typechain/factories/BullaBankerModule__factory";
+import { BullaBanker__factory } from "../../typechain/factories/BullaBanker__factory";
+import { BullaClaimERC721__factory } from "../../typechain/factories/BullaClaimERC721__factory";
+import { BullaManager__factory } from "../../typechain/factories/BullaManager__factory";
+import { BullaToken__factory } from "../../typechain/factories/BullaToken__factory";
+import { TestSafe__factory } from "../../typechain/factories/TestSafe__factory";
+import { declareSignerWithAddress } from "../test-utils";
 
 chai.use(solidity);
 
 describe("test module", async () => {
-  let [safeOwner1, safeOwner2, outsider, collector, creditor, debtor] =
+  let [safeOwner1, safeOwner2, outsider, collector, creditor] =
     declareSignerWithAddress();
   let feeBasisPoint = 1000;
 
   const setupTests = deployments.createFixture(async ({ deployments }) => {
     await deployments.fixture();
-    [safeOwner1, safeOwner2, outsider, collector, creditor, debtor] =
+    [safeOwner1, safeOwner2, outsider, collector, creditor] =
       await ethers.getSigners();
     const ERC20 = (await hre.ethers.getContractFactory(
       "BullaToken"
@@ -98,7 +98,7 @@ describe("test module", async () => {
         claimToken: tokenAddress,
         dueBy,
         attachment: {
-          hash: ethers.utils.formatBytes32String("some hash"),
+          hash: utils.formatBytes32String("some hash"),
           hashFunction: 0,
           size: 0,
         },
@@ -112,6 +112,7 @@ describe("test module", async () => {
       it("should create a claim via module", async () => {
         const { bullaBankerModule, bullaToken, bullaClaim, safe } =
           await setupTests();
+        const tokenId = "1";
 
         await expect(
           getCreateClaimTx(bullaBankerModule, {
@@ -120,7 +121,7 @@ describe("test module", async () => {
             tokenAddress: bullaToken.address,
           })
         ).to.emit(bullaClaim, "ClaimCreated");
-        const tokenId = "1";
+
         const claim = await bullaClaim.getClaim(tokenId);
         expect(await bullaClaim.ownerOf(tokenId)).to.equal(creditor.address);
         expect(claim.debtor).to.equal(safe.address);
@@ -162,12 +163,13 @@ describe("test module", async () => {
           bullaManager,
         } = await setupTests();
         const tokenId = "1";
-        const tx = await getCreateClaimTx(bullaBankerModule, {
+
+        const createClaimTx = await getCreateClaimTx(bullaBankerModule, {
           creditorAddress: creditor.address,
           debtorAddress: safe.address,
           tokenAddress: bullaToken.address,
         });
-        await tx.wait();
+        await createClaimTx.wait();
 
         const tag = utils.formatBytes32String("account tag");
         await expect(
@@ -179,7 +181,7 @@ describe("test module", async () => {
             tokenId,
             safe.address,
             tag,
-            await (
+            (
               await ethers.provider.getBlock("latest")
             ).timestamp
           );
@@ -188,6 +190,7 @@ describe("test module", async () => {
       it("should revert if sender != safe owner", async () => {
         const { bullaBankerModule } = await setupTests();
         const tokenId = "1";
+
         await expect(
           bullaBankerModule
             .connect(outsider)
@@ -203,6 +206,7 @@ describe("test module", async () => {
       it("reject inbound claims", async () => {
         const { bullaBankerModule, bullaToken, safe, bullaClaim, bullaBanker } =
           await setupTests();
+        const tokenId = "1";
 
         // invoice the safe from outsider's account
         const createClaimTx = await getCreateClaimTx(bullaBanker, {
@@ -214,13 +218,15 @@ describe("test module", async () => {
         await createClaimTx.wait();
 
         await expect(
-          bullaBankerModule.connect(safeOwner1).rejectClaim("1")
+          bullaBankerModule.connect(safeOwner1).rejectClaim(tokenId)
         ).to.emit(bullaClaim, "ClaimRejected");
       });
 
       it("should revert if sender != safe owner", async () => {
         const { bullaBankerModule, bullaToken, safe, bullaBanker } =
           await setupTests();
+        const tokenId = "1";
+
         const createClaimTx = await getCreateClaimTx(bullaBanker, {
           creditorAddress: outsider.address,
           debtorAddress: safe.address,
@@ -230,36 +236,16 @@ describe("test module", async () => {
         await createClaimTx.wait();
 
         await expect(
-          bullaBankerModule.connect(outsider).rejectClaim("1")
+          bullaBankerModule.connect(outsider).rejectClaim(tokenId)
         ).to.be.revertedWith("BULLAMODULE: Not safe owner");
       });
     });
 
     describe("rescind claim", async () => {
-      it("should create a claim via module", async () => {
+      it("should rescind a outbound claim", async () => {
         const { bullaBankerModule, bullaToken, bullaClaim, safe } =
           await setupTests();
-
-        await expect(
-          getCreateClaimTx(bullaBankerModule, {
-            creditorAddress: safe.address,
-            debtorAddress: debtor.address,
-            tokenAddress: bullaToken.address,
-          })
-        ).to.emit(bullaClaim, "ClaimCreated");
         const tokenId = "1";
-        const claim = await bullaClaim.getClaim(tokenId);
-        console.log({ sender: safeOwner1.address });
-        console.log({ safe: safe.address });
-        console.log({ creditor: safe.address });
-        console.log({ debtor: debtor.address });
-        await bullaClaim.ownerOf(tokenId).then(console.log);
-        await bullaClaim.getClaim(tokenId).then(console.log);
-        expect(claim.debtor).to.equal(safe.address);
-      });
-
-      it("should revert if sender != safe owner", async () => {
-        const { bullaBankerModule, bullaToken, safe } = await setupTests();
 
         const createClaimTx = await getCreateClaimTx(bullaBankerModule, {
           creditorAddress: safe.address,
@@ -268,7 +254,23 @@ describe("test module", async () => {
         });
         await createClaimTx.wait();
 
+        expect(bullaBankerModule.rescindClaim(tokenId)).to.emit(
+          bullaClaim,
+          "ClaimRescinded"
+        );
+      });
+
+      it("should revert if sender != safe owner", async () => {
+        const { bullaBankerModule, bullaToken, safe } = await setupTests();
         const tokenId = "1";
+
+        const createClaimTx = await getCreateClaimTx(bullaBankerModule, {
+          creditorAddress: safe.address,
+          debtorAddress: outsider.address,
+          tokenAddress: bullaToken.address,
+        });
+        await createClaimTx.wait();
+
         await expect(
           bullaBankerModule.connect(outsider).rescindClaim(tokenId)
         ).to.be.revertedWith("BULLAMODULE: Not safe owner");
