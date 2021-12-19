@@ -10,5 +10,3 @@ coverage/
 /deployments
 yarn.lock
 contracts/artifacts
-yarn.lock
-package-lock.json
