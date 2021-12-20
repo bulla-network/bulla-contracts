@@ -7,7 +7,7 @@ import "./BullaBanker.sol";
 /// @title BullaBankerModule
 /// @author @colinnielsen
 /// @notice A gnosis module for BullaBanker allowing permissionless use of basic BullaClaim and BullaBanker
-///     functions (e.g. createClaim, payClaim, updateTag, rejectClaim, rescindClaim) for the signers of a safe
+///     functions (e.g. createClaim, payClaim, updateTag, rejectClaim, rescindClaim) for the signers of a safe.
 
 contract BullaBankerModule is Module {
     string public constant VERSION = "0.0.8";
@@ -21,7 +21,7 @@ contract BullaBankerModule is Module {
         address indexed initiator
     );
 
-    /// checks the avatar of the module (will be the gnosis safe) and ensures the calling account is a signer on the safe.
+    /// checks the avatar of the module (will be the gnosis safe) and ensures the EOA is a signer on the safe.
     modifier onlySafeOwner() {
         require(
             OwnerManager(avatar).isOwner(msg.sender),
