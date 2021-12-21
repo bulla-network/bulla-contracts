@@ -4,9 +4,25 @@ import "./interfaces/IBullaClaim.sol";
 import "./BullaBanker.sol";
 
 contract BatchBulla {
-    uint8 private batchSize;
-    address public bullaBanker;
-    address public bullaClaim;
+    uint8 private immutable maxOperations;
+    address public immutable bullaBanker;
+    address public immutable bullaClaim;
+
+    struct CreateClaimParams {
+        address creditor;
+        address debtor;
+        string description;
+        uint256 claimAmount;
+        uint256 dueBy;
+        address claimToken;
+        Multihash attachment;
+    }
+
+    event BatchCreated(
+        CreateClaimParams[] claims,
+        address indexed sender,
+        bytes32 indexed tag
+    );
 
     enum CancelOperation {
         rescind,
@@ -15,17 +31,17 @@ contract BatchBulla {
 
     modifier batchGuard(uint256 a, uint256 b) {
         require(a == b, "BATCHBULLA: parameters not equal");
-        require(a < batchSize, "BATCHBULLA: batch size exceeded");
+        require(a <= maxOperations, "BATCHBULLA: batch size exceeded");
         require(a > 0, "BATCHBULLA: zero amount parameters");
         _;
     }
 
     constructor(
-        uint8 maxOperations,
+        uint8 _maxOperations,
         address _bullaBanker,
         address _bullaClaim
     ) {
-        maxOperations = maxOperations;
+        maxOperations = _maxOperations;
         bullaBanker = _bullaBanker;
         bullaClaim = _bullaClaim;
     }
@@ -48,21 +64,29 @@ contract BatchBulla {
         batchGuard(claimIds.length, amounts.length)
     {
         for (uint8 i = 0; i < amounts.length; i++) {
-            IBullaClaim(bullaClaim).payClaim(claimIds[i], amounts[i]);
+            (bool success,) = bullaClaim.delegatecall(abi.encodeWithSignature("payClaim(uint256,uint256)", claimIds[i], amounts[i]));
+            require(success, "BATCHBULLA: failed to pay claim");
         }
     }
 
-    function batchCreate(
-        bytes32 tag,
-        BullaBanker.ClaimParams[] calldata claims,
-        string[] calldata tokenURIs
-    ) external batchGuard(claims.length, tokenURIs.length) {
+    function batchCreate(CreateClaimParams[] calldata claims, bytes32 tag)
+        external
+    {
+        require(
+            claims.length <= maxOperations,
+            "BATCHBULLA: batch size exceeded"
+        );
         for (uint256 i = 0; i < claims.length; i++) {
-            BullaBanker(bullaBanker).createBullaClaim(
-                claims[i],
-                tag,
-                tokenURIs[i]
+            IBullaClaim(bullaClaim).createClaim(
+                claims[i].creditor,
+                claims[i].debtor,
+                claims[i].description,
+                claims[i].claimAmount,
+                claims[i].dueBy,
+                claims[i].claimToken,
+                claims[i].attachment
             );
         }
+        emit BatchCreated(claims, msg.sender, tag);
     }
 }
