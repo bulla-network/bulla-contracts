@@ -27,6 +27,11 @@ error InsufficientAllowance(uint256 senderAllowance);
 error RepayingTooMuch(uint256 amount, uint256 expectedAmount);
 error ValueMustBeGreaterThanZero();
 
+/**  proposed changes
+    1. remove blocktime
+    2. make tokenURI return a link to our server with the correct query string
+*/
+
 abstract contract BullaClaimERC721URI is Ownable, ERC721URIStorage {
     string public baseURI;
 
@@ -34,8 +39,17 @@ abstract contract BullaClaimERC721URI is Ownable, ERC721URIStorage {
         baseURI = baseURI_;
     }
 
-    function _baseURI() internal view override returns (string memory) {
-        return baseURI;
+    function tokenURI(uint256 _tokenId)
+        public
+        view
+        override
+        returns (string memory)
+    {
+        uint256 chainId;
+        assembly {
+            chainId := chainid()
+        }
+        return string(abi.encodePacked(baseURI, "/", chainId, "/", _tokenId));
     }
 }
 
@@ -53,7 +67,7 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
         if (ownerOf(tokenId) != msg.sender) revert NotCreditor(msg.sender);
         _;
     }
-    
+
     modifier onlyDebtor(uint256 tokenId) {
         if (claimTokens[tokenId].debtor != msg.sender)
             revert NotDebtor(msg.sender);
@@ -84,34 +98,26 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
     function setBullaManager(address _bullaManager) public onlyOwner {
         address prevBullaManager = bullaManager;
         bullaManager = _bullaManager;
-        emit BullaManagerSet(prevBullaManager, bullaManager, block.timestamp);
+        emit BullaManagerSet(prevBullaManager, bullaManager);
     }
 
     function _createClaim(
         address creditor,
         address debtor,
-        string memory description,
+        bytes32 description,
         uint256 claimAmount,
-        uint256 dueBy,
+        uint64 dueBy,
         address claimToken,
         Multihash calldata attachment
     ) internal returns (uint256) {
-        if (creditor == address(0) || debtor == address(0)) {
+        if (creditor == address(0) || debtor == address(0))
             revert ZeroAddress();
-        }
-        if (claimAmount == 0) {
-            revert ValueMustBeGreaterThanZero();
-        }
-        if (dueBy < block.timestamp) {
-            revert PastDueDate();
-        }
-        if (!claimToken.isContract()) {
-            revert ClaimTokenNotContract();
-        }
+        if (claimAmount == 0) revert ValueMustBeGreaterThanZero();
+        if (dueBy < block.timestamp) revert PastDueDate();
+        if (!claimToken.isContract()) revert ClaimTokenNotContract();
 
         tokenIds.increment();
         uint256 newTokenId = tokenIds.current();
-        _safeMint(creditor, newTokenId);
 
         Claim memory newClaim;
         newClaim.debtor = debtor;
@@ -119,19 +125,22 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
         newClaim.dueBy = dueBy;
         newClaim.status = Status.Pending;
         newClaim.claimToken = claimToken;
-        newClaim.attachment = attachment;
+        newClaim.ipfsHash = attachment.ipfsHash;
+        newClaim.hashFunction = attachment.hashFunction;
+        newClaim.hashSize = attachment.hashSize;
         claimTokens[newTokenId] = newClaim;
 
+        _safeMint(creditor, newTokenId);
+        
         emit ClaimCreated(
             bullaManager,
             newTokenId,
             msg.sender,
             creditor,
             debtor,
-            tx.origin,
+            tx.origin, //TODO change to creator // maybe???
             description,
-            newClaim,
-            block.timestamp
+            newClaim
         );
         return newTokenId;
     }
@@ -139,9 +148,9 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
     function createClaim(
         address creditor,
         address debtor,
-        string memory description,
+        bytes32 description,
         uint256 claimAmount,
-        uint256 dueBy,
+        uint64 dueBy,
         address claimToken,
         Multihash calldata attachment
     ) external override returns (uint256) {
@@ -154,29 +163,6 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
             claimToken,
             attachment
         );
-        return _tokenId;
-    }
-
-    function createClaimWithURI(
-        address creditor,
-        address debtor,
-        string memory description,
-        uint256 claimAmount,
-        uint256 dueBy,
-        address claimToken,
-        Multihash calldata attachment,
-        string calldata _tokenUri
-    ) external override returns (uint256) {
-        uint256 _tokenId = _createClaim(
-            creditor,
-            debtor,
-            description,
-            claimAmount,
-            dueBy,
-            claimToken,
-            attachment
-        );
-        _setTokenURI(_tokenId, _tokenUri);
         return _tokenId;
     }
 
@@ -225,16 +211,14 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
             claim.debtor,
             msg.sender,
             tx.origin,
-            paymentAmount,
-            block.timestamp
+            paymentAmount
         );
         emit FeePaid(
             bullaManager,
             tokenId,
             collectionAddress,
             paymentAmount,
-            transactionFee,
-            block.timestamp
+            transactionFee
         );
     }
 
@@ -245,7 +229,7 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
         onlyPendingClaim(tokenId)
     {
         claimTokens[tokenId].status = Status.Rejected;
-        emit ClaimRejected(bullaManager, tokenId, block.timestamp);
+        emit ClaimRejected(bullaManager, tokenId);
     }
 
     function rescindClaim(uint256 tokenId)
@@ -255,7 +239,7 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
         onlyPendingClaim(tokenId)
     {
         claimTokens[tokenId].status = Status.Rescinded;
-        emit ClaimRescinded(bullaManager, tokenId, block.timestamp);
+        emit ClaimRescinded(bullaManager, tokenId);
     }
 
     function burn(uint256 tokenId) external onlyTokenOwner(tokenId) {

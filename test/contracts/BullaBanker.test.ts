@@ -15,7 +15,7 @@ import BullaClaimERC721Mock from "../../artifacts/contracts/BullaClaimERC721.sol
 import ERC20Mock from "../../artifacts/contracts/BullaToken.sol/BullaToken.json";
 
 import { utils } from "ethers";
-import { declareSignerWithAddress } from "../test-utils";
+import { declareSignerWithAddress, toBytes32 } from "../test-utils";
 
 chai.use(solidity);
 
@@ -33,7 +33,7 @@ describe("Bulla Banker", function () {
         erc20Contract = (await deployContract(debtor, ERC20Mock)) as ERC20;
 
         bullaManager = (await deployContract(owner, BullaManagerMock, [
-            ethers.utils.formatBytes32String("Bulla Manager Test"),
+            toBytes32("Bulla Manager Test"),
             collector.address,
             feeBasisPoint,
         ])) as BullaManager;
@@ -50,9 +50,9 @@ describe("Bulla Banker", function () {
         const creditorTag = utils.formatBytes32String("creditor tag");
         const debtorTag = utils.formatBytes32String("debtor tag");
         const someMultihash = {
-            hash: ethers.utils.formatBytes32String("some hash"),
+            ipfsHash: toBytes32("some hash"),
             hashFunction: 0,
-            size: 0,
+            hashSize: 0,
         };
 
         it("should emit update tag when creating a claim", async function () {
@@ -67,11 +67,10 @@ describe("Bulla Banker", function () {
                         attachment: someMultihash,
                         claimToken: erc20Contract.address,
                         dueBy,
-                        description: "test"
+                        description: toBytes32("test")
                     },
-                    creditorTag,
-                    'testURI'
-                )).to.be.revertedWith(`NotCreditorOrDebtor("${notOwner.address}")`);
+                    creditorTag
+                 )).to.be.revertedWith(`NotCreditorOrDebtor("${notOwner.address}")`);
 
             await expect(await bullaBanker
                 .connect(creditor)
@@ -83,10 +82,9 @@ describe("Bulla Banker", function () {
                         attachment: someMultihash,
                         claimToken: erc20Contract.address,
                         dueBy,
-                        description: "test"
+                        description: toBytes32("test")
                     },
-                    creditorTag,
-                    'testURI'
+                    creditorTag
                 )).to.emit(bullaBanker, "BullaTagUpdated")
                 .withArgs(
                     bullaManager.address,
@@ -118,10 +116,9 @@ describe("Bulla Banker", function () {
                         attachment: someMultihash,
                         claimToken: erc20Contract.address,
                         dueBy,
-                        description: "test"
+                        description: toBytes32("test")
                     },
-                    creditorTag,
-                    'testURI'
+                    creditorTag
                 )).to.emit(bullaBanker, "BullaTagUpdated")
 
             await expect(bullaBanker.connect(notOwner).updateBullaTag(1, creditorTag))

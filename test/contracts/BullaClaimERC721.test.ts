@@ -12,7 +12,7 @@ import BullaManagerMock from "../../artifacts/contracts/BullaManager.sol/BullaMa
 import BullaClaimERC721Mock from "../../artifacts/contracts/BullaClaimERC721.sol/BullaClaimERC721.json";
 import ERC20Mock from "../../artifacts/contracts/BullaToken.sol/BullaToken.json";
 import { utils } from "ethers";
-import { declareSignerWithAddress } from "../test-utils";
+import { declareSignerWithAddress, toBytes32 } from "../test-utils";
 
 chai.use(solidity);
 
@@ -28,12 +28,13 @@ describe("Bulla Claim ERC721", function () {
     const feeBasisPoint = 1000;
     let dueBy: number;
     const someMultihash = {
-        hash: ethers.utils.formatBytes32String("some hash"),
+        ipfsHash: toBytes32("some hash"),
         hashFunction: 0,
-        size: 0,
+        hashSize: 0,
     };
 
     async function createClaim(creditor: string, debtor: string, description: string, claimAmount: any, erc20Contract: any) {
+        description = toBytes32(description);
         dueBy = (await (await ethers.provider.getBlock('latest')).timestamp) + 100;
 
         // Check Unhappy State
@@ -119,7 +120,7 @@ describe("Bulla Claim ERC721", function () {
         erc20Contract = (await deployContract(debtor, ERC20Mock)) as ERC20;
 
         bullaManager = (await deployContract(owner, BullaManagerMock, [
-            ethers.utils.formatBytes32String("Bulla Manager Test"),
+            toBytes32("Bulla Manager Test"),
             collector.address,
             0,
         ])) as BullaManager;

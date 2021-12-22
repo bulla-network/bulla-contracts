@@ -4,10 +4,18 @@ pragma solidity ^0.8.7;
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./IBullaManager.sol";
 
+/**  proposed changes
+    1. remove blocktime
+    2. take multihash out of a struct so it can be packed with other data
+    3. reorder the claim storage
+    4. change dueby to uint64
+    5. remove createClaimWithURI ?
+*/
+
 struct Multihash {
-    bytes32 hash;
+    bytes32 ipfsHash;
     uint8 hashFunction;
-    uint8 size;
+    uint8 hashSize;
 }
 
 enum Status {
@@ -19,13 +27,15 @@ enum Status {
 }
 
 struct Claim {
-    uint256 claimAmount;
-    uint256 paidAmount;
-    Status status;
-    uint256 dueBy;
-    address debtor;
-    address claimToken;
-    Multihash attachment;
+    uint256 claimAmount; //1
+    uint256 paidAmount; //2
+    bytes32 ipfsHash; //3
+    uint8 hashFunction; //4
+    uint8 hashSize; //..4
+    Status status; //..4
+    uint64 dueBy; //..4
+    address debtor; //..4 (uint248)
+    address claimToken; // 5
 }
 
 interface IBullaClaim {
@@ -36,9 +46,8 @@ interface IBullaClaim {
         address indexed creditor,
         address indexed debtor,
         address origin,
-        string description,
-        Claim claim,
-        uint256 blocktime
+        bytes32 description,
+        Claim claim
     );
 
     event ClaimPayment(
@@ -47,56 +56,34 @@ interface IBullaClaim {
         address indexed debtor,
         address paidBy,
         address paidByOrigin,
-        uint256 paymentAmount,
-        uint256 blocktime
+        uint256 paymentAmount
     );
 
-    event ClaimRejected(
-        address indexed bullaManager,
-        uint256 indexed tokenId,
-        uint256 blocktime
-    );
+    event ClaimRejected(address indexed bullaManager, uint256 indexed tokenId);
 
-    event ClaimRescinded(
-        address indexed bullaManager,
-        uint256 indexed tokenId,
-        uint256 blocktime
-    );
+    event ClaimRescinded(address indexed bullaManager, uint256 indexed tokenId);
 
     event FeePaid(
         address indexed bullaManager,
         uint256 indexed tokenId,
         address indexed collectionAddress,
         uint256 paymentAmount,
-        uint256 transactionFee,
-        uint256 blocktime
+        uint256 transactionFee
     );
 
     event BullaManagerSet(
         address indexed prevBullaManager,
-        address indexed newBullaManager,
-        uint256 blocktime
+        address indexed newBullaManager
     );
 
     function createClaim(
         address creditor,
         address debtor,
-        string memory description,
+        bytes32 description,
         uint256 claimAmount,
-        uint256 dueBy,
+        uint64 dueBy,
         address claimToken,
         Multihash calldata attachment
-    ) external returns (uint256 newTokenId);
-
-    function createClaimWithURI(
-        address creditor,
-        address debtor,
-        string memory description,
-        uint256 claimAmount,
-        uint256 dueBy,
-        address claimToken,
-        Multihash calldata attachment,
-        string calldata _tokenUri
     ) external returns (uint256 newTokenId);
 
     function payClaim(uint256 tokenId, uint256 paymentAmount) external;
