@@ -1,7 +1,7 @@
 import "@nomiclabs/hardhat-ethers";
 import chai, { expect } from "chai";
 import { solidity } from "ethereum-waffle";
-import { utils } from "ethers";
+import { BigNumber, utils } from "ethers";
 import hre, { deployments, ethers } from "hardhat";
 import { BullaBanker } from "../../typechain/BullaBanker";
 import { BullaToken } from "../../typechain/BullaToken";
@@ -11,6 +11,8 @@ import { BullaManager__factory } from "../../typechain/factories/BullaManager__f
 import { BullaToken__factory } from "../../typechain/factories/BullaToken__factory";
 import { BatchBulla__factory } from "../../typechain/factories/BatchBulla__factory";
 import { declareSignerWithAddress } from "../test-utils";
+import { formatEther } from "ethers/lib/utils";
+import { BullaClaimERC721, ClaimCreatedEvent } from "../../typechain/BullaClaimERC721";
 
 chai.use(solidity);
 
@@ -75,44 +77,112 @@ describe("test module", async () => {
   });
 
   const dueBy = (await ethers.provider.getBlock("latest")).timestamp + 100;
-  const getCreateClaimTx = (creditorAddress: string, token: BullaToken) => ({
-    claimAmount: utils.parseEther("1"),
-    creditor: wallet1.address,
-    debtor: [wallet2, wallet3, wallet4, wallet5, wallet6, wallet7].map(
-      (w) => w.address
-    )[Math.floor(Math.random() * 6)],
-    claimToken: token.address,
-    dueBy,
-    description: `claim! ${Math.random()}`,
-    attachment: {
-      hash: utils.formatBytes32String("some hash"),
-      hashFunction: 0,
-      size: 0,
-    },
-  });
+  const getCreateClaimTx = ({
+    token,
+    payments,
+  }: {
+    token: BullaToken;
+    payments?: boolean;
+  }) => {
+    const randosAndWallet1 = [
+      [wallet2, wallet3, wallet4, wallet5, wallet6, wallet7].map(
+        (w) => w.address
+      )[Math.floor(Math.random() * 6)],
+      wallet1.address,
+    ];
+
+    const [creditor, debtor] = payments
+      ? randosAndWallet1
+      : randosAndWallet1.reverse();
+
+    return {
+      claimAmount: utils.parseEther("1"),
+      creditor,
+      debtor,
+      claimToken: token.address,
+      dueBy,
+      description: `claim! ${Math.random()}`,
+      attachment: {
+        hash: utils.formatBytes32String("some hash"),
+        hashFunction: 0,
+        size: 0,
+      },
+    };
+  };
 
   describe("Batch Bulla - Batching bulla functions", async () => {
     describe("createClaim", async () => {
-      it("should create a claim via module", async () => {
-        const { bullaToken, batchBulla } = await setupTests();
+      it("should create a claim via ", async () => {
+        const { bullaToken, batchBulla, bullaClaim, bullaBanker } =
+          await setupTests();
         const claims = [...Array(20)].map((_) =>
-          getCreateClaimTx(wallet1.address, bullaToken)
+          getCreateClaimTx({ token: bullaToken })
         );
 
         const tx = await batchBulla
           .connect(wallet1)
           .batchCreate(claims, utils.formatBytes32String("test"));
         await tx.wait();
+        // await new Promise(res => setTimeout(res, 1000));
+        // await bullaClaim.connect(wallet1.address).getClaim(1).then(console.log);
 
         await (
-          await bullaToken.connect(wallet1).approve(batchBulla.address, utils.parseEther("50"))
+          await bullaToken
+            .connect(wallet1)
+            .approve(bullaClaim.address, utils.parseEther("50"))
         ).wait();
 
-        const payTx = await batchBulla.connect(wallet1).batchPay(
-          claims.map((_, i) => (i + 1).toString()),
-          claims.map((c) => c.claimAmount)
-        );
-        await payTx.wait();
+        console.log(bullaBanker.address, await batchBulla.bullaBanker());
+        console.log(bullaClaim.address, await batchBulla.bullaClaim());
+
+        // await(
+        //   await bullaClaim.connect(wallet1).payClaim(1, utils.parseEther("2"))).wait();
+        console.table({
+          sender: wallet1.address,
+          bullaClaim: bullaClaim.address,
+          batchBulla: batchBulla.address,
+          senderBalance: formatEther(
+            await bullaToken.balanceOf(wallet1.address)
+          ),
+        });
+        const [claim] = claims;
+        const result = await (
+          await bullaClaim.createClaim(
+            claim.creditor,
+            claim.debtor,
+            claim.description,
+            claim.claimAmount,
+            claim.dueBy,
+            claim.claimToken,
+            claim.attachment
+          )
+        ).wait();
+        //ts-ignore
+
+        console.log(((result.events![1] as ClaimCreatedEvent).args.tokenId as BigNumber).toString())
+        await (
+          await batchBulla
+            .connect(wallet1)
+            .payOneClaim(1, utils.parseEther("21"))
+        ).wait();
+        // await (
+        //   await bullaClaim
+        //     .connect(wallet1)
+        //     .payClaim(1, utils.parseEther("21"))
+        // ).wait();
+
+        // await (
+        //   await bullaToken.connect(wallet1).approve(batchBulla.address, utils.parseEther("50"))
+        // ).wait();
+        // await (
+        //   await bullaToken.connect(wallet1).approve(bullaBanker.address, utils.parseEther("50"))
+        // ).wait();
+
+        // const payTx = await batchBulla.connect(wallet1).batchPay(
+        //   claims.map((_, i) => (i + 1).toString()),
+        //   claims.map((c) => c.claimAmount)
+        // );
+        // await payTx.wait();
         // await expect().to.emit(bullaClaim, "ClaimCreated");
 
         // const claim = await bullaClaim.getClaim(tokenId);

@@ -59,14 +59,33 @@ contract BatchBulla {
         }
     }
 
+    function payOneClaim(uint256 claimId, uint256 amount) external {
+        IBullaClaim(bullaClaim).payClaim(claimId, amount);
+        (bool success, ) = bullaClaim.call(
+            abi.encodeWithSignature(
+                "payClaim(uint256,uint256)",
+                claimId,
+                amount
+            )
+        );
+        require(success, "fail");
+    }
+
     function batchPay(uint256[] calldata claimIds, uint256[] calldata amounts)
         external
         batchGuard(claimIds.length, amounts.length)
     {
         for (uint8 i = 0; i < amounts.length; i++) {
-            (bool success,) = bullaClaim.delegatecall(abi.encodeWithSignature("payClaim(uint256,uint256)", claimIds[i], amounts[i]));
-            require(success, "BATCHBULLA: failed to pay claim");
+            IBullaClaim(bullaClaim).payClaim(claimIds[i], amounts[i]);
+            // (bool success, ) = bullaClaim.delegatecall(
+            //     abi.encodeWithSignature(
+            //         "payClaim(uint256,uint256)",
+            //         claimIds[i],
+            //         amounts[i]
+            //     )
+            // );
         }
+        // require(success, "BATCHBULLA: failed to pay claim");
     }
 
     function batchCreate(CreateClaimParams[] calldata claims, bytes32 tag)

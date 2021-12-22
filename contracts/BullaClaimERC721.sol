@@ -9,6 +9,7 @@ import "./interfaces/IBullaManager.sol";
 import "./interfaces/IBullaClaim.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
+import "hardhat/console.sol";
 
 error ZeroAddress();
 error PastDueDate();
@@ -31,7 +32,7 @@ abstract contract BullaClaimERC721URI is Ownable, ERC721URIStorage {
     string public baseURI;
 
     function setBaseURI(string memory baseURI_) public onlyOwner {
-        baseURI = baseURI_;
+        baseURI = baseURI_; // 
     }
 
     function _baseURI() internal view override returns (string memory) {
@@ -53,7 +54,7 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
         if (ownerOf(tokenId) != msg.sender) revert NotCreditor(msg.sender);
         _;
     }
-    
+
     modifier onlyDebtor(uint256 tokenId) {
         if (claimTokens[tokenId].debtor != msg.sender)
             revert NotDebtor(msg.sender);
@@ -185,12 +186,15 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
         override
         onlyIncompleteClaim(tokenId)
     {
+        console.log("test", tokenId);
+        console.log("exists",_exists(tokenId));
         if (paymentAmount == 0) revert ValueMustBeGreaterThanZero();
         if (!_exists(tokenId)) revert TokenIdNoExist();
 
         Claim memory claim = getClaim(tokenId);
+        console.log(tokenId);
         address creditor = ownerOf(tokenId);
-
+        console.log("creditor", creditor);
         uint256 amountToRepay = claim.claimAmount - claim.paidAmount;
         uint256 totalPayment = paymentAmount >= amountToRepay
             ? amountToRepay
@@ -205,6 +209,7 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
             bullaManager
         ).getTransactionFee(msg.sender, totalPayment);
 
+        console.log("total", totalPayment - transactionFee);
         IERC20(claim.claimToken).safeTransferFrom(
             msg.sender,
             creditor,

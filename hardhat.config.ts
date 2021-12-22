@@ -24,7 +24,7 @@ const config: HardhatUserConfig = {
     // hardhat: {
     //   mining: {
     //     auto: false,
-    //     interval: 4000,
+    //     interval: 1000,
     //   },
     // },
     /** ^^^ */
