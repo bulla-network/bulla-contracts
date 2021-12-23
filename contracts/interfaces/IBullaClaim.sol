@@ -45,9 +45,10 @@ interface IBullaClaim {
         address parent,
         address indexed creditor,
         address indexed debtor,
-        address origin,
         bytes32 description,
-        Claim claim
+        Claim claim,
+        address origin,
+        uint256 blocktime
     );
 
     event ClaimPayment(
@@ -56,24 +57,27 @@ interface IBullaClaim {
         address indexed debtor,
         address paidBy,
         address paidByOrigin,
-        uint256 paymentAmount
+        uint256 paymentAmount,
+        uint256 blocktime
     );
 
-    event ClaimRejected(address indexed bullaManager, uint256 indexed tokenId);
+    event ClaimRejected(address indexed bullaManager, uint256 indexed tokenId, uint256 blocktime);
 
-    event ClaimRescinded(address indexed bullaManager, uint256 indexed tokenId);
+    event ClaimRescinded(address indexed bullaManager, uint256 indexed tokenId, uint256 blocktime);
 
     event FeePaid(
         address indexed bullaManager,
         uint256 indexed tokenId,
         address indexed collectionAddress,
         uint256 paymentAmount,
-        uint256 transactionFee
+        uint256 transactionFee,
+        uint256 blocktime
     );
 
     event BullaManagerSet(
         address indexed prevBullaManager,
-        address indexed newBullaManager
+        address indexed newBullaManager,
+        uint256 blocktime
     );
 
     function createClaim(

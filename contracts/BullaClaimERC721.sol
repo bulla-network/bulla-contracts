@@ -98,7 +98,7 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
     function setBullaManager(address _bullaManager) public onlyOwner {
         address prevBullaManager = bullaManager;
         bullaManager = _bullaManager;
-        emit BullaManagerSet(prevBullaManager, bullaManager);
+        emit BullaManagerSet(prevBullaManager, bullaManager, block.timestamp);
     }
 
     function _createClaim(
@@ -138,9 +138,10 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
             msg.sender,
             creditor,
             debtor,
-            tx.origin, //TODO change to creator // maybe???
             description,
-            newClaim
+            newClaim,
+            tx.origin, //TODO change to creator // maybe???
+            block.timestamp
         );
         return newTokenId;
     }
@@ -211,14 +212,16 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
             claim.debtor,
             msg.sender,
             tx.origin,
-            paymentAmount
+            paymentAmount,
+            block.timestamp
         );
         emit FeePaid(
             bullaManager,
             tokenId,
             collectionAddress,
             paymentAmount,
-            transactionFee
+            transactionFee,
+            block.timestamp
         );
     }
 
@@ -229,7 +232,7 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
         onlyPendingClaim(tokenId)
     {
         claimTokens[tokenId].status = Status.Rejected;
-        emit ClaimRejected(bullaManager, tokenId);
+        emit ClaimRejected(bullaManager, tokenId, block.timestamp);
     }
 
     function rescindClaim(uint256 tokenId)
@@ -239,7 +242,7 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
         onlyPendingClaim(tokenId)
     {
         claimTokens[tokenId].status = Status.Rescinded;
-        emit ClaimRescinded(bullaManager, tokenId);
+        emit ClaimRescinded(bullaManager, tokenId, block.timestamp);
     }
 
     function burn(uint256 tokenId) external onlyTokenOwner(tokenId) {
