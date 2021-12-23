@@ -22,12 +22,12 @@ const config: HardhatUserConfig = {
   },
   networks: {
     /** comment out this hardhat config if running tests */
-    // hardhat: {
-    //   mining: {
-    //     auto: false,
-    //     interval: 4000,
-    //   },
-    // },
+    hardhat: {
+      mining: {
+        auto: false,
+        interval: 2000,
+      },
+    },
     /** ^^^ */
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${INFURA_API_KEY}`,
