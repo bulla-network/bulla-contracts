@@ -28,8 +28,7 @@
     "@gnosis.pm/safe-contracts": "^1.3.0",
     "@gnosis.pm/zodiac": "^1.0.3",
     "@types/node": "^16.9.1",
-    "ethers": "^5.4.2",
-    "hardhat-ethernal": "^0.3.10"
+    "ethers": "^5.4.2"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers@^0.3.0-beta.10",

@@ -45,10 +45,10 @@ contract TestSafe is OwnerManager, IERC721Receiver {
     }
 
     function onERC721Received(
-        address operator,
-        address from,
-        uint256 tokenId,
-        bytes calldata data
+        address,
+        address,
+        uint256,
+        bytes calldata
     ) external pure override returns (bytes4) {
         return IERC721Receiver.onERC721Received.selector;
     }

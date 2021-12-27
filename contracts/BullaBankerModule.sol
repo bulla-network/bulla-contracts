@@ -44,7 +44,7 @@ contract BullaBankerModule is Module {
         setUp(initParams);
     }
 
-    function setUp(bytes memory initParams) public override {
+    function setUp(bytes memory initParams) public override initializer {
         (address _safe, address _bullaBanker, address _bullaClaim) = abi.decode(
             initParams,
             (address, address, address)
