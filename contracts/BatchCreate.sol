@@ -4,7 +4,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interfaces/IBullaClaim.sol";
 import "./BullaBanker.sol";
 
-contract BatchBulla is Ownable {
+contract BatchCreate is Ownable {
     uint8 private maxOperations;
     address public immutable bullaBanker;
     address public immutable bullaClaim;
@@ -51,28 +51,7 @@ contract BatchBulla is Ownable {
         maxOperations = _maxOperations;
     }
 
-    function batchCreateOneTag(CreateClaimParams[] calldata claims, bytes32 tag)
-        external
-    {
-        require(
-            claims.length <= maxOperations,
-            "BATCHBULLA: batch size exceeded"
-        );
-        for (uint256 i = 0; i < claims.length; i++) {
-            IBullaClaim(bullaClaim).createClaim(
-                claims[i].creditor,
-                claims[i].debtor,
-                claims[i].description,
-                claims[i].claimAmount,
-                claims[i].dueBy,
-                claims[i].claimToken,
-                claims[i].attachment
-            );
-        }
-        emit BatchCreated(claims, msg.sender, tag);
-    }
-
-    function batchCreateManyTags(
+    function batchCreate(
         CreateClaimParams[] memory claims,
         string[] calldata tokenURIs,
         bytes32 tag

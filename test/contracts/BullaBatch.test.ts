@@ -8,7 +8,7 @@ import { BullaBanker__factory } from "../../typechain/factories/BullaBanker__fac
 import { BullaClaimERC721__factory } from "../../typechain/factories/BullaClaimERC721__factory";
 import { BullaManager__factory } from "../../typechain/factories/BullaManager__factory";
 import { BullaToken__factory } from "../../typechain/factories/BullaToken__factory";
-import { BatchBulla__factory } from "../../typechain/factories/BatchBulla__factory";
+import { BatchCreate__factory } from "../../typechain/factories/BatchCreate__factory";
 import { declareSignerWithAddress } from "../test-utils";
 
 chai.use(solidity);
@@ -44,8 +44,8 @@ describe("test module", async () => {
       "BullaBanker"
     )) as BullaBanker__factory;
     const BatchBulla = (await hre.ethers.getContractFactory(
-      "BatchBulla"
-    )) as BatchBulla__factory;
+      "BatchCreate"
+    )) as BatchCreate__factory;
 
     const bullaToken = await ERC20.connect(wallet1).deploy();
     const bullaManager = await BullaManager.deploy(
@@ -117,14 +117,9 @@ describe("test module", async () => {
         );
         const URIs = [...Array(20)].map((_) => "someURI");
 
-        const tx = await batchBulla
-          .connect(wallet1)
-          .batchCreateOneTag(claims, utils.formatBytes32String("test"));
-        await tx.wait();
-      
         const tx2 = await batchBulla
           .connect(wallet1)
-          .batchCreateManyTags(claims, URIs, utils.formatBytes32String("test"));
+          .batchCreate(claims, URIs, utils.formatBytes32String("test"));
         tx2.wait();
       });
     });
