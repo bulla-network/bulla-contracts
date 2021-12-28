@@ -30,7 +30,7 @@ contract BullaClaimStorage is ERC721 {
 
 // unguarded internal fns
 
-    function _createClaimFrom(
+    function _createClaimFrom( && _createAndPayClaimFrom
         address sender,
         address creditor,
         address debtor,
@@ -60,7 +60,7 @@ contract BullaClaimStorage is ERC721 {
 // unguarded internal fns ^^^^
 
 // basic EOA fns
-    function createClaim(
+    function createClaim( // && createAndPayClaim
         address creditor,
         address debtor,
         string memory description,
@@ -89,7 +89,7 @@ contract BullaClaimStorage is ERC721 {
 
 // whitelisted function calls:
 
-    function createClaimFrom(
+    function createClaimFrom( // && createAndPayClaimFrom
         address sender,
         address creditor,
         address debtor,
