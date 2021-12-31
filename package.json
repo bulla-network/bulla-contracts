@@ -14,7 +14,7 @@
     "test": "npx hardhat test",
     "run-node": "npx hardhat node --fork https://rpc.xdaichain.com",
     "dev": "npx hardhat node",
-    "test:frontend": "npx hardhat node & yarn deploy:hardhat",
+    "test:ci": "npx hardhat node & yarn deploy:hardhat",
     "deploy:hardhat": "npx hardhat run --network localhost scripts/deploy-hardhat.ts",
     "deploy:rinkeby": "npx hardhat run --network rinkeby scripts/deploy-erc721.ts",
     "deploy:xdai": "npx hardhat run --network xdai scripts/deploy-erc721.ts",
@@ -52,7 +52,7 @@
     "tsc": "^2.0.3",
     "typechain": "^6.0.2",
     "solc": "0.7.5",
-    "ts-generator": "^0.1.1", 
+    "ts-generator": "^0.1.1",
     "ts-node": "^9.1.1",
     "typescript": "^4.1.3"
   }
