@@ -212,7 +212,7 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
             claim.debtor,
             msg.sender,
             tx.origin,
-            paymentAmount,
+            paymentAmount, //TODO: paymentamount is not the correct value to emit here
             block.timestamp
         );
         emit FeePaid(
