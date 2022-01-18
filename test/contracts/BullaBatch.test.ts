@@ -59,9 +59,9 @@ describe("test module", async () => {
     );
     const bullaBanker = await BullaBanker.deploy(bullaClaim.address);
     const batchBulla = await BatchBulla.deploy(
-      20,
       bullaBanker.address,
-      bullaClaim.address
+      bullaClaim.address,
+      20
     );
 
     return {
@@ -81,7 +81,7 @@ describe("test module", async () => {
     token: BullaToken;
     payments?: boolean;
   }) => {
-    const randosAndWallet1 = [
+    const randomAddressAndWallet1 = [
       [wallet2, wallet3, wallet4, wallet5, wallet6, wallet7].map(
         (w) => w.address
       )[Math.floor(Math.random() * 6)],
@@ -89,8 +89,8 @@ describe("test module", async () => {
     ];
 
     const [creditor, debtor] = payments
-      ? randosAndWallet1
-      : randosAndWallet1.reverse();
+      ? randomAddressAndWallet1
+      : randomAddressAndWallet1.reverse();
 
     return {
       claimAmount: utils.parseEther("1"),
@@ -98,6 +98,7 @@ describe("test module", async () => {
       debtor,
       claimToken: token.address,
       dueBy,
+      tag: utils.formatBytes32String("test"),
       description: `claim! ${Math.random()}`,
       attachment: {
         hash: utils.formatBytes32String("some hash"),
@@ -117,10 +118,8 @@ describe("test module", async () => {
         );
         const URIs = [...Array(20)].map((_) => "someURI");
 
-        const tx2 = await batchBulla
-          .connect(wallet1)
-          .batchCreate(claims, URIs, utils.formatBytes32String("test"));
-        tx2.wait();
+        const tx = await batchBulla.connect(wallet1).batchCreate(claims, URIs);
+        tx.wait();
       });
     });
   });

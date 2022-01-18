@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.7;
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interfaces/IBullaClaim.sol";
 import "./BullaBanker.sol";
 
-contract BatchCreate is Ownable {
+contract BatchCreate {
+    address public bullaClaimERC721;
+    address public bullaBanker;
     uint8 private maxOperations;
-    address public immutable bullaBanker;
-    address public immutable bullaClaim;
+    address public owner;
 
     struct CreateClaimParams {
         address creditor;
@@ -16,58 +16,66 @@ contract BatchCreate is Ownable {
         uint256 claimAmount;
         uint256 dueBy;
         address claimToken;
+        bytes32 tag;
         Multihash attachment;
     }
 
-    event BatchCreated(
-        CreateClaimParams[] claims,
-        address indexed sender,
-        bytes32 indexed tag
-    );
-
-    enum CancelOperation {
-        rescind,
-        reject
+    modifier batchGuard(uint256 a, uint256 b) {
+        require(a == b, "BATCHCREATE: parameters not equal");
+        require(a < maxOperations + 1, "BATCHCREATE: batch size exceeded");
+        require(a > 0, "BATCHCREATE: zero amount parameters");
+        _;
     }
 
-    modifier batchGuard(uint256 a, uint256 b) {
-        require(a == b, "BATCHBULLA: parameters not equal");
-        require(a <= maxOperations, "BATCHBULLA: batch size exceeded");
-        require(a > 0, "BATCHBULLA: zero amount parameters");
+    modifier onlyOwner() {
+        require(
+            msg.sender == owner,
+            "BATCHCREATE: only owner can call this function"
+        );
         _;
     }
 
     constructor(
-        uint8 _maxOperations,
         address _bullaBanker,
-        address _bullaClaim
+        address _bullaClaim,
+        uint8 _maxOperations
     ) {
-        maxOperations = _maxOperations;
+        bullaClaimERC721 = _bullaClaim;
         bullaBanker = _bullaBanker;
-        bullaClaim = _bullaClaim;
+        maxOperations = _maxOperations;
+        owner = msg.sender;
     }
 
-    function increaseMaxOperations(uint8 _maxOperations) external onlyOwner {
+    function transferOwnership(address newOwner) public onlyOwner {
+        owner = newOwner;
+    }
+
+    function updateMaxOperations(uint8 _maxOperations) external onlyOwner {
         maxOperations = _maxOperations;
     }
 
     function batchCreate(
         CreateClaimParams[] memory claims,
-        string[] calldata tokenURIs,
-        bytes32 tag
+        string[] calldata tokenURIs
     ) external batchGuard(tokenURIs.length, claims.length) {
         for (uint256 i = 0; i < claims.length; i++) {
-            IBullaClaim(bullaClaim).createClaimWithURI(
-                claims[i].creditor,
-                claims[i].debtor,
-                claims[i].description,
-                claims[i].claimAmount,
-                claims[i].dueBy,
-                claims[i].claimToken,
-                claims[i].attachment,
-                tokenURIs[i]
+            (bool success, ) = bullaBanker.delegatecall(
+                abi.encodeWithSelector(
+                    BullaBanker.createBullaClaim.selector,
+                    BullaBanker.ClaimParams(
+                        claims[i].claimAmount,
+                        claims[i].creditor,
+                        claims[i].debtor,
+                        claims[i].description,
+                        claims[i].dueBy,
+                        claims[i].claimToken,
+                        claims[i].attachment
+                    ),
+                    claims[i].tag,
+                    tokenURIs[i]
+                )
             );
+            require(success, "BULLABATCH: batch created failed");
         }
-        emit BatchCreated(claims, msg.sender, tag);
     }
 }

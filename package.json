@@ -1,6 +1,6 @@
 {
   "name": "@bulla-network/contracts",
-  "version": "0.0.9-gnosis-alpha",
+  "version": "0.0.8-batch-dev.1",
   "license": "MIT",
   "files": [
     "contracts/interfaces",
