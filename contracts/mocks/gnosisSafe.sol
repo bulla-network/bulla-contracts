@@ -1,5 +1,7 @@
-// SPDX-License-Identifier: LGPL-3.0-only
+// SPDX-License-Identifier: Unlicensed
 pragma solidity >=0.8.0;
+import "@gnosis.pm/safe-contracts/contracts/base/OwnerManager.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
 contract Enum {
     enum Operation {
@@ -8,10 +10,12 @@ contract Enum {
     }
 }
 
-contract TestSafe {
+contract TestSafe is OwnerManager, IERC721Receiver {
     address public module;
 
-    receive() external payable {}
+    constructor(address[] memory owners, uint8 threshold) {
+        setupOwners(owners, threshold);
+    }
 
     function enableModule(address _module) external {
         module = _module;
@@ -40,26 +44,12 @@ contract TestSafe {
         else (success, ) = to.call{value: value}(data);
     }
 
-    function execTransactionFromModuleReturnData(
-        address payable to,
-        uint256 value,
-        bytes calldata data,
-        uint8 operation
-    ) external returns (bool success, bytes memory returnData) {
-        require(msg.sender == module, "Not authorized");
-        if (operation == 1) (success, ) = to.delegatecall(data);
-        else (success, returnData) = to.call{value: value}(data);
-    }
-
-    function getModulesPaginated(address, uint256 pageSize)
-        external
-        view
-        returns (address[] memory array, address next)
-    {
-        // Init array with max page size
-        array = new address[](pageSize);
-
-        array[0] = module;
-        next = module;
+    function onERC721Received(
+        address,
+        address,
+        uint256,
+        bytes calldata
+    ) external pure override returns (bytes4) {
+        return IERC721Receiver.onERC721Received.selector;
     }
 }
