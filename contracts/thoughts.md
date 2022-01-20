@@ -3,6 +3,7 @@
 - Par-down the functions of BullaClaim to be a permissioned storage + mutation contract.
 - User-accessible functionality will exist via "modules" that extend bullaClaim's functionality. They are deployed and enabled by us. These modules would enable public usability of claims, but handle the permissioning logic on behalf of the user.
 - Module examples: BullaBatch, BullaBanker, BullaPayroll.
+- Have a pausable contract
 
 Example:
 
