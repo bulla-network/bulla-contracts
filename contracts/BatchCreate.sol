@@ -3,10 +3,16 @@ pragma solidity ^0.8.7;
 import "./interfaces/IBullaClaim.sol";
 import "./BullaBanker.sol";
 
+error NotOwner();
+error BatchTooLarge();
+error UnequalParams();
+error ZeroLength();
+error BatchFailed();
+
 contract BatchCreate {
     address public bullaClaimERC721;
     address public bullaBanker;
-    uint8 private maxOperations;
+    uint8 public maxOperations;
     address public owner;
 
     struct CreateClaimParams {
@@ -21,17 +27,14 @@ contract BatchCreate {
     }
 
     modifier batchGuard(uint256 a, uint256 b) {
-        require(a == b, "BATCHCREATE: parameters not equal");
-        require(a < maxOperations + 1, "BATCHCREATE: batch size exceeded");
-        require(a > 0, "BATCHCREATE: zero amount parameters");
+        if (a != b) revert UnequalParams();
+        if (a > maxOperations) revert BatchTooLarge();
+        if (a == 0) revert ZeroLength();
         _;
     }
 
     modifier onlyOwner() {
-        require(
-            msg.sender == owner,
-            "BATCHCREATE: only owner can call this function"
-        );
+        if (msg.sender != owner) revert NotOwner();
         _;
     }
 
@@ -75,7 +78,7 @@ contract BatchCreate {
                     tokenURIs[i]
                 )
             );
-            require(success, "BULLABATCH: batch created failed");
+            if (!success) revert BatchFailed();
         }
     }
 }
