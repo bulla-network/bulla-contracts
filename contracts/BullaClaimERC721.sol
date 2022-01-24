@@ -31,7 +31,7 @@ abstract contract BullaClaimERC721URI is Ownable, ERC721URIStorage {
     string public baseURI;
 
     function setBaseURI(string memory baseURI_) public onlyOwner {
-        baseURI = baseURI_; // 
+        baseURI = baseURI_;
     }
 
     function _baseURI() internal view override returns (string memory) {
@@ -53,7 +53,7 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
         if (ownerOf(tokenId) != msg.sender) revert NotCreditor(msg.sender);
         _;
     }
-
+    
     modifier onlyDebtor(uint256 tokenId) {
         if (claimTokens[tokenId].debtor != msg.sender)
             revert NotDebtor(msg.sender);
@@ -190,6 +190,7 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
 
         Claim memory claim = getClaim(tokenId);
         address creditor = ownerOf(tokenId);
+        
         uint256 amountToRepay = claim.claimAmount - claim.paidAmount;
         uint256 totalPayment = paymentAmount >= amountToRepay
             ? amountToRepay

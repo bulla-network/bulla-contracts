@@ -22,7 +22,6 @@ contract BullaBanker {
         address bullaBanker,
         uint256 blocktime
     );
-
     struct ClaimParams {
         uint256 claimAmount;
         address creditor;
