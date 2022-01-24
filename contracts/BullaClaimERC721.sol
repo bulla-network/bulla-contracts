@@ -190,7 +190,7 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
 
         Claim memory claim = getClaim(tokenId);
         address creditor = ownerOf(tokenId);
-                
+        
         uint256 amountToRepay = claim.claimAmount - claim.paidAmount;
         uint256 totalPayment = paymentAmount >= amountToRepay
             ? amountToRepay
