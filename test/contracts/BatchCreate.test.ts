@@ -102,6 +102,7 @@ describe("test module", async () => {
       dueBy,
       tag: defaultTag,
       description: `claim! ${Math.random()}`,
+      tokenURI: `ipfs.io/ipfs/${Math.random()}`,
       attachment: {
         hash: utils.formatBytes32String("some hash"),
         hashFunction: 0,
@@ -120,10 +121,9 @@ describe("test module", async () => {
         const claims = [...Array(claimsToMake)].map((_) =>
           getCreateClaimTx({ token: bullaToken })
         );
-        const URIs = [...Array(claimsToMake)].map((_) => "someURI");
 
         const tx = await (
-          await batchBulla.connect(wallet1).batchCreate(claims, URIs)
+          await batchBulla.connect(wallet1).batchCreate(claims)
         ).wait();
 
         const events = tx.events?.map((log) =>
@@ -156,38 +156,23 @@ describe("test module", async () => {
       it("should revert on bad params", async () => {
         const { bullaToken, batchBulla } = await setupTests();
 
-        let claimsToMake = 4;
+        let claimsToMake = maxOperations + 1;
 
         let claims = [...Array(claimsToMake)].map((_) =>
           getCreateClaimTx({ token: bullaToken })
         );
-        let URIs = [...Array(claimsToMake)].map((_) => "someURI");
 
-        expect(
-          batchBulla.connect(wallet1).batchCreate(claims, URIs.slice(0, -1))
-        ).to.revertedWith("UnequalParams");
-        expect(
-          batchBulla.connect(wallet1).batchCreate(claims.slice(0, -1), URIs)
-        ).to.revertedWith("UnequalParams");
-
-        claimsToMake = maxOperations + 1;
-        claims = [...Array(claimsToMake)].map((_) =>
-          getCreateClaimTx({ token: bullaToken })
+        expect(batchBulla.connect(wallet1).batchCreate(claims)).to.revertedWith(
+          "BatchTooLarge"
         );
-        URIs = [...Array(claimsToMake)].map((_) => "someURI");
 
-        expect(
-          batchBulla.connect(wallet1).batchCreate(claims, URIs)
-        ).to.revertedWith("BatchTooLarge");
-
-        expect(batchBulla.connect(wallet1).batchCreate([], [])).to.revertedWith(
+        expect(batchBulla.connect(wallet1).batchCreate([])).to.revertedWith(
           "ZeroLength"
         );
 
         claims = [...Array(1)].map((_) =>
           getCreateClaimTx({ token: bullaToken })
         );
-        URIs = [...Array(1)].map((_) => "someURI");
 
         claims[0].dueBy =
           (await ethers.provider.getBlock("latest")).timestamp - 1;
@@ -195,7 +180,7 @@ describe("test module", async () => {
         // there were strange VM issues with catching the revert message here: this is a more verbose way of handling a expect().to.revert
         await batchBulla
           .connect(wallet1)
-          .batchCreate(claims, URIs)
+          .batchCreate(claims)
           .then(() => {
             throw new Error();
           })
