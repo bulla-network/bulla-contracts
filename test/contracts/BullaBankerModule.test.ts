@@ -6,6 +6,7 @@ import { utils } from "ethers";
 import hre, { deployments, ethers } from "hardhat";
 import { BullaBanker } from "../../typechain/BullaBanker";
 import { BullaBankerModule } from "../../typechain/BullaBankerModule";
+import { BatchCreate__factory } from "../../typechain/factories/BatchCreate__factory";
 import { BullaBankerModule__factory } from "../../typechain/factories/BullaBankerModule__factory";
 import { BullaBanker__factory } from "../../typechain/factories/BullaBanker__factory";
 import { BullaClaimERC721__factory } from "../../typechain/factories/BullaClaimERC721__factory";
@@ -37,6 +38,9 @@ describe("test module", async () => {
     const BullaBanker = (await hre.ethers.getContractFactory(
       "BullaBanker"
     )) as BullaBanker__factory;
+    const BatchBulla = (await hre.ethers.getContractFactory(
+      "BatchCreate"
+    )) as BatchCreate__factory;
     const Safe = (await hre.ethers.getContractFactory(
       "TestSafe"
     )) as TestSafe__factory;
@@ -55,11 +59,17 @@ describe("test module", async () => {
       "ipfs.io/ipfs/"
     );
     const bullaBanker = await BullaBanker.deploy(bullaClaim.address);
+    const batchCreate = await BatchBulla.deploy(
+      bullaBanker.address,
+      bullaClaim.address,
+      20
+    );
     const safe = await Safe.deploy([safeOwner1.address, safeOwner2.address], 1);
     const bullaBankerModule = await BullaBankerModule.deploy(
       safe.address,
       bullaBanker.address,
-      bullaClaim.address
+      bullaClaim.address,
+      batchCreate.address
     );
 
     await safe.enableModule(bullaBankerModule.address);
@@ -149,6 +159,86 @@ describe("test module", async () => {
             tokenAddress: bullaToken.address,
             user: outsider,
           })
+        ).to.be.revertedWith("BULLAMODULE: Not safe owner");
+      });
+    });
+
+    describe("batchCreate", async () => {
+      it("should create a batchClaim via module", async () => {
+        const { bullaBankerModule, bullaToken, bullaClaim, safe } =
+          await setupTests();
+        const tokenId = "1";
+
+        const batchPayment = [...Array(20)].map(() => ({
+          claimAmount: utils.parseEther("1"),
+          creditor: creditor.address,
+          debtor: safe.address,
+          claimToken: bullaToken.address,
+          dueBy,
+          tag: ethers.utils.formatBytes32String("test"),
+          description: `claim! ${Math.random()}`,
+          tokenURI: `ipfs.io/ipfs/${Math.random()}`,
+          attachment: {
+            hash: utils.formatBytes32String("some hash"),
+            hashFunction: 0,
+            size: 0,
+          },
+        }));
+
+        await expect(bullaBankerModule.batchCreate(batchPayment)).to.emit(
+          bullaClaim,
+          "ClaimCreated"
+        );
+
+        const claim = await bullaClaim.getClaim(tokenId);
+        expect(await bullaClaim.ownerOf(tokenId)).to.equal(creditor.address);
+        expect(claim.debtor).to.equal(safe.address);
+      });
+
+      it("should revert if params are incorrect", async () => {
+        const { bullaBankerModule, bullaToken } = await setupTests();
+
+        const batchPayment = [...Array(20)].map(() => ({
+          claimAmount: utils.parseEther("1"),
+          creditor: creditor.address,
+          debtor: safeOwner1.address,
+          claimToken: bullaToken.address,
+          dueBy,
+          tag: ethers.utils.formatBytes32String("test"),
+          description: `claim! ${Math.random()}`,
+          tokenURI: `ipfs.io/ipfs/${Math.random()}`,
+          attachment: {
+            hash: utils.formatBytes32String("some hash"),
+            hashFunction: 0,
+            size: 0,
+          },
+        }));
+
+        await expect(
+          bullaBankerModule.batchCreate(batchPayment)
+        ).to.be.revertedWith("BULLAMODULE: Batch create failed");
+      });
+
+      it("should revert if sender != safe owner", async () => {
+        const { bullaBankerModule, bullaToken, safe } = await setupTests();
+        const batchPayment = [...Array(20)].map(() => ({
+          claimAmount: utils.parseEther("1"),
+          creditor: creditor.address,
+          debtor: safe.address,
+          claimToken: bullaToken.address,
+          dueBy,
+          tag: ethers.utils.formatBytes32String("test"),
+          description: `claim! ${Math.random()}`,
+          tokenURI: `ipfs.io/ipfs/${Math.random()}`,
+          attachment: {
+            hash: utils.formatBytes32String("some hash"),
+            hashFunction: 0,
+            size: 0,
+          },
+        }));
+
+        await expect(
+          bullaBankerModule.connect(outsider).batchCreate(batchPayment)
         ).to.be.revertedWith("BULLAMODULE: Not safe owner");
       });
     });
