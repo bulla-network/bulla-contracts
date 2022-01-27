@@ -3,6 +3,8 @@ pragma solidity ^0.8.7;
 import "@gnosis.pm/zodiac/contracts/core/Module.sol";
 import "@gnosis.pm/safe-contracts/contracts/base/OwnerManager.sol";
 import "./BullaBanker.sol";
+import "./BatchCreate.sol";
+import "./interfaces/IBullaClaim.sol";
 
 /// @title BullaBankerModule
 /// @author @colinnielsen
@@ -10,9 +12,10 @@ import "./BullaBanker.sol";
 ///     functions (e.g. createClaim, payClaim, updateTag, rejectClaim, rescindClaim) for the signers of a safe.
 
 contract BullaBankerModule is Module {
-    string public constant VERSION = "0.0.8";
-    address public bullaBanker;
-    address public bullaClaim;
+    string public constant VERSION = "0.0.9";
+    address public bullaBankerAddress;
+    address public bullaClaimAddress;
+    address public batchCreateAddress;
 
     event BullaBankerModuleDeploy(
         string version,
@@ -38,24 +41,33 @@ contract BullaBankerModule is Module {
     constructor(
         address _safe,
         address _bullaBanker,
-        address _bullaClaim
+        address _bullaClaim,
+        address _batchCreate
     ) {
-        bytes memory initParams = abi.encode(_safe, _bullaBanker, _bullaClaim);
+        bytes memory initParams = abi.encode(
+            _safe,
+            _bullaBanker,
+            _bullaClaim,
+            _batchCreate
+        );
         setUp(initParams);
     }
 
     function setUp(bytes memory initParams) public override initializer {
-        (address _safe, address _bullaBanker, address _bullaClaim) = abi.decode(
-            initParams,
-            (address, address, address)
-        );
+        (
+            address _safe,
+            address _bullaBanker,
+            address _bullaClaim,
+            address _batchCreate
+        ) = abi.decode(initParams, (address, address, address, address));
         require(_safe != address(0), "BULLAMODULE: Zero safe address");
         __Ownable_init();
         setAvatar(_safe);
         setTarget(_safe);
         transferOwnership(_safe);
-        bullaBanker = _bullaBanker;
-        bullaClaim = _bullaClaim;
+        bullaBankerAddress = _bullaBanker;
+        bullaClaimAddress = _bullaClaim;
+        batchCreateAddress = _batchCreate;
 
         emit BullaBankerModuleDeploy(VERSION, _safe, address(this), msg.sender);
     }
@@ -65,16 +77,29 @@ contract BullaBankerModule is Module {
         bytes32 _bullaTag,
         string calldata _tokenUri
     ) external onlySafeOwner {
-        //0xa1001a60  =>  createBullaClaim((uint256,address,address,string,uint256,address,(bytes32,uint8,uint8)),bytes32,string)
         bytes memory data = abi.encodeWithSelector(
-            0xa1001a60,
+            BullaBanker.createBullaClaim.selector,
             _claim,
             _bullaTag,
             _tokenUri
         );
         require(
-            exec(bullaBanker, 0, data, Enum.Operation.Call),
+            exec(bullaBankerAddress, 0, data, Enum.Operation.Call),
             "BULLAMODULE: Create claim failed"
+        );
+    }
+
+    function batchCreate(BatchCreate.CreateClaimParams[] calldata claims)
+        external
+        onlySafeOwner
+    {
+        bytes memory data = abi.encodeWithSelector(
+            BatchCreate.batchCreate.selector,
+            claims
+        );
+        require(
+            exec(batchCreateAddress, 0, data, Enum.Operation.Call),
+            "BULLAMODULE: Batch create failed"
         );
     }
 
@@ -82,32 +107,35 @@ contract BullaBankerModule is Module {
         external
         onlySafeOwner
     {
-        //0x4fbb8987  =>  updateBullaTag(uint256 tokenId, bytes32 newTag)
         bytes memory data = abi.encodeWithSelector(
-            0x4fbb8987,
+            BullaBanker.updateBullaTag.selector,
             _tokenId,
             _bullaTag
         );
         require(
-            exec(bullaBanker, 0, data, Enum.Operation.Call),
+            exec(bullaBankerAddress, 0, data, Enum.Operation.Call),
             "BULLAMODULE: Tag update failed"
         );
     }
 
     function rejectClaim(uint256 _tokenId) external onlySafeOwner {
-        //0x20341101  =>  rejectClaim(uint256 tokenId)
-        bytes memory data = abi.encodeWithSelector(0x20341101, _tokenId);
+        bytes memory data = abi.encodeWithSelector(
+            IBullaClaim.rejectClaim.selector,
+            _tokenId
+        );
         require(
-            exec(bullaClaim, 0, data, Enum.Operation.Call),
+            exec(bullaClaimAddress, 0, data, Enum.Operation.Call),
             "BULLAMODULE: Reject failed"
         );
     }
 
     function rescindClaim(uint256 _tokenId) external onlySafeOwner {
-        //0xe8042ce5  =>  rescindClaim(uint256 tokenId)
-        bytes memory data = abi.encodeWithSelector(0xe8042ce5, _tokenId);
+        bytes memory data = abi.encodeWithSelector(
+            IBullaClaim.rescindClaim.selector,
+            _tokenId
+        );
         require(
-            exec(bullaClaim, 0, data, Enum.Operation.Call),
+            exec(bullaClaimAddress, 0, data, Enum.Operation.Call),
             "BULLAMODULE: Rescind failed"
         );
     }

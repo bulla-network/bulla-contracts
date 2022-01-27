@@ -1,6 +1,8 @@
 import { BigNumber, utils } from "ethers";
 import hre from "hardhat";
 
+const MAX_BATCH_OPERATIONS = 20;
+
 const hardhatDeploy = async () => {
   const { deployments, getNamedAccounts, ethers } = hre;
   const { deploy } = deployments;
@@ -28,6 +30,12 @@ const hardhatDeploy = async () => {
     args: [ERC721Address],
   });
 
+  const { address: batchCreateAddress } = await deploy("BatchCreate", {
+    from: deployer,
+    log: true,
+    args: [bankerAddress, ERC721Address, MAX_BATCH_OPERATIONS],
+  });
+
   const WETH = await ethers.getContractFactory("WETH");
   const { address: wethAddress } = await WETH.deploy(
     utils.parseEther("10"),
@@ -41,6 +49,7 @@ const hardhatDeploy = async () => {
     bankerAddress,
     wethAddress,
     ERC721Address,
+    batchCreateAddress,
   });
 };
 
