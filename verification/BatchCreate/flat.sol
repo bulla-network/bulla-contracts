@@ -1,3 +1,8 @@
+
+/** 
+ *  SourceUnit: /Users/colinnielsen/code/bulla-contracts/contracts/BatchCreate.sol
+*/
+            
 // SPDX-License-Identifier: MIT
 // OpenZeppelin Contracts v4.4.1 (token/ERC20/IERC20.sol)
 
@@ -1834,7 +1839,7 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
 
         Claim memory claim = getClaim(tokenId);
         address creditor = ownerOf(tokenId);
-        
+
         uint256 amountToRepay = claim.claimAmount - claim.paidAmount;
         uint256 totalPayment = paymentAmount >= amountToRepay
             ? amountToRepay
@@ -2041,6 +2046,7 @@ contract BullaBanker {
         address bullaBanker,
         uint256 blocktime
     );
+    
     struct ClaimParams {
         uint256 claimAmount;
         address creditor;
@@ -2124,7 +2130,6 @@ pragma solidity ^0.8.7;
 
 error NotOwner();
 error BatchTooLarge();
-error UnequalParams();
 error ZeroLength();
 error BatchFailed();
 
@@ -2135,9 +2140,10 @@ contract BatchCreate {
     address public owner;
 
     struct CreateClaimParams {
+        string description;
+        string tokenURI;
         address creditor;
         address debtor;
-        string description;
         uint256 claimAmount;
         uint256 dueBy;
         address claimToken;
@@ -2145,10 +2151,9 @@ contract BatchCreate {
         Multihash attachment;
     }
 
-    modifier batchGuard(uint256 a, uint256 b) {
-        if (a != b) revert UnequalParams();
-        if (a > maxOperations) revert BatchTooLarge();
-        if (a == 0) revert ZeroLength();
+    modifier batchGuard(uint256 length) {
+        if (length > maxOperations) revert BatchTooLarge();
+        if (length == 0) revert ZeroLength();
         _;
     }
 
@@ -2176,10 +2181,10 @@ contract BatchCreate {
         maxOperations = _maxOperations;
     }
 
-    function batchCreate(
-        CreateClaimParams[] memory claims,
-        string[] calldata tokenURIs
-    ) external batchGuard(tokenURIs.length, claims.length) {
+    function batchCreate(CreateClaimParams[] calldata claims)
+        external
+        batchGuard(claims.length)
+    {
         for (uint256 i = 0; i < claims.length; i++) {
             (bool success, ) = bullaBanker.delegatecall(
                 abi.encodeWithSelector(
@@ -2194,7 +2199,7 @@ contract BatchCreate {
                         claims[i].attachment
                     ),
                     claims[i].tag,
-                    tokenURIs[i]
+                    claims[i].tokenURI
                 )
             );
             if (!success) revert BatchFailed();
