@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: MIT
+//SPDX-License-Identifier: UNLICENSED
 
 pragma solidity ^0.8.7;
 
@@ -22,7 +22,6 @@ interface IERC165 {
      */
     function supportsInterface(bytes4 interfaceId) external view returns (bool);
 }
-
 
 /**
  * @dev Required interface of an ERC721 compliant contract.
@@ -179,7 +178,6 @@ interface IERC721 is IERC165 {
     ) external;
 }
 
-
 /**
  * @title ERC721 token receiver interface
  * @dev Interface for any contract that wants to support safeTransfers
@@ -203,7 +201,6 @@ interface IERC721Receiver {
     ) external returns (bytes4);
 }
 
-
 /**
  * @title ERC-721 Non-Fungible Token Standard, optional metadata extension
  * @dev See https://eips.ethereum.org/EIPS/eip-721
@@ -224,7 +221,6 @@ interface IERC721Metadata is IERC721 {
      */
     function tokenURI(uint256 tokenId) external view returns (string memory);
 }
-
 
 /**
  * @dev Collection of functions related to the address type
@@ -476,7 +472,6 @@ library Address {
     }
 }
 
-
 /**
  * @dev Provides information about the current execution context, including the
  * sender of the transaction and its data. While these are generally available
@@ -496,7 +491,6 @@ abstract contract Context {
         return msg.data;
     }
 }
-
 
 /**
  * @dev String operations.
@@ -565,7 +559,6 @@ library Strings {
     }
 }
 
-
 /**
  * @dev Implementation of the {IERC165} interface.
  *
@@ -594,7 +587,6 @@ abstract contract ERC165 is IERC165 {
         return interfaceId == type(IERC165).interfaceId;
     }
 }
-
 
 /**
  * @dev Implementation of https://eips.ethereum.org/EIPS/eip-721[ERC721] Non-Fungible Token Standard, including
@@ -1082,7 +1074,6 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     ) internal virtual {}
 }
 
-
 /**
  * @dev ERC721 token with storage based token URI management.
  */
@@ -1158,7 +1149,6 @@ abstract contract ERC721URIStorage is ERC721 {
         }
     }
 }
-
 
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP.
@@ -1246,7 +1236,6 @@ interface IERC20 {
         uint256 value
     );
 }
-
 
 /**
  * @title SafeERC20
@@ -1372,7 +1361,6 @@ library SafeERC20 {
     }
 }
 
-
 /**
  * @title Counters
  * @author Matt Condon (@shrugs)
@@ -1411,7 +1399,6 @@ library Counters {
         counter._value = 0;
     }
 }
-
 
 /**
  * @dev Contract module which provides a basic access control mechanism, where
@@ -1485,7 +1472,6 @@ abstract contract Ownable is Context {
     }
 }
 
-
 struct FeeInfo {
     address collectionAddress;
     uint32 feeBasisPoints;
@@ -1555,7 +1541,6 @@ interface IBullaManager {
         view
         returns (address sendFeesTo, uint256 transactionFee);
 }
-
 
 struct Multihash {
     bytes32 hash;

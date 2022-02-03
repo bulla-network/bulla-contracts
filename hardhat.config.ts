@@ -88,7 +88,7 @@ const config: HardhatUserConfig = {
     enabled: true,
     currency: "USD",
     gasPrice: 100,
-    coinmarketcap: COINMARKETCAP_API,
+    // coinmarketcap: COINMARKETCAP_API,
   },
 };
 export default config;

@@ -1,11 +1,9 @@
-import { expect } from "chai";
-import chai from "chai";
-import { ethers } from "hardhat";
-import { deployContract, MockProvider } from "ethereum-waffle";
-import { solidity } from "ethereum-waffle";
 import { Wallet } from "@ethersproject/wallet";
-import { BullaManager } from "../../typechain/BullaManager";
+import chai, { expect } from "chai";
+import { deployContract, MockProvider, solidity } from "ethereum-waffle";
+import { ethers } from "hardhat";
 import BullaManagerMock from "../../artifacts/contracts/BullaManager.sol/BullaManager.json";
+import { BullaManager } from "../../typechain/BullaManager";
 import { declareSignerWithAddress } from "../test-utils";
 
 chai.use(solidity);

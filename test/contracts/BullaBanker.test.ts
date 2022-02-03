@@ -1,20 +1,15 @@
-import { expect } from "chai";
-import chai from "chai";
+import chai, { expect } from "chai";
+import { deployContract, solidity } from "ethereum-waffle";
+import { utils } from "ethers";
 import { ethers } from "hardhat";
-import { deployContract, MockProvider } from "ethereum-waffle";
-import { solidity } from "ethereum-waffle";
-
-import { BullaManager } from "../../typechain/BullaManager";
-import { BullaBanker } from "../../typechain/BullaBanker";
-import { BullaClaimERC721 } from "../../typechain/BullaClaimERC721";
-import { ERC20 } from "../../typechain/ERC20";
-
-import BullaManagerMock from "../../artifacts/contracts/BullaManager.sol/BullaManager.json";
 import BullaBankerMock from "../../artifacts/contracts/BullaBanker.sol/BullaBanker.json";
 import BullaClaimERC721Mock from "../../artifacts/contracts/BullaClaimERC721.sol/BullaClaimERC721.json";
-import ERC20Mock from "../../artifacts/contracts/BullaToken.sol/BullaToken.json";
-
-import { utils } from "ethers";
+import BullaManagerMock from "../../artifacts/contracts/BullaManager.sol/BullaManager.json";
+import ERC20Mock from "../../artifacts/contracts/mocks/BullaToken.sol/BullaToken.json";
+import { BullaBanker } from "../../typechain/BullaBanker";
+import { BullaClaimERC721 } from "../../typechain/BullaClaimERC721";
+import { BullaManager } from "../../typechain/BullaManager";
+import { ERC20 } from "../../typechain/ERC20";
 import { declareSignerWithAddress } from "../test-utils";
 
 chai.use(solidity);
