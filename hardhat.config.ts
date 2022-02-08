@@ -70,6 +70,11 @@ const config: HardhatUserConfig = {
       accounts: [DEPLOY_PK],
       chainId: 42220,
     },
+    aurora: {
+      url: `https://mainnet.aurora.dev`,
+      accounts: [DEPLOY_PK],
+      chainId: 1313161554,
+    },
   },
   namedAccounts: {
     deployer: {
@@ -82,6 +87,7 @@ const config: HardhatUserConfig = {
       1666700000: DEPLOYER_ADDRESS,
       43114: DEPLOYER_ADDRESS,
       30: DEPLOYER_ADDRESS,
+      1313161554: DEPLOYER_ADDRESS,
     },
   },
   gasReporter: {
