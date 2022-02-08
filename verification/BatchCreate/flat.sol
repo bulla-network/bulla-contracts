@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: BUSL-1.1
 // OpenZeppelin Contracts v4.4.1 (token/ERC20/IERC20.sol)
 
 pragma solidity ^0.8.0;
@@ -2226,6 +2226,7 @@ contract BullaBanker {
 }
 
 pragma solidity ^0.8.7;
+
 ////import "./interfaces/IBullaClaim.sol";
 ////import "./BullaBanker.sol";
 
@@ -2234,6 +2235,11 @@ error BatchTooLarge();
 error ZeroLength();
 error BatchFailed();
 
+/// @title BatchCreate
+/// @author @colinnielsen
+/// @notice A contract to allow for the creation of multiple claims in a single transaction.
+/// @dev Uses delegatecall to forward the value of msg.sender to BullaBanker.
+/// @dev Max operations should be wary of the block gas limit on a certain network
 contract BatchCreate {
     address public bullaClaimERC721;
     address public bullaBanker;
