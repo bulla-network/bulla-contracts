@@ -1,5 +1,5 @@
-import hre, { ethers } from "hardhat";
 import { writeFileSync } from "fs";
+import hre, { ethers } from "hardhat";
 
 const dateLabel = (date: Date) => date.toISOString().replace(/\D/g, "");
 const MAX_BATCH_OPERATIONS = 20;

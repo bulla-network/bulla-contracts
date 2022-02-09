@@ -4,11 +4,11 @@ import { solidity } from "ethereum-waffle";
 import { utils } from "ethers";
 import hre, { deployments, ethers } from "hardhat";
 import { BullaToken } from "../../typechain/BullaToken";
+import { BatchCreate__factory } from "../../typechain/factories/BatchCreate__factory";
 import { BullaBanker__factory } from "../../typechain/factories/BullaBanker__factory";
 import { BullaClaimERC721__factory } from "../../typechain/factories/BullaClaimERC721__factory";
 import { BullaManager__factory } from "../../typechain/factories/BullaManager__factory";
 import { BullaToken__factory } from "../../typechain/factories/BullaToken__factory";
-import { BatchCreate__factory } from "../../typechain/factories/BatchCreate__factory";
 import { declareSignerWithAddress, parseRaw } from "../test-utils";
 
 chai.use(solidity);
