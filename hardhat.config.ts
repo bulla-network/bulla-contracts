@@ -6,7 +6,7 @@ import "hardhat-deploy";
 import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-solhint";
 import "hardhat-gas-reporter";
-import "hardhat-ethernal"
+// import "hardhat-ethernal"
 
 const INFURA_API_KEY = process.env.INFURA_API_KEY!;
 const GET_BLOCK_API_KEY = process.env.GET_BLOCK_API_KEY!;
@@ -25,7 +25,7 @@ const config: HardhatUserConfig = {
     // hardhat: {
     //   mining: {
     //     auto: false,
-    //     interval: 4000,
+    //     interval: 1000,
     //   },
     // },
     /** ^^^ */

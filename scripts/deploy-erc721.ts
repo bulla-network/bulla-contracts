@@ -2,6 +2,7 @@ import hre, { ethers } from "hardhat";
 import { writeFileSync } from "fs";
 
 const dateLabel = (date: Date) => date.toISOString().replace(/\D/g, "");
+const MAX_BATCH_OPERATIONS = 20;
 
 const deployCreator = async function () {
   const { deployments, getNamedAccounts, getChainId } = hre;
@@ -36,10 +37,17 @@ const deployCreator = async function () {
     }
   );
 
+  const { address: batchCreateAddress } = await deploy("BatchCreate", {
+    from: deployer,
+    log: true,
+    args: [bankerAddress, ERC721Address, MAX_BATCH_OPERATIONS],
+  });
+
   console.log({
     bankerAddress,
     managerAddress,
     ERC721Address,
+    batchCreateAddress,
     deployedOnBlock: managerReceipt?.blockNumber,
   });
   const now = new Date();
