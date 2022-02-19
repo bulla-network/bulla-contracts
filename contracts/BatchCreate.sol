@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.7;
 import "./interfaces/IBullaClaim.sol";
 import "./BullaBanker.sol";
@@ -8,6 +8,11 @@ error BatchTooLarge();
 error ZeroLength();
 error BatchFailed();
 
+/// @title BatchCreate
+/// @author @colinnielsen
+/// @notice A contract to allow for the creation of multiple claims in a single transaction.
+/// @dev Uses delegatecall to forward the value of msg.sender to BullaBanker.
+/// @dev Max operations should be wary of the block gas limit on a certain network
 contract BatchCreate {
     address public bullaClaimERC721;
     address public bullaBanker;

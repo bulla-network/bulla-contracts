@@ -1,5 +1,5 @@
-import "@nomiclabs/hardhat-ethers";
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
+// import "@nomiclabs/hardhat-ethers";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import chai, { expect } from "chai";
 import { solidity } from "ethereum-waffle";
 import { utils } from "ethers";

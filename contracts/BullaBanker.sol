@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: UNLICENSED
+//SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/proxy/Clones.sol";
@@ -27,8 +27,8 @@ contract BullaBanker {
         uint256 claimAmount;
         address creditor;
         address debtor;
-        bytes32 description;
-        uint64 dueBy;
+        string description;
+        uint256 dueBy;
         address claimToken;
         Multihash attachment;
     }
@@ -45,21 +45,23 @@ contract BullaBanker {
 
     function createBullaClaim(
         ClaimParams calldata claim,
-        bytes32 bullaTag
-     ) public returns (uint256) {
+        bytes32 bullaTag,
+        string calldata _tokenUri
+    ) public returns (uint256) {
         if (msg.sender != claim.creditor && msg.sender != claim.debtor)
             revert NotCreditorOrDebtor(msg.sender);
 
         address _bullaClaimERC721Address = bullaClaimERC721;
         uint256 newTokenId = BullaClaimERC721(_bullaClaimERC721Address)
-            .createClaim(
+            .createClaimWithURI(
                 claim.creditor,
                 claim.debtor,
                 claim.description,
                 claim.claimAmount,
                 claim.dueBy,
                 claim.claimToken,
-                claim.attachment
+                claim.attachment,
+                _tokenUri
             );
 
         emit BullaTagUpdated(

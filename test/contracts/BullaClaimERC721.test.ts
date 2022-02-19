@@ -1,18 +1,13 @@
-import { expect } from "chai";
-import chai from "chai";
-import { ethers, deployments, getUnnamedAccounts } from "hardhat";
-import { deployContract, MockProvider } from "ethereum-waffle";
-import { solidity } from "ethereum-waffle";
-
-import { ERC20 } from "../../typechain/ERC20";
-import { BullaManager } from "../../typechain/BullaManager";
-import { BullaClaimERC721 } from "../../typechain/BullaClaimERC721";
-
-import BullaManagerMock from "../../artifacts/contracts/BullaManager.sol/BullaManager.json";
+import chai, { expect } from "chai";
+import { deployContract, solidity } from "ethereum-waffle";
+import { ethers } from "hardhat";
 import BullaClaimERC721Mock from "../../artifacts/contracts/BullaClaimERC721.sol/BullaClaimERC721.json";
-import ERC20Mock from "../../artifacts/contracts/BullaToken.sol/BullaToken.json";
-import { utils } from "ethers";
-import { declareSignerWithAddress, toBytes32 } from "../test-utils";
+import BullaManagerMock from "../../artifacts/contracts/BullaManager.sol/BullaManager.json";
+import ERC20Mock from "../../artifacts/contracts/mocks/BullaToken.sol/BullaToken.json";
+import { BullaClaimERC721 } from "../../typechain/BullaClaimERC721";
+import { BullaManager } from "../../typechain/BullaManager";
+import { ERC20 } from "../../typechain/ERC20";
+import { declareSignerWithAddress } from "../test-utils";
 
 chai.use(solidity);
 
@@ -28,13 +23,12 @@ describe("Bulla Claim ERC721", function () {
     const feeBasisPoint = 1000;
     let dueBy: number;
     const someMultihash = {
-        ipfsHash: toBytes32("some hash"),
+        hash: ethers.utils.formatBytes32String("some hash"),
         hashFunction: 0,
-        hashSize: 0,
+        size: 0,
     };
 
     async function createClaim(creditor: string, debtor: string, description: string, claimAmount: any, erc20Contract: any) {
-        description = toBytes32(description);
         dueBy = (await (await ethers.provider.getBlock('latest')).timestamp) + 100;
 
         // Check Unhappy State
@@ -120,7 +114,7 @@ describe("Bulla Claim ERC721", function () {
         erc20Contract = (await deployContract(debtor, ERC20Mock)) as ERC20;
 
         bullaManager = (await deployContract(owner, BullaManagerMock, [
-            toBytes32("Bulla Manager Test"),
+            ethers.utils.formatBytes32String("Bulla Manager Test"),
             collector.address,
             0,
         ])) as BullaManager;

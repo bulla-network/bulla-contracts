@@ -1,14 +1,14 @@
-//SPDX-License-Identifier: BUSL-1.1
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./interfaces/IBullaManager.sol";
+import "../interfaces/IBullaManager.sol";
 
 error NotContractOwner(address _sender);
 error ZeroAddress();
 error ValueMustBeGreaterThanZero();
 
-contract BullaManager is IBullaManager {
+contract BullaManagerV2 is IBullaManager {
     bytes32 public immutable description;
     FeeInfo public feeInfo;
     IERC20 public bullaToken;
@@ -44,14 +44,16 @@ contract BullaManager is IBullaManager {
         );
     }
 
+    receive() external payable {}
+
     function setOwner(address _newOwner) external override onlyOwner {
-        if(_newOwner == address(0)) revert ZeroAddress();
+        if (_newOwner == address(0)) revert ZeroAddress();
         owner = _newOwner;
         emit OwnerChanged(address(this), owner, _newOwner, block.timestamp);
     }
 
     function setFee(uint32 _feeBasisPoints) external override onlyOwner {
-        if(_feeBasisPoints == 0) revert ValueMustBeGreaterThanZero();
+        if (_feeBasisPoints == 0) revert ValueMustBeGreaterThanZero();
         uint32 oldFee = feeInfo.feeBasisPoints;
         feeInfo.feeBasisPoints = _feeBasisPoints;
         emit FeeChanged(
@@ -67,7 +69,7 @@ contract BullaManager is IBullaManager {
         override
         onlyOwner
     {
-        if(_collectionAddress == address(0)) revert ZeroAddress();
+        if (_collectionAddress == address(0)) revert ZeroAddress();
         feeInfo.collectionAddress = _collectionAddress;
         emit CollectorChanged(
             address(this),
@@ -94,7 +96,7 @@ contract BullaManager is IBullaManager {
         override
         onlyOwner
     {
-        if(reducedFeeBasisPoints == 0) revert ValueMustBeGreaterThanZero();
+        if (reducedFeeBasisPoints == 0) revert ValueMustBeGreaterThanZero();
         uint32 oldFee = feeInfo.reducedFeeBasisPoints;
         feeInfo.reducedFeeBasisPoints = reducedFeeBasisPoints;
         emit FeeChanged(
@@ -111,7 +113,7 @@ contract BullaManager is IBullaManager {
         override
         onlyOwner
     {
-        if(_bullaTokenAddress == address(0)) revert ZeroAddress();
+        if (_bullaTokenAddress == address(0)) revert ZeroAddress();
         bullaToken = IERC20(_bullaTokenAddress);
         emit BullaTokenChanged(
             address(this),
@@ -149,8 +151,13 @@ contract BullaManager is IBullaManager {
         return (fee, feeInfo.collectionAddress);
     }
 
-    function getTransactionFee(address _holder, uint paymentAmount) external view override returns(address sendFeesTo, uint transactionFee){
-        (uint32 fee, address collectionAddress ) = getFeeInfo(_holder);
+    function getTransactionFee(address _holder, uint256 paymentAmount)
+        external
+        view
+        override
+        returns (address sendFeesTo, uint256 transactionFee)
+    {
+        (uint32 fee, address collectionAddress) = getFeeInfo(_holder);
         sendFeesTo = collectionAddress;
         transactionFee = fee > 0 ? (paymentAmount * fee) / 10000 : 0;
     }
