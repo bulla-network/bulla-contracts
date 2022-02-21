@@ -36,7 +36,7 @@ contract BullaClaimV2 is ERC721, Ownable {
         Rejected,
         Rescinded
     }
-    
+
     struct Claim {
         uint256 claimAmount;
         uint256 paidAmount;
@@ -82,7 +82,7 @@ contract BullaClaimV2 is ERC721, Ownable {
         uint256 claimAmount,
         address claimToken,
         uint64 dueBy
-    );
+    ); //TODO: add attachment
 
     event ClaimPayment(
         uint256 indexed claimId,
@@ -260,6 +260,7 @@ contract BullaClaimV2 is ERC721, Ownable {
     function payClaimWithTokens(uint256 claimId, uint256 amount) external {
         // load the claim from storage
         Claim memory claim = getClaim(claimId);
+        address creditor = getCreditor(claimId);
 
         // get the transaction fee and collection address by passing the requested payment amount from the BullaManager contract
         (address collectionAddress, uint256 transactionFee) = IBullaManager(
@@ -289,12 +290,12 @@ contract BullaClaimV2 is ERC721, Ownable {
             // this contract is now a holder of `amountAfterFee` amount of ETH
             WETH.withdraw(amountAfterFee);
             // we are then going to transfer this contract's ETH to the creditor (or the owner)
-            getCreditor(claimId).safeTransferETH(amountAfterFee);
+            creditor.safeTransferETH(amountAfterFee);
         } else {
             // in any other case, we can directly transfer the token from the debtor to the creditor
             ERC20(claim.token).safeTransferFrom(
                 msg.sender,
-                getCreditor(claimId),
+                creditor,
                 amountAfterFee
             );
         }
@@ -323,6 +324,7 @@ contract BullaClaimV2 is ERC721, Ownable {
     function payClaimWithETH(uint256 claimId, uint256 amount) external payable {
         // load the claim from storage
         Claim memory claim = getClaim(claimId);
+        address creditor = getCreditor(claimId);
 
         // get the transaction fee and collection address by passing the requested payment amount from the BullaManager contract
         (address collectionAddress, uint256 transactionFee) = IBullaManager(
@@ -342,7 +344,7 @@ contract BullaClaimV2 is ERC721, Ownable {
 
         emit ClaimPayment(claimId, msg.sender, amountAfterFee);
 
-        msg.sender.safeTransferETH(amountAfterFee);
+        creditor.safeTransferETH(amountAfterFee);
 
         // if there is a fee enabled, we need to pay it
         if (transactionFee > 0) {
@@ -353,7 +355,7 @@ contract BullaClaimV2 is ERC721, Ownable {
                 transactionFee
             );
 
-            msg.sender.safeTransferETH(transactionFee);
+            creditor.safeTransferETH(transactionFee);
         }
     }
 
