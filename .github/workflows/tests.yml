@@ -7,7 +7,7 @@ on:
     branches: [ master ]
   workflow_dispatch:
 jobs:
-  Test-Mappings:
+  Hardhat-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -15,8 +15,9 @@ jobs:
         with:
           node-version: 14.17.0
           registry-url: https://registry.npmjs.org/
-      - name: run hardhat tests
+      - name: setup and run hardhat tests
         run: |
+          echo 'DEPLOY_PK=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80' > .env
           yarn 
           yarn compile
           yarn test

@@ -24,9 +24,7 @@ interface IERC20 {
      *
      * Emits a {Transfer} event.
      */
-    function transfer(address recipient, uint256 amount)
-        external
-        returns (bool);
+    function transfer(address recipient, uint256 amount) external returns (bool);
 
     /**
      * @dev Returns the remaining number of tokens that `spender` will be
@@ -35,10 +33,7 @@ interface IERC20 {
      *
      * This value changes when {approve} or {transferFrom} are called.
      */
-    function allowance(address owner, address spender)
-        external
-        view
-        returns (uint256);
+    function allowance(address owner, address spender) external view returns (uint256);
 
     /**
      * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
@@ -83,13 +78,13 @@ interface IERC20 {
      * @dev Emitted when the allowance of a `spender` for an `owner` is set by
      * a call to {approve}. `value` is the new allowance.
      */
-    event Approval(
-        address indexed owner,
-        address indexed spender,
-        uint256 value
-    );
+    event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
+
+
+
+            
 // OpenZeppelin Contracts v4.4.1 (utils/Address.sol)
 
 pragma solidity ^0.8.0;
@@ -144,16 +139,10 @@ library Address {
      * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].
      */
     function sendValue(address payable recipient, uint256 amount) internal {
-        require(
-            address(this).balance >= amount,
-            "Address: insufficient balance"
-        );
+        require(address(this).balance >= amount, "Address: insufficient balance");
 
         (bool success, ) = recipient.call{value: amount}("");
-        require(
-            success,
-            "Address: unable to send value, recipient may have reverted"
-        );
+        require(success, "Address: unable to send value, recipient may have reverted");
     }
 
     /**
@@ -174,10 +163,7 @@ library Address {
      *
      * _Available since v3.1._
      */
-    function functionCall(address target, bytes memory data)
-        internal
-        returns (bytes memory)
-    {
+    function functionCall(address target, bytes memory data) internal returns (bytes memory) {
         return functionCall(target, data, "Address: low-level call failed");
     }
 
@@ -211,13 +197,7 @@ library Address {
         bytes memory data,
         uint256 value
     ) internal returns (bytes memory) {
-        return
-            functionCallWithValue(
-                target,
-                data,
-                value,
-                "Address: low-level call with value failed"
-            );
+        return functionCallWithValue(target, data, value, "Address: low-level call with value failed");
     }
 
     /**
@@ -232,15 +212,10 @@ library Address {
         uint256 value,
         string memory errorMessage
     ) internal returns (bytes memory) {
-        require(
-            address(this).balance >= value,
-            "Address: insufficient balance for call"
-        );
+        require(address(this).balance >= value, "Address: insufficient balance for call");
         require(isContract(target), "Address: call to non-contract");
 
-        (bool success, bytes memory returndata) = target.call{value: value}(
-            data
-        );
+        (bool success, bytes memory returndata) = target.call{value: value}(data);
         return verifyCallResult(success, returndata, errorMessage);
     }
 
@@ -250,17 +225,8 @@ library Address {
      *
      * _Available since v3.3._
      */
-    function functionStaticCall(address target, bytes memory data)
-        internal
-        view
-        returns (bytes memory)
-    {
-        return
-            functionStaticCall(
-                target,
-                data,
-                "Address: low-level static call failed"
-            );
+    function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {
+        return functionStaticCall(target, data, "Address: low-level static call failed");
     }
 
     /**
@@ -286,16 +252,8 @@ library Address {
      *
      * _Available since v3.4._
      */
-    function functionDelegateCall(address target, bytes memory data)
-        internal
-        returns (bytes memory)
-    {
-        return
-            functionDelegateCall(
-                target,
-                data,
-                "Address: low-level delegate call failed"
-            );
+    function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {
+        return functionDelegateCall(target, data, "Address: low-level delegate call failed");
     }
 
     /**
@@ -344,6 +302,10 @@ library Address {
     }
 }
 
+
+
+
+            
 pragma solidity ^0.8.3;
 
 ////import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -411,13 +373,14 @@ interface IBullaManager {
         external
         view
         returns (uint32, address);
-
-    function getTransactionFee(address _holder, uint256 paymentAmount)
-        external
-        view
-        returns (address sendFeesTo, uint256 transactionFee);
+    
+    function getTransactionFee(address _holder, uint paymentAmount) external view returns(address sendFeesTo, uint transactionFee);
 }
 
+
+
+
+            
 // OpenZeppelin Contracts v4.4.1 (token/ERC20/utils/SafeERC20.sol)
 
 pragma solidity ^0.8.0;
@@ -442,10 +405,7 @@ library SafeERC20 {
         address to,
         uint256 value
     ) internal {
-        _callOptionalReturn(
-            token,
-            abi.encodeWithSelector(token.transfer.selector, to, value)
-        );
+        _callOptionalReturn(token, abi.encodeWithSelector(token.transfer.selector, to, value));
     }
 
     function safeTransferFrom(
@@ -454,10 +414,7 @@ library SafeERC20 {
         address to,
         uint256 value
     ) internal {
-        _callOptionalReturn(
-            token,
-            abi.encodeWithSelector(token.transferFrom.selector, from, to, value)
-        );
+        _callOptionalReturn(token, abi.encodeWithSelector(token.transferFrom.selector, from, to, value));
     }
 
     /**
@@ -479,10 +436,7 @@ library SafeERC20 {
             (value == 0) || (token.allowance(address(this), spender) == 0),
             "SafeERC20: approve from non-zero to non-zero allowance"
         );
-        _callOptionalReturn(
-            token,
-            abi.encodeWithSelector(token.approve.selector, spender, value)
-        );
+        _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, value));
     }
 
     function safeIncreaseAllowance(
@@ -491,14 +445,7 @@ library SafeERC20 {
         uint256 value
     ) internal {
         uint256 newAllowance = token.allowance(address(this), spender) + value;
-        _callOptionalReturn(
-            token,
-            abi.encodeWithSelector(
-                token.approve.selector,
-                spender,
-                newAllowance
-            )
-        );
+        _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
     }
 
     function safeDecreaseAllowance(
@@ -508,19 +455,9 @@ library SafeERC20 {
     ) internal {
         unchecked {
             uint256 oldAllowance = token.allowance(address(this), spender);
-            require(
-                oldAllowance >= value,
-                "SafeERC20: decreased allowance below zero"
-            );
+            require(oldAllowance >= value, "SafeERC20: decreased allowance below zero");
             uint256 newAllowance = oldAllowance - value;
-            _callOptionalReturn(
-                token,
-                abi.encodeWithSelector(
-                    token.approve.selector,
-                    spender,
-                    newAllowance
-                )
-            );
+            _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
         }
     }
 
@@ -535,20 +472,18 @@ library SafeERC20 {
         // we're implementing it ourselves. We use {Address.functionCall} to perform this call, which verifies that
         // the target address contains contract code and also asserts for success in the low-level call.
 
-        bytes memory returndata = address(token).functionCall(
-            data,
-            "SafeERC20: low-level call failed"
-        );
+        bytes memory returndata = address(token).functionCall(data, "SafeERC20: low-level call failed");
         if (returndata.length > 0) {
             // Return data is optional
-            require(
-                abi.decode(returndata, (bool)),
-                "SafeERC20: ERC20 operation did not succeed"
-            );
+            require(abi.decode(returndata, (bool)), "SafeERC20: ERC20 operation did not succeed");
         }
     }
 }
 
+
+
+
+            
 // OpenZeppelin Contracts v4.4.1 (utils/Context.sol)
 
 pragma solidity ^0.8.0;
@@ -573,6 +508,10 @@ abstract contract Context {
     }
 }
 
+
+
+
+            
 // OpenZeppelin Contracts v4.4.1 (utils/introspection/IERC165.sol)
 
 pragma solidity ^0.8.0;
@@ -598,6 +537,10 @@ interface IERC165 {
     function supportsInterface(bytes4 interfaceId) external view returns (bool);
 }
 
+
+
+
+            
 // OpenZeppelin Contracts v4.4.1 (token/ERC721/IERC721.sol)
 
 pragma solidity ^0.8.0;
@@ -611,29 +554,17 @@ interface IERC721 is IERC165 {
     /**
      * @dev Emitted when `tokenId` token is transferred from `from` to `to`.
      */
-    event Transfer(
-        address indexed from,
-        address indexed to,
-        uint256 indexed tokenId
-    );
+    event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
 
     /**
      * @dev Emitted when `owner` enables `approved` to manage the `tokenId` token.
      */
-    event Approval(
-        address indexed owner,
-        address indexed approved,
-        uint256 indexed tokenId
-    );
+    event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
 
     /**
      * @dev Emitted when `owner` enables or disables (`approved`) `operator` to manage all of its assets.
      */
-    event ApprovalForAll(
-        address indexed owner,
-        address indexed operator,
-        bool approved
-    );
+    event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
 
     /**
      * @dev Returns the number of tokens in ``owner``'s account.
@@ -711,10 +642,7 @@ interface IERC721 is IERC165 {
      *
      * - `tokenId` must exist.
      */
-    function getApproved(uint256 tokenId)
-        external
-        view
-        returns (address operator);
+    function getApproved(uint256 tokenId) external view returns (address operator);
 
     /**
      * @dev Approve or remove `operator` as an operator for the caller.
@@ -733,10 +661,7 @@ interface IERC721 is IERC165 {
      *
      * See {setApprovalForAll}
      */
-    function isApprovedForAll(address owner, address operator)
-        external
-        view
-        returns (bool);
+    function isApprovedForAll(address owner, address operator) external view returns (bool);
 
     /**
      * @dev Safely transfers `tokenId` token from `from` to `to`.
@@ -759,6 +684,10 @@ interface IERC721 is IERC165 {
     ) external;
 }
 
+
+
+
+            
 // OpenZeppelin Contracts v4.4.1 (utils/introspection/ERC165.sol)
 
 pragma solidity ^0.8.0;
@@ -783,17 +712,15 @@ abstract contract ERC165 is IERC165 {
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override
-        returns (bool)
-    {
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return interfaceId == type(IERC165).interfaceId;
     }
 }
 
+
+
+
+            
 // OpenZeppelin Contracts v4.4.1 (utils/Strings.sol)
 
 pragma solidity ^0.8.0;
@@ -848,11 +775,7 @@ library Strings {
     /**
      * @dev Converts a `uint256` to its ASCII `string` hexadecimal representation with fixed length.
      */
-    function toHexString(uint256 value, uint256 length)
-        internal
-        pure
-        returns (string memory)
-    {
+    function toHexString(uint256 value, uint256 length) internal pure returns (string memory) {
         bytes memory buffer = new bytes(2 * length + 2);
         buffer[0] = "0";
         buffer[1] = "x";
@@ -865,6 +788,10 @@ library Strings {
     }
 }
 
+
+
+
+            
 // OpenZeppelin Contracts v4.4.1 (token/ERC721/extensions/IERC721Metadata.sol)
 
 pragma solidity ^0.8.0;
@@ -892,6 +819,10 @@ interface IERC721Metadata is IERC721 {
     function tokenURI(uint256 tokenId) external view returns (string memory);
 }
 
+
+
+
+            
 // OpenZeppelin Contracts v4.4.1 (token/ERC721/IERC721Receiver.sol)
 
 pragma solidity ^0.8.0;
@@ -919,6 +850,10 @@ interface IERC721Receiver {
     ) external returns (bytes4);
 }
 
+
+
+
+            
 // OpenZeppelin Contracts v4.4.1 (token/ERC721/ERC721.sol)
 
 pragma solidity ^0.8.0;
@@ -969,13 +904,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(ERC165, IERC165)
-        returns (bool)
-    {
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
         return
             interfaceId == type(IERC721).interfaceId ||
             interfaceId == type(IERC721Metadata).interfaceId ||
@@ -985,35 +914,17 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     /**
      * @dev See {IERC721-balanceOf}.
      */
-    function balanceOf(address owner)
-        public
-        view
-        virtual
-        override
-        returns (uint256)
-    {
-        require(
-            owner != address(0),
-            "ERC721: balance query for the zero address"
-        );
+    function balanceOf(address owner) public view virtual override returns (uint256) {
+        require(owner != address(0), "ERC721: balance query for the zero address");
         return _balances[owner];
     }
 
     /**
      * @dev See {IERC721-ownerOf}.
      */
-    function ownerOf(uint256 tokenId)
-        public
-        view
-        virtual
-        override
-        returns (address)
-    {
+    function ownerOf(uint256 tokenId) public view virtual override returns (address) {
         address owner = _owners[tokenId];
-        require(
-            owner != address(0),
-            "ERC721: owner query for nonexistent token"
-        );
+        require(owner != address(0), "ERC721: owner query for nonexistent token");
         return owner;
     }
 
@@ -1034,23 +945,11 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     /**
      * @dev See {IERC721Metadata-tokenURI}.
      */
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        virtual
-        override
-        returns (string memory)
-    {
-        require(
-            _exists(tokenId),
-            "ERC721Metadata: URI query for nonexistent token"
-        );
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+        require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
 
         string memory baseURI = _baseURI();
-        return
-            bytes(baseURI).length > 0
-                ? string(abi.encodePacked(baseURI, tokenId.toString()))
-                : "";
+        return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenId.toString())) : "";
     }
 
     /**
@@ -1080,17 +979,8 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     /**
      * @dev See {IERC721-getApproved}.
      */
-    function getApproved(uint256 tokenId)
-        public
-        view
-        virtual
-        override
-        returns (address)
-    {
-        require(
-            _exists(tokenId),
-            "ERC721: approved query for nonexistent token"
-        );
+    function getApproved(uint256 tokenId) public view virtual override returns (address) {
+        require(_exists(tokenId), "ERC721: approved query for nonexistent token");
 
         return _tokenApprovals[tokenId];
     }
@@ -1098,24 +988,14 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     /**
      * @dev See {IERC721-setApprovalForAll}.
      */
-    function setApprovalForAll(address operator, bool approved)
-        public
-        virtual
-        override
-    {
+    function setApprovalForAll(address operator, bool approved) public virtual override {
         _setApprovalForAll(_msgSender(), operator, approved);
     }
 
     /**
      * @dev See {IERC721-isApprovedForAll}.
      */
-    function isApprovedForAll(address owner, address operator)
-        public
-        view
-        virtual
-        override
-        returns (bool)
-    {
+    function isApprovedForAll(address owner, address operator) public view virtual override returns (bool) {
         return _operatorApprovals[owner][operator];
     }
 
@@ -1128,10 +1008,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         uint256 tokenId
     ) public virtual override {
         //solhint-disable-next-line max-line-length
-        require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
-            "ERC721: transfer caller is not owner nor approved"
-        );
+        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
 
         _transfer(from, to, tokenId);
     }
@@ -1156,10 +1033,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         uint256 tokenId,
         bytes memory _data
     ) public virtual override {
-        require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
-            "ERC721: transfer caller is not owner nor approved"
-        );
+        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
         _safeTransfer(from, to, tokenId, _data);
     }
 
@@ -1188,10 +1062,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         bytes memory _data
     ) internal virtual {
         _transfer(from, to, tokenId);
-        require(
-            _checkOnERC721Received(from, to, tokenId, _data),
-            "ERC721: transfer to non ERC721Receiver implementer"
-        );
+        require(_checkOnERC721Received(from, to, tokenId, _data), "ERC721: transfer to non ERC721Receiver implementer");
     }
 
     /**
@@ -1213,20 +1084,10 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
      *
      * - `tokenId` must exist.
      */
-    function _isApprovedOrOwner(address spender, uint256 tokenId)
-        internal
-        view
-        virtual
-        returns (bool)
-    {
-        require(
-            _exists(tokenId),
-            "ERC721: operator query for nonexistent token"
-        );
+    function _isApprovedOrOwner(address spender, uint256 tokenId) internal view virtual returns (bool) {
+        require(_exists(tokenId), "ERC721: operator query for nonexistent token");
         address owner = ERC721.ownerOf(tokenId);
-        return (spender == owner ||
-            getApproved(tokenId) == spender ||
-            isApprovedForAll(owner, spender));
+        return (spender == owner || getApproved(tokenId) == spender || isApprovedForAll(owner, spender));
     }
 
     /**
@@ -1323,10 +1184,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         address to,
         uint256 tokenId
     ) internal virtual {
-        require(
-            ERC721.ownerOf(tokenId) == from,
-            "ERC721: transfer of token that is not own"
-        );
+        require(ERC721.ownerOf(tokenId) == from, "ERC721: transfer of token that is not own");
         require(to != address(0), "ERC721: transfer to the zero address");
 
         _beforeTokenTransfer(from, to, tokenId);
@@ -1383,20 +1241,11 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         bytes memory _data
     ) private returns (bool) {
         if (to.isContract()) {
-            try
-                IERC721Receiver(to).onERC721Received(
-                    _msgSender(),
-                    from,
-                    tokenId,
-                    _data
-                )
-            returns (bytes4 retval) {
+            try IERC721Receiver(to).onERC721Received(_msgSender(), from, tokenId, _data) returns (bytes4 retval) {
                 return retval == IERC721Receiver.onERC721Received.selector;
             } catch (bytes memory reason) {
                 if (reason.length == 0) {
-                    revert(
-                        "ERC721: transfer to non ERC721Receiver implementer"
-                    );
+                    revert("ERC721: transfer to non ERC721Receiver implementer");
                 } else {
                     assembly {
                         revert(add(32, reason), mload(reason))
@@ -1429,6 +1278,10 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     ) internal virtual {}
 }
 
+
+
+
+            
 // OpenZeppelin Contracts v4.4.1 (utils/Counters.sol)
 
 pragma solidity ^0.8.0;
@@ -1472,6 +1325,10 @@ library Counters {
     }
 }
 
+
+
+
+            
 pragma solidity ^0.8.7;
 
 ////import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -1583,6 +1440,10 @@ interface IBullaClaim {
     function bullaManager() external view returns (address);
 }
 
+
+
+
+            
 // OpenZeppelin Contracts v4.4.1 (access/Ownable.sol)
 
 pragma solidity ^0.8.0;
@@ -1604,10 +1465,7 @@ pragma solidity ^0.8.0;
 abstract contract Ownable is Context {
     address private _owner;
 
-    event OwnershipTransferred(
-        address indexed previousOwner,
-        address indexed newOwner
-    );
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     /**
      * @dev Initializes the contract setting the deployer as the initial owner.
@@ -1647,10 +1505,7 @@ abstract contract Ownable is Context {
      * Can only be called by the current owner.
      */
     function transferOwnership(address newOwner) public virtual onlyOwner {
-        require(
-            newOwner != address(0),
-            "Ownable: new owner is the zero address"
-        );
+        require(newOwner != address(0), "Ownable: new owner is the zero address");
         _transferOwnership(newOwner);
     }
 
@@ -1665,6 +1520,10 @@ abstract contract Ownable is Context {
     }
 }
 
+
+
+
+            
 // OpenZeppelin Contracts v4.4.1 (token/ERC721/extensions/ERC721URIStorage.sol)
 
 pragma solidity ^0.8.0;
@@ -1683,17 +1542,8 @@ abstract contract ERC721URIStorage is ERC721 {
     /**
      * @dev See {IERC721Metadata-tokenURI}.
      */
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        virtual
-        override
-        returns (string memory)
-    {
-        require(
-            _exists(tokenId),
-            "ERC721URIStorage: URI query for nonexistent token"
-        );
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+        require(_exists(tokenId), "ERC721URIStorage: URI query for nonexistent token");
 
         string memory _tokenURI = _tokenURIs[tokenId];
         string memory base = _baseURI();
@@ -1717,14 +1567,8 @@ abstract contract ERC721URIStorage is ERC721 {
      *
      * - `tokenId` must exist.
      */
-    function _setTokenURI(uint256 tokenId, string memory _tokenURI)
-        internal
-        virtual
-    {
-        require(
-            _exists(tokenId),
-            "ERC721URIStorage: URI set of nonexistent token"
-        );
+    function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal virtual {
+        require(_exists(tokenId), "ERC721URIStorage: URI set of nonexistent token");
         _tokenURIs[tokenId] = _tokenURI;
     }
 
@@ -1747,6 +1591,10 @@ abstract contract ERC721URIStorage is ERC721 {
     }
 }
 
+
+
+
+            
 pragma solidity ^0.8.7;
 
 ////import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
@@ -1801,7 +1649,7 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
         if (ownerOf(tokenId) != msg.sender) revert NotCreditor(msg.sender);
         _;
     }
-
+    
     modifier onlyDebtor(uint256 tokenId) {
         if (claimTokens[tokenId].debtor != msg.sender)
             revert NotDebtor(msg.sender);
@@ -2024,6 +1872,10 @@ contract BullaClaimERC721 is IBullaClaim, BullaClaimERC721URI {
     }
 }
 
+
+
+
+            
 // OpenZeppelin Contracts v4.4.1 (proxy/Clones.sol)
 
 pragma solidity ^0.8.0;
@@ -2050,15 +1902,9 @@ library Clones {
     function clone(address implementation) internal returns (address instance) {
         assembly {
             let ptr := mload(0x40)
-            mstore(
-                ptr,
-                0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000
-            )
+            mstore(ptr, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)
             mstore(add(ptr, 0x14), shl(0x60, implementation))
-            mstore(
-                add(ptr, 0x28),
-                0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000
-            )
+            mstore(add(ptr, 0x28), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)
             instance := create(0, ptr, 0x37)
         }
         require(instance != address(0), "ERC1167: create failed");
@@ -2071,21 +1917,12 @@ library Clones {
      * the clone. Using the same `implementation` and `salt` multiple time will revert, since
      * the clones cannot be deployed twice at the same address.
      */
-    function cloneDeterministic(address implementation, bytes32 salt)
-        internal
-        returns (address instance)
-    {
+    function cloneDeterministic(address implementation, bytes32 salt) internal returns (address instance) {
         assembly {
             let ptr := mload(0x40)
-            mstore(
-                ptr,
-                0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000
-            )
+            mstore(ptr, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)
             mstore(add(ptr, 0x14), shl(0x60, implementation))
-            mstore(
-                add(ptr, 0x28),
-                0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000
-            )
+            mstore(add(ptr, 0x28), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)
             instance := create2(0, ptr, 0x37, salt)
         }
         require(instance != address(0), "ERC1167: create2 failed");
@@ -2101,15 +1938,9 @@ library Clones {
     ) internal pure returns (address predicted) {
         assembly {
             let ptr := mload(0x40)
-            mstore(
-                ptr,
-                0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000
-            )
+            mstore(ptr, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)
             mstore(add(ptr, 0x14), shl(0x60, implementation))
-            mstore(
-                add(ptr, 0x28),
-                0x5af43d82803e903d91602b57fd5bf3ff00000000000000000000000000000000
-            )
+            mstore(add(ptr, 0x28), 0x5af43d82803e903d91602b57fd5bf3ff00000000000000000000000000000000)
             mstore(add(ptr, 0x38), shl(0x60, deployer))
             mstore(add(ptr, 0x4c), salt)
             mstore(add(ptr, 0x6c), keccak256(ptr, 0x37))
@@ -2129,6 +1960,10 @@ library Clones {
     }
 }
 
+
+
+
+            
 pragma solidity ^0.8.7;
 
 ////import "@openzeppelin/contracts/proxy/Clones.sol";
@@ -2152,7 +1987,7 @@ contract BullaBanker {
         address bullaBanker,
         uint256 blocktime
     );
-
+    
     struct ClaimParams {
         uint256 claimAmount;
         address creditor;
@@ -2225,8 +2060,630 @@ contract BullaBanker {
     }
 }
 
-pragma solidity ^0.8.7;
 
+
+
+            
+pragma solidity >=0.7.0 <0.9.0;
+
+/// @title SelfAuthorized - authorizes current contract to perform actions
+/// @author Richard Meissner - <richard@gnosis.pm>
+contract SelfAuthorized {
+    function requireSelfCall() private view {
+        require(msg.sender == address(this), "GS031");
+    }
+
+    modifier authorized() {
+        // This is a function call as it minimized the bytecode size
+        requireSelfCall();
+        _;
+    }
+}
+
+
+
+
+            
+pragma solidity >=0.7.0 <0.9.0;
+
+/// @title Enum - Collection of enums
+/// @author Richard Meissner - <richard@gnosis.pm>
+contract Enum {
+    enum Operation {Call, DelegateCall}
+}
+
+
+
+
+            
+pragma solidity >=0.7.0 <0.9.0;
+
+////import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
+
+interface IGuard {
+    function checkTransaction(
+        address to,
+        uint256 value,
+        bytes memory data,
+        Enum.Operation operation,
+        uint256 safeTxGas,
+        uint256 baseGas,
+        uint256 gasPrice,
+        address gasToken,
+        address payable refundReceiver,
+        bytes memory signatures,
+        address msgSender
+    ) external;
+
+    function checkAfterExecution(bytes32 txHash, bool success) external;
+}
+
+
+
+
+            
+// OpenZeppelin Contracts v4.4.1 (utils/Address.sol)
+
+pragma solidity ^0.8.0;
+
+/**
+ * @dev Collection of functions related to the address type
+ */
+library AddressUpgradeable {
+    /**
+     * @dev Returns true if `account` is a contract.
+     *
+     * [////IMPORTANT]
+     * ====
+     * It is unsafe to assume that an address for which this function returns
+     * false is an externally-owned account (EOA) and not a contract.
+     *
+     * Among others, `isContract` will return false for the following
+     * types of addresses:
+     *
+     *  - an externally-owned account
+     *  - a contract in construction
+     *  - an address where a contract will be created
+     *  - an address where a contract lived, but was destroyed
+     * ====
+     */
+    function isContract(address account) internal view returns (bool) {
+        // This method relies on extcodesize, which returns 0 for contracts in
+        // construction, since the code is only stored at the end of the
+        // constructor execution.
+
+        uint256 size;
+        assembly {
+            size := extcodesize(account)
+        }
+        return size > 0;
+    }
+
+    /**
+     * @dev Replacement for Solidity's `transfer`: sends `amount` wei to
+     * `recipient`, forwarding all available gas and reverting on errors.
+     *
+     * https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost
+     * of certain opcodes, possibly making contracts go over the 2300 gas limit
+     * imposed by `transfer`, making them unable to receive funds via
+     * `transfer`. {sendValue} removes this limitation.
+     *
+     * https://diligence.consensys.net/posts/2019/09/stop-using-soliditys-transfer-now/[Learn more].
+     *
+     * ////IMPORTANT: because control is transferred to `recipient`, care must be
+     * taken to not create reentrancy vulnerabilities. Consider using
+     * {ReentrancyGuard} or the
+     * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].
+     */
+    function sendValue(address payable recipient, uint256 amount) internal {
+        require(address(this).balance >= amount, "Address: insufficient balance");
+
+        (bool success, ) = recipient.call{value: amount}("");
+        require(success, "Address: unable to send value, recipient may have reverted");
+    }
+
+    /**
+     * @dev Performs a Solidity function call using a low level `call`. A
+     * plain `call` is an unsafe replacement for a function call: use this
+     * function instead.
+     *
+     * If `target` reverts with a revert reason, it is bubbled up by this
+     * function (like regular Solidity function calls).
+     *
+     * Returns the raw returned data. To convert to the expected return value,
+     * use https://solidity.readthedocs.io/en/latest/units-and-global-variables.html?highlight=abi.decode#abi-encoding-and-decoding-functions[`abi.decode`].
+     *
+     * Requirements:
+     *
+     * - `target` must be a contract.
+     * - calling `target` with `data` must not revert.
+     *
+     * _Available since v3.1._
+     */
+    function functionCall(address target, bytes memory data) internal returns (bytes memory) {
+        return functionCall(target, data, "Address: low-level call failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`], but with
+     * `errorMessage` as a fallback revert reason when `target` reverts.
+     *
+     * _Available since v3.1._
+     */
+    function functionCall(
+        address target,
+        bytes memory data,
+        string memory errorMessage
+    ) internal returns (bytes memory) {
+        return functionCallWithValue(target, data, 0, errorMessage);
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+     * but also transferring `value` wei to `target`.
+     *
+     * Requirements:
+     *
+     * - the calling contract must have an ETH balance of at least `value`.
+     * - the called Solidity function must be `payable`.
+     *
+     * _Available since v3.1._
+     */
+    function functionCallWithValue(
+        address target,
+        bytes memory data,
+        uint256 value
+    ) internal returns (bytes memory) {
+        return functionCallWithValue(target, data, value, "Address: low-level call with value failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCallWithValue-address-bytes-uint256-}[`functionCallWithValue`], but
+     * with `errorMessage` as a fallback revert reason when `target` reverts.
+     *
+     * _Available since v3.1._
+     */
+    function functionCallWithValue(
+        address target,
+        bytes memory data,
+        uint256 value,
+        string memory errorMessage
+    ) internal returns (bytes memory) {
+        require(address(this).balance >= value, "Address: insufficient balance for call");
+        require(isContract(target), "Address: call to non-contract");
+
+        (bool success, bytes memory returndata) = target.call{value: value}(data);
+        return verifyCallResult(success, returndata, errorMessage);
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+     * but performing a static call.
+     *
+     * _Available since v3.3._
+     */
+    function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {
+        return functionStaticCall(target, data, "Address: low-level static call failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
+     * but performing a static call.
+     *
+     * _Available since v3.3._
+     */
+    function functionStaticCall(
+        address target,
+        bytes memory data,
+        string memory errorMessage
+    ) internal view returns (bytes memory) {
+        require(isContract(target), "Address: static call to non-contract");
+
+        (bool success, bytes memory returndata) = target.staticcall(data);
+        return verifyCallResult(success, returndata, errorMessage);
+    }
+
+    /**
+     * @dev Tool to verifies that a low level call was successful, and revert if it wasn't, either by bubbling the
+     * revert reason using the provided one.
+     *
+     * _Available since v4.3._
+     */
+    function verifyCallResult(
+        bool success,
+        bytes memory returndata,
+        string memory errorMessage
+    ) internal pure returns (bytes memory) {
+        if (success) {
+            return returndata;
+        } else {
+            // Look for revert reason and bubble it up if present
+            if (returndata.length > 0) {
+                // The easiest way to bubble the revert reason is using memory via assembly
+
+                assembly {
+                    let returndata_size := mload(returndata)
+                    revert(add(32, returndata), returndata_size)
+                }
+            } else {
+                revert(errorMessage);
+            }
+        }
+    }
+}
+
+
+
+
+            
+// OpenZeppelin Contracts v4.4.1 (proxy/utils/Initializable.sol)
+
+pragma solidity ^0.8.0;
+
+////import "../../utils/AddressUpgradeable.sol";
+
+/**
+ * @dev This is a base contract to aid in writing upgradeable contracts, or any kind of contract that will be deployed
+ * behind a proxy. Since a proxied contract can't have a constructor, it's common to move constructor logic to an
+ * external initializer function, usually called `initialize`. It then becomes necessary to protect this initializer
+ * function so it can only be called once. The {initializer} modifier provided by this contract will have this effect.
+ *
+ * TIP: To avoid leaving the proxy in an uninitialized state, the initializer function should be called as early as
+ * possible by providing the encoded function call as the `_data` argument to {ERC1967Proxy-constructor}.
+ *
+ * CAUTION: When used with inheritance, manual care must be taken to not invoke a parent initializer twice, or to ensure
+ * that all initializers are idempotent. This is not verified automatically as constructors are by Solidity.
+ *
+ * [CAUTION]
+ * ====
+ * Avoid leaving a contract uninitialized.
+ *
+ * An uninitialized contract can be taken over by an attacker. This applies to both a proxy and its implementation
+ * contract, which may impact the proxy. To initialize the implementation contract, you can either invoke the
+ * initializer manually, or you can include a constructor to automatically mark it as initialized when it is deployed:
+ *
+ * [.hljs-theme-light.nopadding]
+ * ```
+ * /// @custom:oz-upgrades-unsafe-allow constructor
+ * constructor() initializer {}
+ * ```
+ * ====
+ */
+abstract contract Initializable {
+    /**
+     * @dev Indicates that the contract has been initialized.
+     */
+    bool private _initialized;
+
+    /**
+     * @dev Indicates that the contract is in the process of being initialized.
+     */
+    bool private _initializing;
+
+    /**
+     * @dev Modifier to protect an initializer function from being invoked twice.
+     */
+    modifier initializer() {
+        // If the contract is initializing we ignore whether _initialized is set in order to support multiple
+        // inheritance patterns, but we only do this in the context of a constructor, because in other contexts the
+        // contract may have been reentered.
+        require(_initializing ? _isConstructor() : !_initialized, "Initializable: contract is already initialized");
+
+        bool isTopLevelCall = !_initializing;
+        if (isTopLevelCall) {
+            _initializing = true;
+            _initialized = true;
+        }
+
+        _;
+
+        if (isTopLevelCall) {
+            _initializing = false;
+        }
+    }
+
+    /**
+     * @dev Modifier to protect an initialization function so that it can only be invoked by functions with the
+     * {initializer} modifier, directly or indirectly.
+     */
+    modifier onlyInitializing() {
+        require(_initializing, "Initializable: contract is not initializing");
+        _;
+    }
+
+    function _isConstructor() private view returns (bool) {
+        return !AddressUpgradeable.isContract(address(this));
+    }
+}
+
+
+
+
+            
+// OpenZeppelin Contracts v4.4.1 (utils/Context.sol)
+
+pragma solidity ^0.8.0;
+////import "../proxy/utils/Initializable.sol";
+
+/**
+ * @dev Provides information about the current execution context, including the
+ * sender of the transaction and its data. While these are generally available
+ * via msg.sender and msg.data, they should not be accessed in such a direct
+ * manner, since when dealing with meta-transactions the account sending and
+ * paying for execution may not be the actual sender (as far as an application
+ * is concerned).
+ *
+ * This contract is only required for intermediate, library-like contracts.
+ */
+abstract contract ContextUpgradeable is Initializable {
+    function __Context_init() internal onlyInitializing {
+        __Context_init_unchained();
+    }
+
+    function __Context_init_unchained() internal onlyInitializing {
+    }
+    function _msgSender() internal view virtual returns (address) {
+        return msg.sender;
+    }
+
+    function _msgData() internal view virtual returns (bytes calldata) {
+        return msg.data;
+    }
+    uint256[50] private __gap;
+}
+
+
+
+
+            
+pragma solidity >=0.7.0 <0.9.0;
+
+////import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
+////import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+////import "../interfaces/IGuard.sol";
+
+abstract contract BaseGuard is IERC165 {
+    function supportsInterface(bytes4 interfaceId)
+        external
+        pure
+        override
+        returns (bool)
+    {
+        return
+            interfaceId == type(IGuard).interfaceId || // 0xe6d7a83a
+            interfaceId == type(IERC165).interfaceId; // 0x01ffc9a7
+    }
+
+    /// Module transactions only use the first four parameters: to, value, data, and operation.
+    /// Module.sol hardcodes the remaining parameters as 0 since they are not used for module transactions.
+    /// This interface is used to maintain compatibilty with Gnosis Safe transaction guards.
+    function checkTransaction(
+        address to,
+        uint256 value,
+        bytes memory data,
+        Enum.Operation operation,
+        uint256 safeTxGas,
+        uint256 baseGas,
+        uint256 gasPrice,
+        address gasToken,
+        address payable refundReceiver,
+        bytes memory signatures,
+        address msgSender
+    ) external virtual;
+
+    function checkAfterExecution(bytes32 txHash, bool success) external virtual;
+}
+
+
+
+
+            
+// OpenZeppelin Contracts v4.4.1 (access/Ownable.sol)
+
+pragma solidity ^0.8.0;
+
+////import "../utils/ContextUpgradeable.sol";
+////import "../proxy/utils/Initializable.sol";
+
+/**
+ * @dev Contract module which provides a basic access control mechanism, where
+ * there is an account (an owner) that can be granted exclusive access to
+ * specific functions.
+ *
+ * By default, the owner account will be the one that deploys the contract. This
+ * can later be changed with {transferOwnership}.
+ *
+ * This module is used through inheritance. It will make available the modifier
+ * `onlyOwner`, which can be applied to your functions to restrict their use to
+ * the owner.
+ */
+abstract contract OwnableUpgradeable is Initializable, ContextUpgradeable {
+    address private _owner;
+
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
+    /**
+     * @dev Initializes the contract setting the deployer as the initial owner.
+     */
+    function __Ownable_init() internal onlyInitializing {
+        __Context_init_unchained();
+        __Ownable_init_unchained();
+    }
+
+    function __Ownable_init_unchained() internal onlyInitializing {
+        _transferOwnership(_msgSender());
+    }
+
+    /**
+     * @dev Returns the address of the current owner.
+     */
+    function owner() public view virtual returns (address) {
+        return _owner;
+    }
+
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyOwner() {
+        require(owner() == _msgSender(), "Ownable: caller is not the owner");
+        _;
+    }
+
+    /**
+     * @dev Leaves the contract without owner. It will not be possible to call
+     * `onlyOwner` functions anymore. Can only be called by the current owner.
+     *
+     * NOTE: Renouncing ownership will leave the contract without an owner,
+     * thereby removing any functionality that is only available to the owner.
+     */
+    function renounceOwnership() public virtual onlyOwner {
+        _transferOwnership(address(0));
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Can only be called by the current owner.
+     */
+    function transferOwnership(address newOwner) public virtual onlyOwner {
+        require(newOwner != address(0), "Ownable: new owner is the zero address");
+        _transferOwnership(newOwner);
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Internal function without access restriction.
+     */
+    function _transferOwnership(address newOwner) internal virtual {
+        address oldOwner = _owner;
+        _owner = newOwner;
+        emit OwnershipTransferred(oldOwner, newOwner);
+    }
+    uint256[49] private __gap;
+}
+
+
+
+
+            
+pragma solidity >=0.7.0 <0.9.0;
+
+////import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
+////import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+////import "./BaseGuard.sol";
+
+/// @title Guardable - A contract that manages fallback calls made to this contract
+contract Guardable is OwnableUpgradeable {
+    event ChangedGuard(address guard);
+
+    address public guard;
+
+    /// @dev Set a guard that checks transactions before execution
+    /// @param _guard The address of the guard to be used or the 0 address to disable the guard
+    function setGuard(address _guard) external onlyOwner {
+        if (_guard != address(0)) {
+            require(
+                BaseGuard(_guard).supportsInterface(type(IGuard).interfaceId),
+                "Guard does not implement IERC165"
+            );
+        }
+        guard = _guard;
+        emit ChangedGuard(guard);
+    }
+
+    function getGuard() external view returns (address _guard) {
+        return guard;
+    }
+}
+
+
+
+
+            
+
+/// @title Zodiac FactoryFriendly - A contract that allows other contracts to be initializable and pass bytes as arguments to define contract state
+pragma solidity >=0.7.0 <0.9.0;
+
+////import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+
+abstract contract FactoryFriendly is OwnableUpgradeable {
+    function setUp(bytes memory initializeParams) public virtual;
+}
+
+
+
+
+            
+
+/// @title Zodiac Avatar - A contract that manages modules that can execute transactions via this contract.
+pragma solidity >=0.7.0 <0.9.0;
+
+////import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
+
+interface IAvatar {
+    /// @dev Enables a module on the avatar.
+    /// @notice Can only be called by the avatar.
+    /// @notice Modules should be stored as a linked list.
+    /// @notice Must emit EnabledModule(address module) if successful.
+    /// @param module Module to be enabled.
+    function enableModule(address module) external;
+
+    /// @dev Disables a module on the avatar.
+    /// @notice Can only be called by the avatar.
+    /// @notice Must emit DisabledModule(address module) if successful.
+    /// @param prevModule Address that pointed to the module to be removed in the linked list
+    /// @param module Module to be removed.
+    function disableModule(address prevModule, address module) external;
+
+    /// @dev Allows a Module to execute a transaction.
+    /// @notice Can only be called by an enabled module.
+    /// @notice Must emit ExecutionFromModuleSuccess(address module) if successful.
+    /// @notice Must emit ExecutionFromModuleFailure(address module) if unsuccessful.
+    /// @param to Destination address of module transaction.
+    /// @param value Ether value of module transaction.
+    /// @param data Data payload of module transaction.
+    /// @param operation Operation type of module transaction: 0 == call, 1 == delegate call.
+    function execTransactionFromModule(
+        address to,
+        uint256 value,
+        bytes memory data,
+        Enum.Operation operation
+    ) external returns (bool success);
+
+    /// @dev Allows a Module to execute a transaction and return data
+    /// @notice Can only be called by an enabled module.
+    /// @notice Must emit ExecutionFromModuleSuccess(address module) if successful.
+    /// @notice Must emit ExecutionFromModuleFailure(address module) if unsuccessful.
+    /// @param to Destination address of module transaction.
+    /// @param value Ether value of module transaction.
+    /// @param data Data payload of module transaction.
+    /// @param operation Operation type of module transaction: 0 == call, 1 == delegate call.
+    function execTransactionFromModuleReturnData(
+        address to,
+        uint256 value,
+        bytes memory data,
+        Enum.Operation operation
+    ) external returns (bool success, bytes memory returnData);
+
+    /// @dev Returns if an module is enabled
+    /// @return True if the module is enabled
+    function isModuleEnabled(address module) external view returns (bool);
+
+    /// @dev Returns array of modules.
+    /// @param start Start of the page.
+    /// @param pageSize Maximum number of modules that should be returned.
+    /// @return array Array of modules.
+    /// @return next Start of the next page.
+    function getModulesPaginated(address start, uint256 pageSize)
+        external
+        view
+        returns (address[] memory array, address next);
+}
+
+
+
+
+            
+pragma solidity ^0.8.7;
 ////import "./interfaces/IBullaClaim.sol";
 ////import "./BullaBanker.sol";
 
@@ -2235,11 +2692,6 @@ error BatchTooLarge();
 error ZeroLength();
 error BatchFailed();
 
-/// @title BatchCreate
-/// @author @colinnielsen
-/// @notice A contract to allow for the creation of multiple claims in a single transaction.
-/// @dev Uses delegatecall to forward the value of msg.sender to BullaBanker.
-/// @dev Max operations should be wary of the block gas limit on a certain network
 contract BatchCreate {
     address public bullaClaimERC721;
     address public bullaBanker;
@@ -2313,3 +2765,418 @@ contract BatchCreate {
         }
     }
 }
+
+
+
+
+            
+pragma solidity >=0.7.0 <0.9.0;
+////import "../common/SelfAuthorized.sol";
+
+/// @title OwnerManager - Manages a set of owners and a threshold to perform actions.
+/// @author Stefan George - <stefan@gnosis.pm>
+/// @author Richard Meissner - <richard@gnosis.pm>
+contract OwnerManager is SelfAuthorized {
+    event AddedOwner(address owner);
+    event RemovedOwner(address owner);
+    event ChangedThreshold(uint256 threshold);
+
+    address internal constant SENTINEL_OWNERS = address(0x1);
+
+    mapping(address => address) internal owners;
+    uint256 internal ownerCount;
+    uint256 internal threshold;
+
+    /// @dev Setup function sets initial storage of contract.
+    /// @param _owners List of Safe owners.
+    /// @param _threshold Number of required confirmations for a Safe transaction.
+    function setupOwners(address[] memory _owners, uint256 _threshold) internal {
+        // Threshold can only be 0 at initialization.
+        // Check ensures that setup function can only be called once.
+        require(threshold == 0, "GS200");
+        // Validate that threshold is smaller than number of added owners.
+        require(_threshold <= _owners.length, "GS201");
+        // There has to be at least one Safe owner.
+        require(_threshold >= 1, "GS202");
+        // Initializing Safe owners.
+        address currentOwner = SENTINEL_OWNERS;
+        for (uint256 i = 0; i < _owners.length; i++) {
+            // Owner address cannot be null.
+            address owner = _owners[i];
+            require(owner != address(0) && owner != SENTINEL_OWNERS && owner != address(this) && currentOwner != owner, "GS203");
+            // No duplicate owners allowed.
+            require(owners[owner] == address(0), "GS204");
+            owners[currentOwner] = owner;
+            currentOwner = owner;
+        }
+        owners[currentOwner] = SENTINEL_OWNERS;
+        ownerCount = _owners.length;
+        threshold = _threshold;
+    }
+
+    /// @dev Allows to add a new owner to the Safe and update the threshold at the same time.
+    ///      This can only be done via a Safe transaction.
+    /// @notice Adds the owner `owner` to the Safe and updates the threshold to `_threshold`.
+    /// @param owner New owner address.
+    /// @param _threshold New threshold.
+    function addOwnerWithThreshold(address owner, uint256 _threshold) public authorized {
+        // Owner address cannot be null, the sentinel or the Safe itself.
+        require(owner != address(0) && owner != SENTINEL_OWNERS && owner != address(this), "GS203");
+        // No duplicate owners allowed.
+        require(owners[owner] == address(0), "GS204");
+        owners[owner] = owners[SENTINEL_OWNERS];
+        owners[SENTINEL_OWNERS] = owner;
+        ownerCount++;
+        emit AddedOwner(owner);
+        // Change threshold if threshold was changed.
+        if (threshold != _threshold) changeThreshold(_threshold);
+    }
+
+    /// @dev Allows to remove an owner from the Safe and update the threshold at the same time.
+    ///      This can only be done via a Safe transaction.
+    /// @notice Removes the owner `owner` from the Safe and updates the threshold to `_threshold`.
+    /// @param prevOwner Owner that pointed to the owner to be removed in the linked list
+    /// @param owner Owner address to be removed.
+    /// @param _threshold New threshold.
+    function removeOwner(
+        address prevOwner,
+        address owner,
+        uint256 _threshold
+    ) public authorized {
+        // Only allow to remove an owner, if threshold can still be reached.
+        require(ownerCount - 1 >= _threshold, "GS201");
+        // Validate owner address and check that it corresponds to owner index.
+        require(owner != address(0) && owner != SENTINEL_OWNERS, "GS203");
+        require(owners[prevOwner] == owner, "GS205");
+        owners[prevOwner] = owners[owner];
+        owners[owner] = address(0);
+        ownerCount--;
+        emit RemovedOwner(owner);
+        // Change threshold if threshold was changed.
+        if (threshold != _threshold) changeThreshold(_threshold);
+    }
+
+    /// @dev Allows to swap/replace an owner from the Safe with another address.
+    ///      This can only be done via a Safe transaction.
+    /// @notice Replaces the owner `oldOwner` in the Safe with `newOwner`.
+    /// @param prevOwner Owner that pointed to the owner to be replaced in the linked list
+    /// @param oldOwner Owner address to be replaced.
+    /// @param newOwner New owner address.
+    function swapOwner(
+        address prevOwner,
+        address oldOwner,
+        address newOwner
+    ) public authorized {
+        // Owner address cannot be null, the sentinel or the Safe itself.
+        require(newOwner != address(0) && newOwner != SENTINEL_OWNERS && newOwner != address(this), "GS203");
+        // No duplicate owners allowed.
+        require(owners[newOwner] == address(0), "GS204");
+        // Validate oldOwner address and check that it corresponds to owner index.
+        require(oldOwner != address(0) && oldOwner != SENTINEL_OWNERS, "GS203");
+        require(owners[prevOwner] == oldOwner, "GS205");
+        owners[newOwner] = owners[oldOwner];
+        owners[prevOwner] = newOwner;
+        owners[oldOwner] = address(0);
+        emit RemovedOwner(oldOwner);
+        emit AddedOwner(newOwner);
+    }
+
+    /// @dev Allows to update the number of required confirmations by Safe owners.
+    ///      This can only be done via a Safe transaction.
+    /// @notice Changes the threshold of the Safe to `_threshold`.
+    /// @param _threshold New threshold.
+    function changeThreshold(uint256 _threshold) public authorized {
+        // Validate that threshold is smaller than number of owners.
+        require(_threshold <= ownerCount, "GS201");
+        // There has to be at least one Safe owner.
+        require(_threshold >= 1, "GS202");
+        threshold = _threshold;
+        emit ChangedThreshold(threshold);
+    }
+
+    function getThreshold() public view returns (uint256) {
+        return threshold;
+    }
+
+    function isOwner(address owner) public view returns (bool) {
+        return owner != SENTINEL_OWNERS && owners[owner] != address(0);
+    }
+
+    /// @dev Returns array of owners.
+    /// @return Array of Safe owners.
+    function getOwners() public view returns (address[] memory) {
+        address[] memory array = new address[](ownerCount);
+
+        // populate return array
+        uint256 index = 0;
+        address currentOwner = owners[SENTINEL_OWNERS];
+        while (currentOwner != SENTINEL_OWNERS) {
+            array[index] = currentOwner;
+            currentOwner = owners[currentOwner];
+            index++;
+        }
+        return array;
+    }
+}
+
+
+
+
+            
+
+/// @title Module Interface - A contract that can pass messages to a Module Manager contract if enabled by that contract.
+pragma solidity >=0.7.0 <0.9.0;
+
+////import "../interfaces/IAvatar.sol";
+////import "../factory/FactoryFriendly.sol";
+////import "../guard/Guardable.sol";
+
+abstract contract Module is FactoryFriendly, Guardable {
+    /// @dev Emitted each time the avatar is set.
+    event AvatarSet(address indexed previousAvatar, address indexed newAvatar);
+    /// @dev Emitted each time the Target is set.
+    event TargetSet(address indexed previousTarget, address indexed newTarget);
+
+    /// @dev Address that will ultimately execute function calls.
+    address public avatar;
+    /// @dev Address that this module will pass transactions to.
+    address public target;
+
+    /// @dev Sets the avatar to a new avatar (`newAvatar`).
+    /// @notice Can only be called by the current owner.
+    function setAvatar(address _avatar) public onlyOwner {
+        address previousAvatar = avatar;
+        avatar = _avatar;
+        emit AvatarSet(previousAvatar, _avatar);
+    }
+
+    /// @dev Sets the target to a new target (`newTarget`).
+    /// @notice Can only be called by the current owner.
+    function setTarget(address _target) public onlyOwner {
+        address previousTarget = target;
+        target = _target;
+        emit TargetSet(previousTarget, _target);
+    }
+
+    /// @dev Passes a transaction to be executed by the avatar.
+    /// @notice Can only be called by this contract.
+    /// @param to Destination address of module transaction.
+    /// @param value Ether value of module transaction.
+    /// @param data Data payload of module transaction.
+    /// @param operation Operation type of module transaction: 0 == call, 1 == delegate call.
+    function exec(
+        address to,
+        uint256 value,
+        bytes memory data,
+        Enum.Operation operation
+    ) internal returns (bool success) {
+        /// check if a transactioon guard is enabled.
+        if (guard != address(0)) {
+            IGuard(guard).checkTransaction(
+                /// Transaction info used by module transactions
+                to,
+                value,
+                data,
+                operation,
+                /// Zero out the redundant transaction information only used for Safe multisig transctions
+                0,
+                0,
+                0,
+                address(0),
+                payable(0),
+                bytes("0x"),
+                address(0)
+            );
+        }
+        success = IAvatar(target).execTransactionFromModule(
+            to,
+            value,
+            data,
+            operation
+        );
+        if (guard != address(0)) {
+            IGuard(guard).checkAfterExecution(bytes32("0x"), success);
+        }
+        return success;
+    }
+
+    /// @dev Passes a transaction to be executed by the target and returns data.
+    /// @notice Can only be called by this contract.
+    /// @param to Destination address of module transaction.
+    /// @param value Ether value of module transaction.
+    /// @param data Data payload of module transaction.
+    /// @param operation Operation type of module transaction: 0 == call, 1 == delegate call.
+    function execAndReturnData(
+        address to,
+        uint256 value,
+        bytes memory data,
+        Enum.Operation operation
+    ) internal returns (bool success, bytes memory returnData) {
+        /// check if a transactioon guard is enabled.
+        if (guard != address(0)) {
+            IGuard(guard).checkTransaction(
+                /// Transaction info used by module transactions
+                to,
+                value,
+                data,
+                operation,
+                /// Zero out the redundant transaction information only used for Safe multisig transctions
+                0,
+                0,
+                0,
+                address(0),
+                payable(0),
+                bytes("0x"),
+                address(0)
+            );
+        }
+        (success, returnData) = IAvatar(target)
+            .execTransactionFromModuleReturnData(to, value, data, operation);
+        if (guard != address(0)) {
+            IGuard(guard).checkAfterExecution(bytes32("0x"), success);
+        }
+        return (success, returnData);
+    }
+}
+
+
+
+pragma solidity ^0.8.7;
+////import "@gnosis.pm/zodiac/contracts/core/Module.sol";
+////import "@gnosis.pm/safe-contracts/contracts/base/OwnerManager.sol";
+////import "./BullaBanker.sol";
+////import "./BatchCreate.sol";
+////import "./interfaces/IBullaClaim.sol";
+/// @notice A gnosis module for BullaBanker allowing permissionless use of basic BullaClaim and BullaBanker
+///     functions (e.g. createClaim, payClaim, updateTag, rejectClaim, rescindClaim) for the signers of a safe.
+
+contract BullaBankerModule is Module {
+    string public constant VERSION = "0.0.9";
+    address public bullaBankerAddress;
+    address public bullaClaimAddress;
+    address public batchCreateAddress;
+
+    event BullaBankerModuleDeploy(
+        string version,
+        address indexed safe,
+        address indexed moduleAddress,
+        address indexed initiator
+    );
+
+    /// checks the avatar of the module (will be the gnosis safe) and ensures the EOA is a signer on the safe.
+    modifier onlySafeOwner() {
+        require(
+            OwnerManager(avatar).isOwner(msg.sender),
+            "BULLAMODULE: Not safe owner"
+        );
+        _;
+    }
+
+    /// @dev Initialize function, will be triggered when a new proxy is deployed
+    /// @param _safe Address of the safe
+    /// @param _bullaBanker Address of the avatar in this case, a gnosis safe
+    /// @param _bullaClaim Address of the avatar in this case, a gnosis safe
+    /// @notice Designated token address can not be zero
+    constructor(
+        address _safe,
+        address _bullaBanker,
+        address _bullaClaim,
+        address _batchCreate
+    ) {
+        bytes memory initParams = abi.encode(
+            _safe,
+            _bullaBanker,
+            _bullaClaim,
+            _batchCreate
+        );
+        setUp(initParams);
+    }
+
+    function setUp(bytes memory initParams) public override initializer {
+        (
+            address _safe,
+            address _bullaBanker,
+            address _bullaClaim,
+            address _batchCreate
+        ) = abi.decode(initParams, (address, address, address, address));
+        require(_safe != address(0), "BULLAMODULE: Zero safe address");
+        __Ownable_init();
+        setAvatar(_safe);
+        setTarget(_safe);
+        transferOwnership(_safe);
+        bullaBankerAddress = _bullaBanker;
+        bullaClaimAddress = _bullaClaim;
+        batchCreateAddress = _batchCreate;
+
+        emit BullaBankerModuleDeploy(VERSION, _safe, address(this), msg.sender);
+    }
+
+    function createBullaClaim(
+        BullaBanker.ClaimParams calldata _claim,
+        bytes32 _bullaTag,
+        string calldata _tokenUri
+    ) external onlySafeOwner {
+        bytes memory data = abi.encodeWithSelector(
+            BullaBanker.createBullaClaim.selector,
+            _claim,
+            _bullaTag,
+            _tokenUri
+        );
+        require(
+            exec(bullaBankerAddress, 0, data, Enum.Operation.Call),
+            "BULLAMODULE: Create claim failed"
+        );
+    }
+
+    function batchCreate(BatchCreate.CreateClaimParams[] calldata claims)
+        external
+        onlySafeOwner
+    {
+        bytes memory data = abi.encodeWithSelector(
+            BatchCreate.batchCreate.selector,
+            claims
+        );
+        require(
+            exec(batchCreateAddress, 0, data, Enum.Operation.Call),
+            "BULLAMODULE: Batch create failed"
+        );
+    }
+
+    function updateBullaTag(uint256 _tokenId, bytes32 _bullaTag)
+        external
+        onlySafeOwner
+    {
+        bytes memory data = abi.encodeWithSelector(
+            BullaBanker.updateBullaTag.selector,
+            _tokenId,
+            _bullaTag
+        );
+        require(
+            exec(bullaBankerAddress, 0, data, Enum.Operation.Call),
+            "BULLAMODULE: Tag update failed"
+        );
+    }
+
+    function rejectClaim(uint256 _tokenId) external onlySafeOwner {
+        bytes memory data = abi.encodeWithSelector(
+            IBullaClaim.rejectClaim.selector,
+            _tokenId
+        );
+        require(
+            exec(bullaClaimAddress, 0, data, Enum.Operation.Call),
+            "BULLAMODULE: Reject failed"
+        );
+    }
+
+    function rescindClaim(uint256 _tokenId) external onlySafeOwner {
+        bytes memory data = abi.encodeWithSelector(
+            IBullaClaim.rescindClaim.selector,
+            _tokenId
+        );
+        require(
+            exec(bullaClaimAddress, 0, data, Enum.Operation.Call),
+            "BULLAMODULE: Rescind failed"
+        );
+    }
+}
+
