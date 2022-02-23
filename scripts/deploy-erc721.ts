@@ -2,7 +2,7 @@ import { writeFileSync } from "fs";
 import hre, { ethers } from "hardhat";
 
 const dateLabel = (date: Date) => date.toISOString().replace(/\D/g, "");
-const MAX_BATCH_OPERATIONS = 20;
+const MAX_BATCH_OPERATIONS = 40;
 
 const deployCreator = async function () {
   const { deployments, getNamedAccounts, getChainId } = hre;
