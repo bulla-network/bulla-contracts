@@ -28,7 +28,7 @@ contract BullaBankerV2 {
         address debtor;
         bytes32 description;
         uint256 claimAmount;
-        uint64 dueBy;
+        uint256 dueBy;
         address token;
         uint8 hashFunction;
         uint8 hashSize;

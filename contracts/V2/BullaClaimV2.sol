@@ -9,12 +9,15 @@ import {ERC20} from "@rari-capital/solmate/src/tokens/ERC20.sol";
 import {SafeTransferLib} from "@rari-capital/solmate/src/utils/SafeTransferLib.sol";
 import {BoringBatchable} from "../libraries/BoringBatchable.sol";
 
-// TODO: implement eip-712
-// TODO: look into using blake2b-328 for storing 2 bytes32 hashes as it will be cheaper to store
+// TODO: implement eip-2612
 // TODO: implement user module
-// TODO: implement reject, rescind, rejectWithNote, rescindWithNote
+// TODO: implement reject, rescind, - with note
 // TODO: look into having the fee info set locally, to avoid the gas of an external call to the manager contract
 // TODO: look into having the amount be uint128 because we can then pack Claim into 3 storage slots
+// TODO: fee is set when claim is made and stored on the claim
+// TODO: userModules
+// TODO: bullaModules
+// TODO: look into using blake2b-328 for storing 2 bytes32 hashes as it will be cheaper to store
 
 contract BullaClaimV2 is ERC721, Ownable, BoringBatchable {
     using SafeTransferLib for ERC20;
@@ -31,11 +34,11 @@ contract BullaClaimV2 is ERC721, Ownable, BoringBatchable {
     /// the total amount of claims minted
     uint256 currentClaimId;
     /// a mapping of claimId to a claim struct in storage
-    mapping(uint256 => Claim) private claims;
+    mapping(uint256 => ClaimStorage) private claims;
     /// a mapping of claimId to attachment structs: attachments are destructured multihashes: see `createClaimWithAttachment` for more details
     mapping(uint256 => Attachment) private attachments;
-    /// a mapping of userAddresses to a mapping of function signatures to addresses of a module to call.
-    mapping(address => mapping(bytes4 => address)) private userModules;
+    // /// a mapping of userAddresses to a mapping of function signatures to addresses of a module to call.
+    // mapping(address => mapping(bytes4 => address)) private userModules;
     /// the base URL of the server used to fetch metadata: see `tokenURI` for more
     string private baseURI;
 
@@ -52,14 +55,24 @@ contract BullaClaimV2 is ERC721, Ownable, BoringBatchable {
     }
 
     // NOTE: the owner of the claim NFT is the creditor, until the the claim is paid, then the payee is the owner
-    struct Claim {
-        uint256 claimAmount; // amount the debtor owes the creditor
-        uint256 paidAmount; // amount paid thusfar: NOTE: could be
-        Status status;
-        uint64 dueBy; // dueBy date: NOTE: could be 0, we treat this as an instant payment
+    struct ClaimStorage {
+        uint128 claimAmount; // amount the debtor owes the creditor
+        uint128 paidAmount; // amount paid thusfar: NOTE: could be
         address debtor; // the wallet who owes the creditor, never changes
+        uint64 dueBy; // dueBy date: NOTE: could be 0, we treat this as an instant payment
+        Status status;
         address token; // the token address that the claim is denominated in. NOTE: if this token is address(0), we treat this as a native token
-    } // takes 4 storage slots
+    } // takes 3 storage slots
+
+    // a cheaper struct for working memory (unpacked is cheapter)
+    struct Claim {
+        uint256 claimAmount;
+        uint256 paidAmount;
+        Status status;
+        uint256 dueBy;
+        address debtor;
+        address token;
+    }
 
     struct Attachment {
         bytes32 ipfsHash;
@@ -68,6 +81,7 @@ contract BullaClaimV2 is ERC721, Ownable, BoringBatchable {
     }
 
     error ZeroAddress();
+    error ZeroAmount();
     error PastDueDate();
     error ClaimNotETH();
     // error NotCreditor(address sender);
@@ -75,7 +89,6 @@ contract BullaClaimV2 is ERC721, Ownable, BoringBatchable {
     // error NotTokenOwner(address sender);
     // error NotCreditorOrDebtor(address sender);
     // error OwnerNotCreditor(address sender);
-    // error ClaimCompleted();
     error OverPaying();
     error ClaimNotPending();
     // error IncorrectValue(uint256 value, uint256 expectedValue);
@@ -96,7 +109,7 @@ contract BullaClaimV2 is ERC721, Ownable, BoringBatchable {
         bytes32 description,
         uint256 claimAmount,
         address claimToken,
-        uint64 dueBy
+        uint256 dueBy
     );
 
     event AttachmentCreated(
@@ -162,7 +175,7 @@ contract BullaClaimV2 is ERC721, Ownable, BoringBatchable {
         address debtor,
         bytes32 description,
         uint256 claimAmount,
-        uint64 dueBy,
+        uint256 dueBy,
         address token
     ) external returns (uint256) {
         // @audit should we check that the creditor or the debtor is not the zero address
@@ -177,12 +190,12 @@ contract BullaClaimV2 is ERC721, Ownable, BoringBatchable {
         uint256 claimId = currentClaimId;
 
         // create a storage pointer
-        Claim storage claim = claims[claimId];
+        ClaimStorage storage claim = claims[claimId];
 
         // NOTE: we can cleverly omit several write operations in the initialization of the claim storage
         //       notably: the paidAmount, Status, and possibly the token as they are all the 0 version of their respective value
-        claim.claimAmount = claimAmount;
-        claim.dueBy = dueBy;
+        claim.claimAmount = uint128(claimAmount);
+        claim.dueBy = uint64(dueBy);
         claim.debtor = debtor;
         // only pay for the sstore operation if the token is not native
         if (token != address(0)) claim.token = token;
@@ -221,7 +234,7 @@ contract BullaClaimV2 is ERC721, Ownable, BoringBatchable {
         address debtor,
         bytes32 description,
         uint256 claimAmount,
-        uint64 dueBy,
+        uint256 dueBy,
         address token,
         uint8 hashFunction,
         uint8 hashSize,
@@ -235,9 +248,9 @@ contract BullaClaimV2 is ERC721, Ownable, BoringBatchable {
         uint256 claimId = currentClaimId;
         // NOTE: we create a new block scope here to avoid "stack too deep" errors
         {
-            Claim storage claim = claims[claimId];
-            claim.claimAmount = claimAmount;
-            claim.dueBy = dueBy;
+            ClaimStorage storage claim = claims[claimId];
+            claim.claimAmount = uint128(claimAmount);
+            claim.dueBy = uint64(dueBy);
             claim.debtor = debtor;
             if (token != address(0)) claim.token = token;
         }
@@ -264,245 +277,15 @@ contract BullaClaimV2 is ERC721, Ownable, BoringBatchable {
         return claimId;
     }
 
-    /// @notice allows a user to create and pay a claim in 1 tx (NOTE: it is more efficient to use bulla transferNote (or whatever we call it))
-    /// @notice these claims are created and minted back to the payer in one tx. They exist as a "receipt" that the claim has been paid
-    /// @param creditor the wallet _owed_ money on this claim
-    /// @param debtor the wallet in debt to the creditor
-    /// @param description a brief bytes32 description of the claim, can be omitted, exists only on the event
-    /// @param claimAmount amount to be transferred to the creditor
-    /// @param token the ERC20 token address (or address(0) for ETH) that the claim is denominated in
-    /// @return the id of the created claim
-    function createAndPayClaim(
-        address creditor,
-        address debtor,
-        bytes32 description,
-        uint256 claimAmount,
-        address token
-    ) external returns (uint256) {
-        /// @audit ? - should we ignore charging a fee on instant payments?
-        if (creditor == address(0) || debtor == address(0))
-            revert ZeroAddress();
-
-        _incrementClaimId();
-        uint256 claimId = currentClaimId;
-
-        Claim storage claim = claims[claimId];
-        claim.claimAmount = claimAmount;
-        claim.paidAmount = claimAmount;
-        claim.status = Status.Paid;
-        claim.debtor = debtor;
-        // NOTE: we can ignore the dueBy date here as we treat 0 dueBy dates as an instant payment
-        claim.token = token;
-
-        emit ClaimCreated(
-            claimId,
-            msg.sender,
-            creditor,
-            debtor,
-            description,
-            claimAmount,
-            token,
-            0
-        );
-
-        emit ClaimPayment(claimId, msg.sender, claimAmount);
-
-        // pay the creditor
-        if (token == address(0)) {
-            // this allows the debtor (msg.sender) to pay a native claim with WETH if they so desire. See `payClaimWithTokens` for more details
-            WETH.transferFrom(msg.sender, address(this), claimAmount);
-            WETH.withdraw(claimAmount);
-            creditor.safeTransferETH(claimAmount);
-        } else ERC20(token).safeTransferFrom(msg.sender, creditor, claimAmount);
-
-        // mint to the payer
-        _safeMint(msg.sender, claimId);
-
-        return claimId;
-    }
-
-    /// @notice the same as createAndPayClaim but is payable for ETH payments
-    /// @param creditor the wallet _owed_ money on this claim
-    /// @param debtor the wallet in debt to the creditor
-    /// @param description a brief bytes32 description of the claim, can be omitted, exists only on the event
-    /// @param claimAmount amount to be transferred to the creditor
-    /// @return the id of the created claim
-    function createAndPayClaimETH(
-        address creditor,
-        address debtor,
-        bytes32 description,
-        uint256 claimAmount
-    ) external payable returns (uint256) {
-        if (creditor == address(0) || debtor == address(0))
-            revert ZeroAddress();
-
-        _incrementClaimId();
-        uint256 claimId = currentClaimId;
-
-        Claim storage claim = claims[claimId];
-        claim.claimAmount = claimAmount;
-        claim.paidAmount = claimAmount;
-        claim.status = Status.Paid;
-        claim.debtor = debtor;
-        // NOTE: we can ignore token here as the claim is denominated in ETH
-
-        emit ClaimCreated(
-            claimId,
-            msg.sender,
-            creditor,
-            debtor,
-            description,
-            claimAmount,
-            address(0), // native claim
-            0 // 0 means instant payment
-        );
-
-        emit ClaimPayment(claimId, msg.sender, claimAmount);
-
-        // pay the creditor
-        creditor.safeTransferETH(claimAmount);
-        // mint to the payer
-        _safeMint(msg.sender, claimId);
-
-        return claimId;
-    }
-
-    /// @notice the same as createAndPayClaim but includes an attachment to be saved on-chain
-    /// @param creditor the wallet _owed_ money on this claim
-    /// @param debtor the wallet in debt to the creditor
-    /// @param description a brief bytes32 description of the claim, can be omitted, exists only on the event
-    /// @param claimAmount the amount owed by the debtor
-    /// @param token the ERC20 token address (or address(0) for ETH) that the claim is denominated in
-    /// @param hashFunction the hash function (the first byte) of a multihash
-    /// @param hashSize the digest size (the second byte) of a multihash
-    /// @param ipfsHash the actual 32 byte multihash digest - see https://multiformats.io/multihash/ for more details
-    /// @return the id of the created claim
-    function createAndPayClaimWithAttachment(
-        address creditor,
-        address debtor,
-        bytes32 description,
-        uint256 claimAmount,
-        address token,
-        uint8 hashFunction,
-        uint8 hashSize,
-        bytes32 ipfsHash
-    ) external returns (uint256) {
-        if (creditor == address(0) || debtor == address(0))
-            revert ZeroAddress();
-
-        _incrementClaimId();
-        uint256 claimId = currentClaimId;
-
-        {
-            Claim memory claim = claims[claimId];
-            claim.claimAmount = claimAmount;
-            claim.paidAmount = claimAmount;
-            claim.status = Status.Paid;
-            claim.debtor = debtor;
-            claim.token = token;
-        }
-
-        Attachment storage attachment = attachments[claimId];
-        attachment.ipfsHash = ipfsHash;
-        attachment.hashFunction = hashFunction;
-        attachment.hashSize = hashSize;
-
-        emit ClaimCreated(
-            claimId,
-            msg.sender,
-            creditor,
-            debtor,
-            description,
-            claimAmount,
-            token,
-            uint64(block.timestamp)
-        );
-
-        emit AttachmentCreated(claimId, ipfsHash, hashFunction, hashSize);
-
-        emit ClaimPayment(claimId, msg.sender, claimAmount);
-        // pay the creditor
-        if (token == address(0)) {
-            // this allows the debtor (msg.sender) to pay a native claim with WETH if they so desire. See `payClaimWithTokens` for more details
-            WETH.transferFrom(msg.sender, address(this), claimAmount);
-            WETH.withdraw(claimAmount);
-            creditor.safeTransferETH(claimAmount);
-        } else ERC20(token).safeTransferFrom(msg.sender, creditor, claimAmount);
-
-        _safeMint(msg.sender, claimId);
-
-        return claimId;
-    }
-
-    /// @notice the same as createAndPayClaimWithAttachment but for ETH
-    /// @param creditor the wallet _owed_ money on this claim
-    /// @param debtor the wallet in debt to the creditor
-    /// @param description a brief bytes32 description of the claim, can be omitted, exists only on the event
-    /// @param claimAmount the amount owed by the debtor
-    /// @param hashFunction the hash function (the first byte) of a multihash
-    /// @param hashSize the digest size (the second byte) of a multihash
-    /// @param ipfsHash the actual 32 byte multihash digest - see https://multiformats.io/multihash/ for more details
-    /// @return the id of the created claim
-    function createAndPayClaimWithAttachmentETH(
-        address creditor,
-        address debtor,
-        bytes32 description,
-        uint256 claimAmount,
-        uint8 hashFunction,
-        uint8 hashSize,
-        bytes32 ipfsHash
-    ) external returns (uint256) {
-        if (creditor == address(0) || debtor == address(0))
-            revert ZeroAddress();
-
-        _incrementClaimId();
-        uint256 claimId = currentClaimId;
-
-        {
-            Claim memory claim = claims[claimId];
-            claim.claimAmount = claimAmount;
-            claim.paidAmount = claimAmount;
-            claim.status = Status.Paid;
-            claim.debtor = debtor;
-        }
-
-        Attachment storage attachment = attachments[claimId];
-        attachment.ipfsHash = ipfsHash;
-        attachment.hashFunction = hashFunction;
-        attachment.hashSize = hashSize;
-
-        emit ClaimCreated(
-            claimId,
-            msg.sender,
-            creditor,
-            debtor,
-            description,
-            claimAmount,
-            address(0),
-            uint64(block.timestamp)
-        );
-
-        emit AttachmentCreated(claimId, ipfsHash, hashFunction, hashSize);
-
-        emit ClaimPayment(claimId, msg.sender, claimAmount);
-
-        // pay the creditor
-        creditor.safeTransferETH(claimAmount);
-
-        _safeMint(msg.sender, claimId);
-
-        return claimId;
-    }
-
     /// @notice pay a claim with tokens (WETH -> ETH included)
-    /// @notice NOTE: if the claim token is address(0) (eth) then transfer weth to us, unwrap it, then transfer the value to the creditor
+    /// @notice NOTE: if the claim token is address(0) (eth) then we use the eth transferred to the contract
     /// @notice NOTE: we transfer the NFT back to whomever makes the final payment of the claim. This represents a receipt of their payment
     /// @param claimId id of the claim to pay
     /// @param amount amount the user wants to pay from their ERC20 balance:
     ///        NOTE: The actual amount paid off the claim may be less if our fee is enabled
     ///              In other words, we treat the `amount` param as the amount the user wants to spend, and then deduct a fee from that amount
     /// @dev @audit does this need to be non-reentrant?
-    function payClaimWithTokens(uint256 claimId, uint256 amount) external {
+    function payClaim(uint256 claimId, uint256 amount) external payable {
         // load the claim from storage
         Claim memory claim = getClaim(claimId);
         address creditor = getCreditor(claimId);
@@ -511,6 +294,9 @@ contract BullaClaimV2 is ERC721, Ownable, BoringBatchable {
         (address collectionAddress, uint256 transactionFee) = IBullaManager(
             bullaManager
         ).getTransactionFee(msg.sender, amount);
+
+        // make sure the the amount requrested is not 0
+        if (amount == 0) revert ZeroAmount();
 
         // make sure the claim can be paid (not completed, not rejected, not rescinded)
         if (claim.status != Status.Pending || claim.status != Status.Repaying)
@@ -523,6 +309,17 @@ contract BullaClaimV2 is ERC721, Ownable, BoringBatchable {
         // calculate the amount they are paying on the claim minus the fee for using our service
         uint256 amountAfterFee = amount - transactionFee;
 
+        emit ClaimPayment(claimId, msg.sender, amountAfterFee);
+
+        // update the amount paid on the claim TODO ?: implement safecastmath?
+        claim.paidAmount += uint128(amountAfterFee);
+
+        // if the claim is now fully paid, update the status to paid
+        // if the claim is still not fully paid, update the status to repaying
+        claim.status = claim.paidAmount == claim.claimAmount
+            ? Status.Paid
+            : claim.status = Status.Repaying;
+
         // if there is a fee enabled, the user needs to pay it
         if (transactionFee > 0) {
             emit FeePaid(
@@ -532,100 +329,26 @@ contract BullaClaimV2 is ERC721, Ownable, BoringBatchable {
                 transactionFee
             );
 
-            ERC20(claim.token).safeTransferFrom(
-                msg.sender,
-                collectionAddress,
-                transactionFee
-            );
+            claim.token == address(0)
+                ? collectionAddress.safeTransferETH(amountAfterFee)
+                : ERC20(claim.token).safeTransferFrom(
+                    msg.sender,
+                    collectionAddress,
+                    transactionFee
+                );
         }
 
-        emit ClaimPayment(claimId, msg.sender, amountAfterFee);
-
-        // check to see if they are actually paying any amount of the claim before updating the state of the claim
-        if (amountAfterFee > 0) {
-            // update the amount paid on the claim
-            claim.paidAmount += amountAfterFee;
-
-            if (claim.paidAmount == claim.claimAmount) {
-                // if the claim is now fully paid, update the status to paid
-                claim.status = Status.Paid;
-                // transfer the ownership of the claim NFT to the payee as a receipt of their completed payment
-                safeTransferFrom(creditor, msg.sender, claimId);
-            } else {
-                // if the claim is still not fully paid, update the status to repaying
-                claim.status = Status.Repaying;
-            }
-        }
-
-        // now this is a little confusing, but this allows us a user to pay an ETH claim with their WETH
-        if (claim.token == address(0)) {
-            // if the claim is in native token we are going to transfer the payee's payment amount to this contract
-            // this contract is now a holder of `amountAfterFee` amount of WETH
-            WETH.transferFrom(msg.sender, address(this), amountAfterFee);
-            // we are then going to ask the WETH contract to withdraw the `amountAfterFee` amount
-            // this will burn this contract's WETH balance and transfer us actual ether (native token)
-            // this contract is now a holder of `amountAfterFee` amount of ETH
-            WETH.withdraw(amountAfterFee);
-            // we are then going to transfer this contract's ETH to the creditor (or the owner)
-            creditor.safeTransferETH(amountAfterFee);
-        } else {
-            // in any other case, we can directly transfer the token from the sender to the creditor
-            ERC20(claim.token).safeTransferFrom(
+        claim.token == address(0)
+            ? collectionAddress.safeTransferETH(amountAfterFee)
+            : ERC20(claim.token).safeTransferFrom(
                 msg.sender,
                 creditor,
                 amountAfterFee
             );
-        }
-    }
 
-    /// @notice Pay a claim with a address(0) token in ETH
-    /// @dev NOTE: this function uses amount, not msg.value so that this function can be batchable
-    /// @param claimId id of the claim to pay
-    /// @param amount amount the user wants to pay from their ERC20 balance:
-    ///        NOTE: The actual amount paid off the claim may be less if our fee is enabled
-    ///              In other words, we treat the `amount` param as the amount the user wants to spend, and then deduct a fee from that amount
-
-    function payClaimWithETH(uint256 claimId, uint256 amount) external payable {
-        // load the claim from storage
-        Claim memory claim = getClaim(claimId);
-        address creditor = getCreditor(claimId);
-
-        // get the transaction fee and collection address by passing the requested payment amount from the BullaManager contract
-        (address collectionAddress, uint256 transactionFee) = IBullaManager(
-            bullaManager
-        ).getTransactionFee(msg.sender, amount);
-
-        // make sure the claim can be paid (not completed, not rejected, not rescinded)
-        if (claim.status != Status.Pending || claim.status != Status.Repaying)
-            revert ClaimNotPending();
-
-        // make sure the previously paid amount plus the user's requested payment amount _minus_ the transaction fee
-        //     is less than or equal to the claim amount
-        if (claim.paidAmount + amount - transactionFee > claim.claimAmount)
-            revert OverPaying();
-
-        // make sure the claim is denominated in ETH
-        if (claim.token != address(0)) revert ClaimNotETH();
-
-        // calculate the amount they are paying minus the fee for using the service
-        uint256 amountAfterFee = amount - transactionFee;
-
-        // if there is a fee enabled, pay it
-        if (transactionFee > 0) {
-            emit FeePaid(
-                claimId,
-                collectionAddress,
-                amountAfterFee,
-                transactionFee
-            );
-
-            creditor.safeTransferETH(transactionFee);
-        }
-
-        emit ClaimPayment(claimId, msg.sender, amountAfterFee);
-
-        // transfer the ETH sent to this contract from msg.sender to the creditor
-        creditor.safeTransferETH(amountAfterFee);
+        // transfer the ownership of the claim NFT to the payee as a receipt of their completed payment
+        if (claim.paidAmount == claim.claimAmount)
+            safeTransferFrom(creditor, msg.sender, claimId);
     }
 
     /// @notice get the tokenURI generated for this claim
@@ -650,8 +373,19 @@ contract BullaClaimV2 is ERC721, Ownable, BoringBatchable {
         emit BullaManagerSet(address(prevBullaManager), address(bullaManager));
     }
 
-    function getClaim(uint256 claimId) public view returns (Claim memory) {
-        return claims[claimId];
+    function getClaim(uint256 claimId)
+        public
+        view
+        returns (Claim memory claim)
+    {
+        claim = Claim(
+            uint256(claims[claimId].claimAmount),
+            uint256(claims[claimId].paidAmount),
+            claims[claimId].status,
+            uint256(claims[claimId].dueBy),
+            claims[claimId].debtor,
+            claims[claimId].token
+        );
     }
 
     function getCreditor(uint256 claimId) public view returns (address) {
