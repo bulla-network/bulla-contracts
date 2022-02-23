@@ -75,6 +75,11 @@ const config: HardhatUserConfig = {
       accounts: [DEPLOY_PK],
       chainId: 1313161554,
     },
+    moonbeam: {
+      url: `https://rpc.api.moonbeam.network`,
+      accounts: [DEPLOY_PK],
+      chainId: 1284,
+    },
   },
   namedAccounts: {
     deployer: {
@@ -88,6 +93,7 @@ const config: HardhatUserConfig = {
       43114: DEPLOYER_ADDRESS,
       30: DEPLOYER_ADDRESS,
       1313161554: DEPLOYER_ADDRESS,
+      1284: DEPLOYER_ADDRESS,
     },
   },
   gasReporter: {
