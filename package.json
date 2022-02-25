@@ -24,7 +24,8 @@
     "deploy:rsk": "npx hardhat run --network rsk scripts/deploy-erc721.ts",
     "deploy:celo": "npx hardhat run --network celo scripts/deploy-erc721.ts",
     "deploy:aurora": "npx hardhat run --network aurora scripts/deploy-erc721.ts",
-    "deploy:moonbeam": "npx hardhat run --network moonbeam scripts/deploy-erc721.ts"
+    "deploy:moonbeam": "npx hardhat run --network moonbeam scripts/deploy-erc721.ts",
+    "deploy:arbitrum": "npx hardhat run --network arbitrum scripts/deploy-erc721.ts"
   },
   "dependencies": {
     "@gnosis.pm/safe-contracts": "^1.3.0",
