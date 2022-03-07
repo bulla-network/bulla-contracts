@@ -22,7 +22,6 @@ contract BullaInstantPayment {
         address tokenAddress,
         string description,
         string[] tags,
-        uint256 blocktime,
         Multihash attachment
     );
 
@@ -44,7 +43,7 @@ contract BullaInstantPayment {
             amount
         );
 
-        emit InstantPayment(msg.sender, to, amount, tokenAddress, description, tags, block.timestamp, attachment);
+        emit InstantPayment(msg.sender, to, amount, tokenAddress, description, tags, attachment);
     }
 }
 
