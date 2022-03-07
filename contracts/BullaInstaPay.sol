@@ -53,6 +53,7 @@ contract BullaInstantPayment {
         string memory description,
         string[] memory tags,
         string memory ipfsHash,
+        uint256 deadline,
         uint8 v,
         bytes32 r,
         bytes32 s
@@ -61,7 +62,7 @@ contract BullaInstantPayment {
             msg.sender,
             address(this),
             amount,
-            block.timestamp,
+            deadline,
             v,
             r,
             s
