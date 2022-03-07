@@ -22,7 +22,7 @@ contract BullaInstantPayment {
         address tokenAddress,
         string description,
         string[] tags,
-        Multihash attachment
+        string ipfsHash
     );
 
     function instantPayment(
@@ -31,7 +31,7 @@ contract BullaInstantPayment {
         address tokenAddress,
         string memory description,
         string[] memory tags,
-        Multihash calldata attachment
+        string memory ipfsHash
     ) public {
         if (amount == 0) {
             revert ValueMustBeGreaterThanZero();
@@ -43,7 +43,7 @@ contract BullaInstantPayment {
             amount
         );
 
-        emit InstantPayment(msg.sender, to, amount, tokenAddress, description, tags, attachment);
+        emit InstantPayment(msg.sender, to, amount, tokenAddress, description, tags, ipfsHash);
     }
 }
 
