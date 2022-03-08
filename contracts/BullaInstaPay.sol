@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 
-error ValueMustBeGreaterThanZero();
+error ValueMustNoBeZero();
 
 contract BullaInstantPayment {
     using Address for address;
@@ -30,7 +30,7 @@ contract BullaInstantPayment {
         string memory ipfsHash
     ) public {
         if (amount == 0) {
-            revert ValueMustBeGreaterThanZero();
+            revert ValueMustNoBeZero();
         }
 
         IERC20(tokenAddress).safeTransferFrom(msg.sender, to, amount);
