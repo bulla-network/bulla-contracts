@@ -84,7 +84,7 @@ describe("test module", async () => {
     };
   });
 
-  const dueBy = (await ethers.provider.getBlock("latest")).timestamp + 100;
+  const dueBy = (await ethers.provider.getBlock("latest")).timestamp + 1000;
   const getCreateClaimTx = (
     contract: BullaBankerModule | BullaBanker,
     {

@@ -3,11 +3,11 @@ pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
+import "./libraries/BoringBatchable.sol";
 
 error ValueMustNoBeZero();
 
-contract BullaInstantPayment {
+contract BullaInstantPayment is BoringBatchable {
     using Address for address;
     using SafeERC20 for IERC20;
 
@@ -28,12 +28,17 @@ contract BullaInstantPayment {
         string memory description,
         string[] memory tags,
         string memory ipfsHash
-    ) public {
+    ) public payable {
         if (amount == 0) {
             revert ValueMustNoBeZero();
         }
 
-        IERC20(tokenAddress).safeTransferFrom(msg.sender, to, amount);
+        if(tokenAddress == address(0)) {
+            (bool success, ) = to.call{value: amount}("");
+            require(success, "Failed to transfer native tokens");
+        } else {
+            IERC20(tokenAddress).safeTransferFrom(msg.sender, to, amount);
+        }
 
         emit InstantPayment(
             msg.sender,
@@ -44,29 +49,5 @@ contract BullaInstantPayment {
             tags,
             ipfsHash
         );
-    }
-
-    function instantPaymentWithPermit(
-        address to,
-        uint256 amount,
-        address tokenAddress,
-        string memory description,
-        string[] memory tags,
-        string memory ipfsHash,
-        uint256 deadline,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) public {
-        ERC20Permit(tokenAddress).permit(
-            msg.sender,
-            address(this),
-            amount,
-            deadline,
-            v,
-            r,
-            s
-        );
-        instantPayment(to, amount, tokenAddress, description, tags, ipfsHash);
     }
 }
