@@ -9,23 +9,13 @@ import * as secp from "@noble/secp256k1";
 import keccak256 from "keccak256";
 import { ERC20 } from "../../typechain/ERC20";
 import ERC20Mock from "../../artifacts/contracts/mocks/BullaToken.sol/BullaToken.json";
+import { BigNumberish } from "ethers";
 
 chai.use(solidity);
 
 const ethAddressArb: () => fc.Arbitrary<string> = () => {
     return fc.uint8Array({minLength: 31, maxLength: 33}).filter(arr => {try {secp.getPublicKey(arr); return true} catch(_) { return false;} }).map(secp.getPublicKey).map(x => ethers.utils.getAddress(`0x${keccak256(Buffer.from(x)).toString('hex').slice(-40)}`)) as fc.Arbitrary<string>;
 }
-
-type InstantPaymentParams = {
-    toAddress: string;
-    description: string;
-    tokenAddress: string;
-    amount: bigint;
-    ipfsHash: string;
-    tags: string[];
-}
-
-const instantPaymentParamsArb: (tokenAddress: string) => fc.Arbitrary<InstantPaymentParams> = (tokenAddress) => fc.tuple(ethAddressArb(), fc.string(), smallerThan10000Arb(), fc.string(), fc.array(fc.string())).map(([toAddress, description, amount, ipfsHash, tags]) => ({toAddress, description, tokenAddress, amount, ipfsHash, tags}))
 
 const nonZeroIntArb = () => fc.bigUint().filter(x => x !== BigInt(0));
 const biggerThan10000Arb = () => nonZeroIntArb().filter(x => x.toString(10).length > 23); 
@@ -50,36 +40,28 @@ describe("Bulla instant payment", function () {
         bullaInstantPaymentContract = (await deployContract(signer, BullaInstantPaymentMock)) as BullaInstantPayment;
     });
 
-    const encodeInstantPaymentsCall = ({toAddress, amount, tokenAddress, description, tags, ipfsHash} : InstantPaymentParams) => bullaInstantPaymentContract.interface.encodeFunctionData('instantPayment', [toAddress, amount, tokenAddress, description, tags, ipfsHash]);
+    const encodeInstantPaymentsCall = (toAddress: string, amount: BigNumberish, tokenAddress: string, description: string, tags: string[], ipfsHash: string) => bullaInstantPaymentContract.interface.encodeFunctionData('instantPayment', [toAddress, amount, tokenAddress, description, tags, ipfsHash]);
 
-    it("generates N events when N payments is made", function () {
-        console.log("in fct 2")
-        return fc.assert(fc.asyncProperty(instantPaymentParamsArb(nullAddress), fc.array(instantPaymentParamsArb(erc20Contract.address)), async (nativeInstantPayment, erc20InstantPayments) => {
-            console.log("batch success, start")
-            const amountToApprove = erc20InstantPayments.reduce((acc, {amount}) => acc + amount, BigInt(0));
-            console.log("batch success, before approve")
-            await erc20Contract.connect(signer).approve(bullaInstantPaymentContract.address, amountToApprove);
-            console.log("batch success, after approve")
-            const tx = bullaInstantPaymentContract.connect(signer).batch([...erc20InstantPayments.map(encodeInstantPaymentsCall), encodeInstantPaymentsCall(nativeInstantPayment)], true, {value: nativeInstantPayment.amount});
-            const expectation = await expect(tx);
-            console.log("batch success, after await")
-            await Promise.all([...erc20InstantPayments, nativeInstantPayment]
-                .map(({toAddress, amount, tokenAddress, description, tags, ipfsHash}) => expectation.to.emit(bullaInstantPaymentContract, 'InstantPayment').withArgs(signer.address, toAddress, amount, tokenAddress, description, tags, ipfsHash)));
-        }), {numRuns: 1});
-    });
-
-    it("does not generate events when token amounts are insufficient", function () {
-        console.log("in fct")
-        return fc.assert(fc.asyncProperty(instantPaymentParamsArb(nullAddress), fc.array(instantPaymentParamsArb(erc20Contract.address)), async (nativeInstantPayment, erc20InstantPayments) => {
-            console.log("batch fail, start")
-            const amountToApprove = erc20InstantPayments.reduce((acc, {amount}) => acc + amount, BigInt(0))
-            console.log("batch fail, before approve")
-            await erc20Contract.connect(signer).approve(bullaInstantPaymentContract.address, amountToApprove);
-            console.log("batch fail, after approve")
-            const tx = bullaInstantPaymentContract.connect(signer).batch([...erc20InstantPayments.map(encodeInstantPaymentsCall), encodeInstantPaymentsCall(nativeInstantPayment)], true, {value: nativeInstantPayment.amount - BigInt(1)});
-            await expect(tx).to.revertedWith("Failed to transfer native tokens");
-            console.log("batch fail, after all")
-        }), {numRuns: 1});
+    describe("batch", function () {
+        it("generates N events when N payments is made", function () {
+            return fc.assert(fc.asyncProperty(ethAddressArb(), fc.string(), smallerThan10000Arb(), fc.string(), fc.array(fc.string()), ethAddressArb(), fc.string(), smallerThan10000Arb(), fc.string(), fc.array(fc.string()), async (toAddressNative, descriptionNative, amountBigIntNative, ipfsHashNative, tagsNative, toAddressErc, descriptionErc, amountBigIntErc, ipfsHashErc, tagsErc,) => {
+                await erc20Contract.connect(signer).approve(bullaInstantPaymentContract.address, amountBigIntErc);
+                const tx = bullaInstantPaymentContract.connect(signer).batch([
+                    encodeInstantPaymentsCall(toAddressNative, amountBigIntNative, nullAddress, descriptionNative,  tagsNative, ipfsHashNative ),
+                    encodeInstantPaymentsCall(toAddressErc, amountBigIntErc, erc20Contract.address, descriptionErc,  tagsErc, ipfsHashErc )], true, {value: amountBigIntNative});
+                expect((await (await tx).wait()).events?.filter(x => x.event == 'InstantPayment').length).to.equal(2);
+            }), {numRuns: 1});
+        });
+    
+        it("does not generate events when token amounts are insufficient", function () {
+            return fc.assert(fc.asyncProperty(ethAddressArb(), fc.string(), smallerThan10000Arb(), fc.string(), fc.array(fc.string()), ethAddressArb(), fc.string(), smallerThan10000Arb(), fc.string(), fc.array(fc.string()), async (toAddressNative, descriptionNative, amountBigIntNative, ipfsHashNative, tagsNative, toAddressErc, descriptionErc, amountBigIntErc, ipfsHashErc, tagsErc,) => {
+                await erc20Contract.connect(signer).approve(bullaInstantPaymentContract.address, amountBigIntErc);
+                const tx = bullaInstantPaymentContract.connect(signer).batch([
+                    encodeInstantPaymentsCall(toAddressNative, amountBigIntNative, nullAddress, descriptionNative,  tagsNative, ipfsHashNative ),
+                    encodeInstantPaymentsCall(toAddressErc, amountBigIntErc, erc20Contract.address, descriptionErc,  tagsErc, ipfsHashErc )], true, {value: amountBigIntNative - BigInt(1)});
+                await expect(tx).to.revertedWith("Failed to transfer native tokens");
+            }), {numRuns: 1});
+        });
     });
     
     describe("ERC20", function () {
@@ -100,12 +82,10 @@ describe("Bulla instant payment", function () {
         });
 
         it("generates en event when payment is made", function () {
-            return fc.assert(fc.asyncProperty(ethAddressArb(), fc.string(), nonZeroIntArb(), fc.string(), fc.array(fc.string()), async (toAddress, description, amount, ipfsHash, tags) => {
+            return fc.assert(fc.asyncProperty(ethAddressArb(), fc.string(), smallerThan10000Arb(), fc.string(), fc.array(fc.string()), async (toAddress, description, amount, ipfsHash, tags) => {
                 await erc20Contract.connect(signer).approve(bullaInstantPaymentContract.address, amount);
-                const tx = bullaInstantPaymentContract.connect(signer).instantPayment(toAddress, amount, erc20Contract.address, description, tags, ipfsHash);
-                const expectTx = expect(tx);
-                await expectTx.to.emit(bullaInstantPaymentContract, 'InstantPayment').withArgs(signer.address, toAddress, amount, erc20Contract.address, description, tags, ipfsHash);
-            }), {numRuns: 1, timeout: 60000})
+                await expect(bullaInstantPaymentContract.connect(signer).instantPayment(toAddress, amount, erc20Contract.address, description, tags, ipfsHash)).to.emit(bullaInstantPaymentContract, 'InstantPayment').withArgs(signer.address, toAddress, amount, erc20Contract.address, description, tags, ipfsHash);
+            }), {numRuns: 1})
          });
      });
      
