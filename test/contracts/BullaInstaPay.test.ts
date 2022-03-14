@@ -19,6 +19,7 @@ const ethAddressArb: () => fc.Arbitrary<string> = () => {
 
 const nonZeroIntArb = () => fc.bigUint().filter(x => x !== BigInt(0));
 const biggerThan10000Arb = () => nonZeroIntArb().filter(x => x.toString(10).length > 23); 
+const biggerThan1000000Arb = () => nonZeroIntArb().filter(x => x.toString(10).length > 25); 
 const smallerThan10000Arb = () => nonZeroIntArb().filter(x => x.toString(10).length <= 23); 
 const nullAddress = "0x0000000000000000000000000000000000000000";
 
@@ -50,7 +51,7 @@ describe("Bulla instant payment", function () {
                     encodeInstantPaymentsCall(toAddressNative, amountBigIntNative, nullAddress, descriptionNative,  tagsNative, ipfsHashNative ),
                     encodeInstantPaymentsCall(toAddressErc, amountBigIntErc, erc20Contract.address, descriptionErc,  tagsErc, ipfsHashErc )], true, {value: amountBigIntNative});
                 expect((await (await tx).wait()).events?.filter(x => x.event == 'InstantPayment').length).to.equal(2);
-            }), {numRuns: 1});
+            }), {numRuns: 20});
         });
     
         it("does not generate events when token amounts are insufficient", function () {
@@ -60,32 +61,32 @@ describe("Bulla instant payment", function () {
                     encodeInstantPaymentsCall(toAddressNative, amountBigIntNative, nullAddress, descriptionNative,  tagsNative, ipfsHashNative ),
                     encodeInstantPaymentsCall(toAddressErc, amountBigIntErc, erc20Contract.address, descriptionErc,  tagsErc, ipfsHashErc )], true, {value: amountBigIntNative - BigInt(1)});
                 await expect(tx).to.revertedWith("Failed to transfer native tokens");
-            }), {numRuns: 1});
+            }));
         });
     });
     
     describe("ERC20", function () {
         it("fails when from has no tokens", async function () {
-            await fc.assert(fc.asyncProperty(ethAddressArb(), fc.string(), nonZeroIntArb(), fc.string(), fc.array(fc.string()), async (toAddress, description, amountBigInt, ipfsHash, tags) => {
+            await fc.assert(fc.asyncProperty(ethAddressArb(), fc.string(), biggerThan1000000Arb(), fc.string(), fc.array(fc.string()), async (toAddress, description, amountBigInt, ipfsHash, tags) => {
                 const amount = amountBigInt.toString();
                 await erc20Contract.connect(empty).approve(bullaInstantPaymentContract.address, amount);
                 const tx = bullaInstantPaymentContract.connect(empty).instantPayment(toAddress, amount, erc20Contract.address, description, tags, ipfsHash);
                 await expect(tx).to.revertedWith("ERC20: transfer amount exceeds balance");
-            }), {numRuns: 1})
+            }))
         });
 
         it("fails when amount is 0", async function () {
             await fc.assert(fc.asyncProperty(ethAddressArb(), fc.string(), fc.string(), fc.array(fc.string()), async (toAddress, description, ipfsHash, tags) => {
                 const tx = bullaInstantPaymentContract.connect(signer).instantPayment(toAddress, "0", erc20Contract.address, description, tags, ipfsHash);
                 await expect(tx).to.revertedWith("ValueMustNoBeZero()");
-            }), {numRuns: 1})
+            }))
         });
 
         it("generates en event when payment is made", function () {
             return fc.assert(fc.asyncProperty(ethAddressArb(), fc.string(), smallerThan10000Arb(), fc.string(), fc.array(fc.string()), async (toAddress, description, amount, ipfsHash, tags) => {
                 await erc20Contract.connect(signer).approve(bullaInstantPaymentContract.address, amount);
                 await expect(bullaInstantPaymentContract.connect(signer).instantPayment(toAddress, amount, erc20Contract.address, description, tags, ipfsHash)).to.emit(bullaInstantPaymentContract, 'InstantPayment').withArgs(signer.address, toAddress, amount, erc20Contract.address, description, tags, ipfsHash);
-            }), {numRuns: 1})
+            }), {numRuns: 20})
          });
      });
      
@@ -95,14 +96,14 @@ describe("Bulla instant payment", function () {
                 const amount = amountBigInt.toString();
                 const tx = bullaInstantPaymentContract.connect(empty).instantPayment(toAddress, amount, nullAddress, description, tags, ipfsHash);
                 await expect(tx).to.be.reverted;
-            }), {numRuns: 1})
+            }))
         });
 
         it("fails when amount is 0", async function () {
             await fc.assert(fc.asyncProperty(ethAddressArb(), fc.string(), fc.string(), fc.array(fc.string()), async (toAddress, description, ipfsHash, tags) => {
                 const tx = bullaInstantPaymentContract.connect(signer).instantPayment(toAddress, "0", nullAddress, description, tags, ipfsHash);
                 await expect(tx).to.revertedWith("ValueMustNoBeZero()");
-            }), {numRuns: 1})
+            }))
         });
 
         it("generates en event when native payment is made", async function () {
@@ -110,7 +111,7 @@ describe("Bulla instant payment", function () {
                 const amount = `0x${amountBigInt.toString(16)}`;
                 const tx = bullaInstantPaymentContract.connect(signer).instantPayment(toAddress, amount, nullAddress, description, tags, ipfsHash, {value: amount});
                 await expect(tx).to.emit(bullaInstantPaymentContract, 'InstantPayment').withArgs(signer.address, toAddress, amount, nullAddress, description, tags, ipfsHash);
-            }), {numRuns: 1})
+            }))
         });
     });
 });
