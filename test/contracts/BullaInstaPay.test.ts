@@ -306,5 +306,25 @@ describe('Bulla instant payment', function () {
                 ),
             );
         });
+
+        it('fails when contract is paused', async function () {
+            await fc.assert(
+                fc.asyncProperty(
+                    ethAddressArb(),
+                    fc.string(),
+                    smallerThan10000Arb(),
+                    fc.string(),
+                    fc.array(fc.string()),
+                    async (toAddress, description, amountBigInt, ipfsHash, tags) => {
+                        await bullaInstantPaymentContract.connect(signer).pause();
+                        const tx = bullaInstantPaymentContract
+                            .connect(signer)
+                            .instantPayment(toAddress, amountBigInt, nullAddress, description, tags, ipfsHash, { value: amountBigInt });
+                        await expect(tx).to.be.revertedWith('Pausable: paused');
+                        await bullaInstantPaymentContract.connect(signer).unpause();
+                    },
+                ),
+            );
+        });
     });
 });
