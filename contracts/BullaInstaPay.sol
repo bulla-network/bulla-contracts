@@ -25,7 +25,7 @@ contract BullaInstantPayment is BoringBatchable, Pausable {
         address indexed from,
         address indexed to,
         uint256 amount,
-        address tokenAddress,
+        address indexed tokenAddress,
         string description,
         string[] tags,
         string ipfsHash
