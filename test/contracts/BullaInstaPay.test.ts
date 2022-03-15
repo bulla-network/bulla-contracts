@@ -322,9 +322,9 @@ describe('Bulla instant payment', function () {
                             .connect(signer)
                             .instantPayment(toAddress, amountBigInt, nullAddress, description, tags, ipfsHash, { value: amountBigInt });
                         await expect(tx).to.be.revertedWith('Pausable: paused');
+                        await bullaInstantPaymentContract.connect(signer).unpause();
                     },
                 ),
-                { numRuns: 1 },
             );
         });
     });

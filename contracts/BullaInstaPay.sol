@@ -35,6 +35,10 @@ contract BullaInstantPayment is BoringBatchable, Pausable {
         _pause();
     }
 
+    function unpause() public whenPaused onlyOwner {
+        _unpause();
+    }
+
     function instantPayment(
         address to,
         uint256 amount,
