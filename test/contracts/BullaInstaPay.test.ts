@@ -10,7 +10,6 @@ import keccak256 from 'keccak256';
 import { ERC20 } from '../../typechain/ERC20';
 import ERC20Mock from '../../artifacts/contracts/mocks/BullaToken.sol/BullaToken.json';
 import { BigNumberish } from 'ethers';
-import { BullaManager } from '../../typechain';
 
 chai.use(solidity);
 
