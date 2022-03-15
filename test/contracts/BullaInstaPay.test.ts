@@ -10,6 +10,7 @@ import keccak256 from 'keccak256';
 import { ERC20 } from '../../typechain/ERC20';
 import ERC20Mock from '../../artifacts/contracts/mocks/BullaToken.sol/BullaToken.json';
 import { BigNumberish } from 'ethers';
+import { BullaManager } from '../../typechain';
 
 chai.use(solidity);
 
@@ -304,6 +305,26 @@ describe('Bulla instant payment', function () {
                             .withArgs(signer.address, toAddress, amount, nullAddress, description, tags, ipfsHash);
                     },
                 ),
+            );
+        });
+
+        it('fails when contract is paused', async function () {
+            await fc.assert(
+                fc.asyncProperty(
+                    ethAddressArb(),
+                    fc.string(),
+                    smallerThan10000Arb(),
+                    fc.string(),
+                    fc.array(fc.string()),
+                    async (toAddress, description, amountBigInt, ipfsHash, tags) => {
+                        await bullaInstantPaymentContract.connect(signer).pause();
+                        const tx = bullaInstantPaymentContract
+                            .connect(signer)
+                            .instantPayment(toAddress, amountBigInt, nullAddress, description, tags, ipfsHash, { value: amountBigInt });
+                        await expect(tx).to.be.revertedWith('Pausable: paused');
+                    },
+                ),
+                { numRuns: 1 },
             );
         });
     });

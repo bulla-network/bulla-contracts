@@ -2,12 +2,24 @@
 pragma solidity ^0.8.7;
 
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
+import '@openzeppelin/contracts/security/Pausable.sol';
 import './libraries/BoringBatchable.sol';
 
 error ValueMustNoBeZero();
+error NotContractOwner(address _sender);
 
-contract BullaInstantPayment is BoringBatchable {
+contract BullaInstantPayment is BoringBatchable, Pausable {
     using SafeERC20 for IERC20;
+    address public owner;
+
+    modifier onlyOwner() {
+        if (owner != msg.sender) revert NotContractOwner(msg.sender);
+        _;
+    }
+
+    constructor() {
+        owner = msg.sender;
+    }
 
     event InstantPayment(
         address indexed from,
@@ -19,6 +31,10 @@ contract BullaInstantPayment is BoringBatchable {
         string ipfsHash
     );
 
+    function pause() public whenNotPaused onlyOwner {
+        _pause();
+    }
+
     function instantPayment(
         address to,
         uint256 amount,
@@ -26,7 +42,7 @@ contract BullaInstantPayment is BoringBatchable {
         string memory description,
         string[] memory tags,
         string memory ipfsHash
-    ) public payable {
+    ) public payable whenNotPaused {
         if (amount == 0) {
             revert ValueMustNoBeZero();
         }
