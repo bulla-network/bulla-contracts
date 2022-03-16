@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import { deployContract, solidity } from 'ethereum-waffle';
 import fc from 'fast-check';
 import { ethers } from 'hardhat';
-import BullaInstantPaymentMock from '../../artifacts/contracts/BullaInstaPay.sol/BullaInstantPayment.json';
+import BullaInstantPaymentMock from '../../artifacts/contracts/BullaInstantPayment.sol/BullaInstantPayment.json';
 import { BullaInstantPayment } from '../../typechain/BullaInstantPayment';
 import { declareSignerWithAddress } from '../test-utils';
 import * as secp from '@noble/secp256k1';
@@ -60,7 +60,7 @@ describe('Bulla instant payment', function () {
         amount: BigNumberish,
         tokenAddress: string,
         description: string,
-        tags: string[],
+        tag: string,
         ipfsHash: string,
     ) =>
         bullaInstantPaymentContract.interface.encodeFunctionData('instantPayment', [
@@ -68,7 +68,7 @@ describe('Bulla instant payment', function () {
             amount,
             tokenAddress,
             description,
-            tags,
+            tag,
             ipfsHash,
         ]);
 
@@ -80,12 +80,12 @@ describe('Bulla instant payment', function () {
                     fc.string(),
                     smallerThan10000Arb(),
                     fc.string(),
-                    fc.array(fc.string()),
+                    fc.string(),
                     ethAddressArb(),
                     fc.string(),
                     smallerThan10000Arb(),
                     fc.string(),
-                    fc.array(fc.string()),
+                    fc.string(),
                     async (
                         toAddressNative,
                         descriptionNative,
@@ -137,12 +137,12 @@ describe('Bulla instant payment', function () {
                     fc.string(),
                     smallerThan10000Arb(),
                     fc.string(),
-                    fc.array(fc.string()),
+                    fc.string(),
                     ethAddressArb(),
                     fc.string(),
                     smallerThan10000Arb(),
                     fc.string(),
-                    fc.array(fc.string()),
+                    fc.string(),
                     async (
                         toAddressNative,
                         descriptionNative,
@@ -195,7 +195,7 @@ describe('Bulla instant payment', function () {
                     fc.string(),
                     biggerThan1000000Arb(),
                     fc.string(),
-                    fc.array(fc.string()),
+                    fc.string(),
                     async (toAddress, description, amountBigInt, ipfsHash, tags) => {
                         const amount = amountBigInt.toString();
                         await erc20Contract.connect(empty).approve(bullaInstantPaymentContract.address, amount);
@@ -210,18 +210,12 @@ describe('Bulla instant payment', function () {
 
         it('fails when amount is 0', async function () {
             await fc.assert(
-                fc.asyncProperty(
-                    ethAddressArb(),
-                    fc.string(),
-                    fc.string(),
-                    fc.array(fc.string()),
-                    async (toAddress, description, ipfsHash, tags) => {
-                        const tx = bullaInstantPaymentContract
-                            .connect(signer)
-                            .instantPayment(toAddress, '0', erc20Contract.address, description, tags, ipfsHash);
-                        await expect(tx).to.revertedWith('ValueMustNoBeZero()');
-                    },
-                ),
+                fc.asyncProperty(ethAddressArb(), fc.string(), fc.string(), fc.string(), async (toAddress, description, ipfsHash, tags) => {
+                    const tx = bullaInstantPaymentContract
+                        .connect(signer)
+                        .instantPayment(toAddress, '0', erc20Contract.address, description, tags, ipfsHash);
+                    await expect(tx).to.revertedWith('ValueMustNoBeZero()');
+                }),
             );
         });
 
@@ -232,16 +226,27 @@ describe('Bulla instant payment', function () {
                     fc.string(),
                     smallerThan10000Arb(),
                     fc.string(),
-                    fc.array(fc.string()),
+                    fc.string(),
                     async (toAddress, description, amount, ipfsHash, tags) => {
                         await erc20Contract.connect(signer).approve(bullaInstantPaymentContract.address, amount);
                         await expect(
-                            bullaInstantPaymentContract
+                            await bullaInstantPaymentContract
                                 .connect(signer)
                                 .instantPayment(toAddress, amount, erc20Contract.address, description, tags, ipfsHash),
                         )
                             .to.emit(bullaInstantPaymentContract, 'InstantPayment')
-                            .withArgs(signer.address, toAddress, amount, erc20Contract.address, description, tags, ipfsHash);
+                            .withArgs(
+                                signer.address,
+                                toAddress,
+                                amount,
+                                erc20Contract.address,
+                                description,
+                                tags,
+                                ipfsHash,
+                                (
+                                    await ethers.provider.getBlock('latest')
+                                ).timestamp,
+                            );
                     },
                 ),
                 { numRuns: 20 },
@@ -257,7 +262,7 @@ describe('Bulla instant payment', function () {
                     fc.string(),
                     biggerThan10000Arb(),
                     fc.string(),
-                    fc.array(fc.string()),
+                    fc.string(),
                     async (toAddress, description, amountBigInt, ipfsHash, tags) => {
                         const amount = amountBigInt.toString();
                         const tx = bullaInstantPaymentContract
@@ -271,18 +276,12 @@ describe('Bulla instant payment', function () {
 
         it('fails when amount is 0', async function () {
             await fc.assert(
-                fc.asyncProperty(
-                    ethAddressArb(),
-                    fc.string(),
-                    fc.string(),
-                    fc.array(fc.string()),
-                    async (toAddress, description, ipfsHash, tags) => {
-                        const tx = bullaInstantPaymentContract
-                            .connect(signer)
-                            .instantPayment(toAddress, '0', nullAddress, description, tags, ipfsHash);
-                        await expect(tx).to.revertedWith('ValueMustNoBeZero()');
-                    },
-                ),
+                fc.asyncProperty(ethAddressArb(), fc.string(), fc.string(), fc.string(), async (toAddress, description, ipfsHash, tags) => {
+                    const tx = bullaInstantPaymentContract
+                        .connect(signer)
+                        .instantPayment(toAddress, '0', nullAddress, description, tags, ipfsHash);
+                    await expect(tx).to.revertedWith('ValueMustNoBeZero()');
+                }),
             );
         });
 
@@ -293,15 +292,26 @@ describe('Bulla instant payment', function () {
                     fc.string(),
                     smallerThan10000Arb(),
                     fc.string(),
-                    fc.array(fc.string()),
+                    fc.string(),
                     async (toAddress, description, amountBigInt, ipfsHash, tags) => {
                         const amount = `0x${amountBigInt.toString(16)}`;
-                        const tx = bullaInstantPaymentContract
+                        const tx = await bullaInstantPaymentContract
                             .connect(signer)
                             .instantPayment(toAddress, amount, nullAddress, description, tags, ipfsHash, { value: amount });
                         await expect(tx)
                             .to.emit(bullaInstantPaymentContract, 'InstantPayment')
-                            .withArgs(signer.address, toAddress, amount, nullAddress, description, tags, ipfsHash);
+                            .withArgs(
+                                signer.address,
+                                toAddress,
+                                amount,
+                                nullAddress,
+                                description,
+                                tags,
+                                ipfsHash,
+                                (
+                                    await ethers.provider.getBlock('latest')
+                                ).timestamp,
+                            );
                     },
                 ),
             );
@@ -314,7 +324,7 @@ describe('Bulla instant payment', function () {
                     fc.string(),
                     smallerThan10000Arb(),
                     fc.string(),
-                    fc.array(fc.string()),
+                    fc.string(),
                     async (toAddress, description, amountBigInt, ipfsHash, tags) => {
                         await bullaInstantPaymentContract.connect(signer).pause();
                         const tx = bullaInstantPaymentContract

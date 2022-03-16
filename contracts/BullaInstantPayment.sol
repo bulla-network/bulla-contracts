@@ -3,23 +3,16 @@ pragma solidity ^0.8.7;
 
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import '@openzeppelin/contracts/security/Pausable.sol';
+import '@openzeppelin/contracts/access/Ownable.sol';
 import './libraries/BoringBatchable.sol';
 
 error ValueMustNoBeZero();
 error NotContractOwner(address _sender);
 
-contract BullaInstantPayment is BoringBatchable, Pausable {
+contract BullaInstantPayment is BoringBatchable, Pausable, Ownable {
     using SafeERC20 for IERC20;
-    address public owner;
 
-    modifier onlyOwner() {
-        if (owner != msg.sender) revert NotContractOwner(msg.sender);
-        _;
-    }
-
-    constructor() {
-        owner = msg.sender;
-    }
+    event InstantPaymentTagUpdated(bytes32 indexed txAndLogIndexHash, address indexed updatedBy, string tag, uint256 blocktime);
 
     event InstantPayment(
         address indexed from,
@@ -27,8 +20,9 @@ contract BullaInstantPayment is BoringBatchable, Pausable {
         uint256 amount,
         address indexed tokenAddress,
         string description,
-        string[] tags,
-        string ipfsHash
+        string tag,
+        string ipfsHash,
+        uint256 blocktime
     );
 
     function pause() public whenNotPaused onlyOwner {
@@ -44,7 +38,7 @@ contract BullaInstantPayment is BoringBatchable, Pausable {
         uint256 amount,
         address tokenAddress,
         string memory description,
-        string[] memory tags,
+        string memory tag,
         string memory ipfsHash
     ) public payable whenNotPaused {
         if (amount == 0) {
@@ -58,6 +52,10 @@ contract BullaInstantPayment is BoringBatchable, Pausable {
             IERC20(tokenAddress).safeTransferFrom(msg.sender, to, amount);
         }
 
-        emit InstantPayment(msg.sender, to, amount, tokenAddress, description, tags, ipfsHash);
+        emit InstantPayment(msg.sender, to, amount, tokenAddress, description, tag, ipfsHash, block.timestamp);
+    }
+
+    function updateBullaTag(bytes32 txAndLogIndexHash, string memory newTag) public {
+        emit InstantPaymentTagUpdated(txAndLogIndexHash, msg.sender, newTag, block.timestamp);
     }
 }
