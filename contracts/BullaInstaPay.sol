@@ -27,7 +27,7 @@ contract BullaInstantPayment is BoringBatchable, Pausable {
         uint256 amount,
         address indexed tokenAddress,
         string description,
-        string[] tags,
+        string tag,
         string ipfsHash
     );
 
@@ -44,7 +44,7 @@ contract BullaInstantPayment is BoringBatchable, Pausable {
         uint256 amount,
         address tokenAddress,
         string memory description,
-        string[] memory tags,
+        string memory tag,
         string memory ipfsHash
     ) public payable whenNotPaused {
         if (amount == 0) {
@@ -58,6 +58,6 @@ contract BullaInstantPayment is BoringBatchable, Pausable {
             IERC20(tokenAddress).safeTransferFrom(msg.sender, to, amount);
         }
 
-        emit InstantPayment(msg.sender, to, amount, tokenAddress, description, tags, ipfsHash);
+        emit InstantPayment(msg.sender, to, amount, tokenAddress, description, tag, ipfsHash);
     }
 }
