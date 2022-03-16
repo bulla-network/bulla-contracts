@@ -3,23 +3,16 @@ pragma solidity ^0.8.7;
 
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import '@openzeppelin/contracts/security/Pausable.sol';
+import '@openzeppelin/contracts/access/Ownable.sol';
 import './libraries/BoringBatchable.sol';
 
 error ValueMustNoBeZero();
 error NotContractOwner(address _sender);
 
-contract BullaInstantPayment is BoringBatchable, Pausable {
+contract BullaInstantPayment is BoringBatchable, Pausable, Ownable {
     using SafeERC20 for IERC20;
-    address public owner;
 
-    modifier onlyOwner() {
-        if (owner != msg.sender) revert NotContractOwner(msg.sender);
-        _;
-    }
-
-    constructor() {
-        owner = msg.sender;
-    }
+    event BullaTagUpdated(bytes32 indexed txAndLogIndexHash, address indexed updatedBy, bytes32 tag, uint256 blocktime);
 
     event InstantPayment(
         address indexed from,
@@ -59,5 +52,9 @@ contract BullaInstantPayment is BoringBatchable, Pausable {
         }
 
         emit InstantPayment(msg.sender, to, amount, tokenAddress, description, tag, ipfsHash);
+    }
+
+    function updateBullaTag(bytes32 txAndLogIndexHash, bytes32 newTag) public {
+        emit BullaTagUpdated(txAndLogIndexHash, msg.sender, newTag, block.timestamp);
     }
 }
