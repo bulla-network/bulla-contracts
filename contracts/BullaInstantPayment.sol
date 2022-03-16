@@ -12,7 +12,7 @@ error NotContractOwner(address _sender);
 contract BullaInstantPayment is BoringBatchable, Pausable, Ownable {
     using SafeERC20 for IERC20;
 
-    event BullaTagUpdated(bytes32 indexed txAndLogIndexHash, address indexed updatedBy, bytes32 tag, uint256 blocktime);
+    event InstantPaymentTagUpdated(bytes32 indexed txAndLogIndexHash, address indexed updatedBy, bytes32 tag, uint256 blocktime);
 
     event InstantPayment(
         address indexed from,
@@ -55,6 +55,6 @@ contract BullaInstantPayment is BoringBatchable, Pausable, Ownable {
     }
 
     function updateBullaTag(bytes32 txAndLogIndexHash, bytes32 newTag) public {
-        emit BullaTagUpdated(txAndLogIndexHash, msg.sender, newTag, block.timestamp);
+        emit InstantPaymentTagUpdated(txAndLogIndexHash, msg.sender, newTag, block.timestamp);
     }
 }

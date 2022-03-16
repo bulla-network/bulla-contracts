@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import { deployContract, solidity } from 'ethereum-waffle';
 import fc from 'fast-check';
 import { ethers } from 'hardhat';
-import BullaInstantPaymentMock from '../../artifacts/contracts/BullaInstaPay.sol/BullaInstantPayment.json';
+import BullaInstantPaymentMock from '../../artifacts/contracts/BullaInstantPayment.sol/BullaInstantPayment.json';
 import { BullaInstantPayment } from '../../typechain/BullaInstantPayment';
 import { declareSignerWithAddress } from '../test-utils';
 import * as secp from '@noble/secp256k1';
