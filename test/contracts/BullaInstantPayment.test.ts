@@ -230,12 +230,23 @@ describe('Bulla instant payment', function () {
                     async (toAddress, description, amount, ipfsHash, tags) => {
                         await erc20Contract.connect(signer).approve(bullaInstantPaymentContract.address, amount);
                         await expect(
-                            bullaInstantPaymentContract
+                            await bullaInstantPaymentContract
                                 .connect(signer)
                                 .instantPayment(toAddress, amount, erc20Contract.address, description, tags, ipfsHash),
                         )
                             .to.emit(bullaInstantPaymentContract, 'InstantPayment')
-                            .withArgs(signer.address, toAddress, amount, erc20Contract.address, description, tags, ipfsHash);
+                            .withArgs(
+                                signer.address,
+                                toAddress,
+                                amount,
+                                erc20Contract.address,
+                                description,
+                                tags,
+                                ipfsHash,
+                                (
+                                    await ethers.provider.getBlock('latest')
+                                ).timestamp,
+                            );
                     },
                 ),
                 { numRuns: 20 },
@@ -284,12 +295,23 @@ describe('Bulla instant payment', function () {
                     fc.string(),
                     async (toAddress, description, amountBigInt, ipfsHash, tags) => {
                         const amount = `0x${amountBigInt.toString(16)}`;
-                        const tx = bullaInstantPaymentContract
+                        const tx = await bullaInstantPaymentContract
                             .connect(signer)
                             .instantPayment(toAddress, amount, nullAddress, description, tags, ipfsHash, { value: amount });
                         await expect(tx)
                             .to.emit(bullaInstantPaymentContract, 'InstantPayment')
-                            .withArgs(signer.address, toAddress, amount, nullAddress, description, tags, ipfsHash);
+                            .withArgs(
+                                signer.address,
+                                toAddress,
+                                amount,
+                                nullAddress,
+                                description,
+                                tags,
+                                ipfsHash,
+                                (
+                                    await ethers.provider.getBlock('latest')
+                                ).timestamp,
+                            );
                     },
                 ),
             );

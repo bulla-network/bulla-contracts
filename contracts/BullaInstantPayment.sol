@@ -21,7 +21,8 @@ contract BullaInstantPayment is BoringBatchable, Pausable, Ownable {
         address indexed tokenAddress,
         string description,
         string tag,
-        string ipfsHash
+        string ipfsHash,
+        uint256 blocktime
     );
 
     function pause() public whenNotPaused onlyOwner {
@@ -51,7 +52,7 @@ contract BullaInstantPayment is BoringBatchable, Pausable, Ownable {
             IERC20(tokenAddress).safeTransferFrom(msg.sender, to, amount);
         }
 
-        emit InstantPayment(msg.sender, to, amount, tokenAddress, description, tag, ipfsHash);
+        emit InstantPayment(msg.sender, to, amount, tokenAddress, description, tag, ipfsHash, block.timestamp);
     }
 
     function updateBullaTag(bytes32 txAndLogIndexHash, bytes32 newTag) public {
