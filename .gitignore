@@ -11,3 +11,4 @@ coverage/
 yarn.lock
 contracts/artifacts
 dist/
+.DS_Store
