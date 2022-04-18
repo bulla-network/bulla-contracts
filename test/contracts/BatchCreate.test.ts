@@ -26,7 +26,7 @@ describe("test module", async () => {
   ] = declareSignerWithAddress();
   const defaultTag = utils.formatBytes32String("test");
   const maxOperations = 20;
-  let dueBy = (await ethers.provider.getBlock("latest")).timestamp + 100;
+  let dueBy = (await ethers.provider.getBlock("latest")).timestamp + 10000;
   let feeBasisPoint = 1000;
 
   const setupTests = deployments.createFixture(async ({ deployments }) => {
