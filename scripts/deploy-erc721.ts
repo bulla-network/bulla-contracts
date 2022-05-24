@@ -1,13 +1,26 @@
 import { writeFileSync } from "fs";
 import hre, { ethers } from "hardhat";
+import { createInterface } from "readline";
+
+const lineReader = createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
 
 const dateLabel = (date: Date) => date.toISOString().replace(/\D/g, "");
-const MAX_BATCH_OPERATIONS = 40;
 
 const deployCreator = async function () {
-  const { deployments, getNamedAccounts, getChainId } = hre;
+  const { deployments, getNamedAccounts, getChainId, network } = hre;
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
+
+  const MAX_BATCH_OPERATIONS = await new Promise(resolve =>
+    lineReader.question('Max operations in BatchCreate? \n...\n', amount => {
+        if (!amount) process.exit(1);
+        lineReader.close();
+        resolve(amount);
+      }),
+  );
 
   const { address: managerAddress, receipt: managerReceipt } = await deploy(
     "BullaManager",
@@ -15,7 +28,7 @@ const deployCreator = async function () {
       from: deployer,
       args: [
         ethers.utils.formatBytes32String("BullaManager v1"),
-        "0x89e03E7980C92fd81Ed3A9b72F5c73fDf57E5e6D",
+        "0x6307edea4FA19C2a3D3F8Fd12759D6BD319AAb8f",
         0,
       ],
       log: true,
@@ -43,29 +56,37 @@ const deployCreator = async function () {
     args: [bankerAddress, ERC721Address, MAX_BATCH_OPERATIONS],
   });
 
+  const { address: instantPaymentAddress } = await deploy("BullaInstantPayment", {
+    from: deployer,
+    log: true
+  });
+
   console.log({
     bankerAddress,
     managerAddress,
     ERC721Address,
     batchCreateAddress,
+    instantPaymentAddress,
     deployedOnBlock: managerReceipt?.blockNumber,
   });
   const now = new Date();
   const deployInfo = {
     contract: "BullaManager",
     filename: `deploy_info_${dateLabel(now)}.json`,
-    deployer: deployer,
+    deployer,
     chainId: await getChainId(),
     currentTime: now.toISOString(),
-    managerReceipt: managerReceipt,
-    managerAddress: managerAddress,
+    managerReceipt,
+    managerAddress,
     gasUsed: managerReceipt?.gasUsed,
-    bankerReceipt: bankerReceipt,
-    bankerAddress: bankerAddress,
+    bankerReceipt,
+    bankerAddress,
+    batchCreateAddress,
+    instantPaymentAddress
   };
-
+  
   writeFileSync(
-    `./deploy_info/${deployInfo.filename}`,
+    `./deployments/${network.name}/${deployInfo.filename}`,
     JSON.stringify(deployInfo, undefined, 4)
   );
 };
