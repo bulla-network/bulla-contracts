@@ -29,6 +29,11 @@ const config: HardhatUserConfig = {
     //   },
     // },
     /** ^^^ */
+    mainnet: {
+      url: `https://mainnet.infura.io/v3/${INFURA_API_KEY}`,
+      accounts: [DEPLOY_PK],
+      chainId: 1,
+    },
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${INFURA_API_KEY}`,
       accounts: [DEPLOY_PK],
