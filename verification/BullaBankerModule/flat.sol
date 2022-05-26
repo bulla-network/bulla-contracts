@@ -1,5 +1,5 @@
-// SPDX-License-Identifier: BUSL-1.1
-// OpenZeppelin Contracts v4.4.1 (token/ERC20/IERC20.sol)
+// SPDX-License-Identifier: MIT
+// OpenZeppelin Contracts (last updated v4.5.0) (token/ERC20/IERC20.sol)
 
 pragma solidity ^0.8.0;
 
@@ -18,13 +18,13 @@ interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
 
     /**
-     * @dev Moves `amount` tokens from the caller's account to `recipient`.
+     * @dev Moves `amount` tokens from the caller's account to `to`.
      *
      * Returns a boolean value indicating whether the operation succeeded.
      *
      * Emits a {Transfer} event.
      */
-    function transfer(address recipient, uint256 amount) external returns (bool);
+    function transfer(address to, uint256 amount) external returns (bool);
 
     /**
      * @dev Returns the remaining number of tokens that `spender` will be
@@ -52,7 +52,7 @@ interface IERC20 {
     function approve(address spender, uint256 amount) external returns (bool);
 
     /**
-     * @dev Moves `amount` tokens from `sender` to `recipient` using the
+     * @dev Moves `amount` tokens from `from` to `to` using the
      * allowance mechanism. `amount` is then deducted from the caller's
      * allowance.
      *
@@ -61,8 +61,8 @@ interface IERC20 {
      * Emits a {Transfer} event.
      */
     function transferFrom(
-        address sender,
-        address recipient,
+        address from,
+        address to,
         uint256 amount
     ) external returns (bool);
 
@@ -85,9 +85,9 @@ interface IERC20 {
 
 
             
-// OpenZeppelin Contracts v4.4.1 (utils/Address.sol)
+// OpenZeppelin Contracts (last updated v4.5.0) (utils/Address.sol)
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.1;
 
 /**
  * @dev Collection of functions related to the address type
@@ -109,17 +109,22 @@ library Address {
      *  - an address where a contract will be created
      *  - an address where a contract lived, but was destroyed
      * ====
+     *
+     * [IMPORTANT]
+     * ====
+     * You shouldn't rely on `isContract` to protect against flash loan attacks!
+     *
+     * Preventing calls from contracts is highly discouraged. It breaks composability, breaks support for smart wallets
+     * like Gnosis Safe, and does not provide security since it can be circumvented by calling from a contract
+     * constructor.
+     * ====
      */
     function isContract(address account) internal view returns (bool) {
-        // This method relies on extcodesize, which returns 0 for contracts in
-        // construction, since the code is only stored at the end of the
-        // constructor execution.
+        // This method relies on extcodesize/address.code.length, which returns 0
+        // for contracts in construction, since the code is only stored at the end
+        // of the constructor execution.
 
-        uint256 size;
-        assembly {
-            size := extcodesize(account)
-        }
-        return size > 0;
+        return account.code.length > 0;
     }
 
     /**
@@ -854,7 +859,7 @@ interface IERC721Receiver {
 
 
             
-// OpenZeppelin Contracts v4.4.1 (token/ERC721/ERC721.sol)
+// OpenZeppelin Contracts (last updated v4.5.0) (token/ERC721/ERC721.sol)
 
 pragma solidity ^0.8.0;
 
@@ -1142,6 +1147,8 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         _owners[tokenId] = to;
 
         emit Transfer(address(0), to, tokenId);
+
+        _afterTokenTransfer(address(0), to, tokenId);
     }
 
     /**
@@ -1166,6 +1173,8 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         delete _owners[tokenId];
 
         emit Transfer(owner, address(0), tokenId);
+
+        _afterTokenTransfer(owner, address(0), tokenId);
     }
 
     /**
@@ -1184,7 +1193,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         address to,
         uint256 tokenId
     ) internal virtual {
-        require(ERC721.ownerOf(tokenId) == from, "ERC721: transfer of token that is not own");
+        require(ERC721.ownerOf(tokenId) == from, "ERC721: transfer from incorrect owner");
         require(to != address(0), "ERC721: transfer to the zero address");
 
         _beforeTokenTransfer(from, to, tokenId);
@@ -1197,6 +1206,8 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         _owners[tokenId] = to;
 
         emit Transfer(from, to, tokenId);
+
+        _afterTokenTransfer(from, to, tokenId);
     }
 
     /**
@@ -1272,6 +1283,23 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
      * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
      */
     function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal virtual {}
+
+    /**
+     * @dev Hook that is called after any transfer of tokens. This includes
+     * minting and burning.
+     *
+     * Calling conditions:
+     *
+     * - when `from` and `to` are both non-zero.
+     * - `from` and `to` are never both zero.
+     *
+     * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
+     */
+    function _afterTokenTransfer(
         address from,
         address to,
         uint256 tokenId
@@ -2122,9 +2150,9 @@ interface IGuard {
 
 
             
-// OpenZeppelin Contracts v4.4.1 (utils/Address.sol)
+// OpenZeppelin Contracts (last updated v4.5.0) (utils/Address.sol)
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.1;
 
 /**
  * @dev Collection of functions related to the address type
@@ -2146,17 +2174,22 @@ library AddressUpgradeable {
      *  - an address where a contract will be created
      *  - an address where a contract lived, but was destroyed
      * ====
+     *
+     * [IMPORTANT]
+     * ====
+     * You shouldn't rely on `isContract` to protect against flash loan attacks!
+     *
+     * Preventing calls from contracts is highly discouraged. It breaks composability, breaks support for smart wallets
+     * like Gnosis Safe, and does not provide security since it can be circumvented by calling from a contract
+     * constructor.
+     * ====
      */
     function isContract(address account) internal view returns (bool) {
-        // This method relies on extcodesize, which returns 0 for contracts in
-        // construction, since the code is only stored at the end of the
-        // constructor execution.
+        // This method relies on extcodesize/address.code.length, which returns 0
+        // for contracts in construction, since the code is only stored at the end
+        // of the constructor execution.
 
-        uint256 size;
-        assembly {
-            size := extcodesize(account)
-        }
-        return size > 0;
+        return account.code.length > 0;
     }
 
     /**
@@ -2316,7 +2349,7 @@ library AddressUpgradeable {
 
 
             
-// OpenZeppelin Contracts v4.4.1 (proxy/utils/Initializable.sol)
+// OpenZeppelin Contracts (last updated v4.5.0) (proxy/utils/Initializable.sol)
 
 pragma solidity ^0.8.0;
 
@@ -2324,7 +2357,7 @@ pragma solidity ^0.8.0;
 
 /**
  * @dev This is a base contract to aid in writing upgradeable contracts, or any kind of contract that will be deployed
- * behind a proxy. Since a proxied contract can't have a constructor, it's common to move constructor logic to an
+ * behind a proxy. Since proxied contracts do not make use of a constructor, it's common to move constructor logic to an
  * external initializer function, usually called `initialize`. It then becomes necessary to protect this initializer
  * function so it can only be called once. The {initializer} modifier provided by this contract will have this effect.
  *
@@ -2417,7 +2450,6 @@ pragma solidity ^0.8.0;
  */
 abstract contract ContextUpgradeable is Initializable {
     function __Context_init() internal onlyInitializing {
-        __Context_init_unchained();
     }
 
     function __Context_init_unchained() internal onlyInitializing {
@@ -2429,6 +2461,12 @@ abstract contract ContextUpgradeable is Initializable {
     function _msgData() internal view virtual returns (bytes calldata) {
         return msg.data;
     }
+
+    /**
+     * @dev This empty reserved space is put in place to allow future versions to add new
+     * variables without shifting down storage in the inheritance chain.
+     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
+     */
     uint256[50] private __gap;
 }
 
@@ -2506,7 +2544,6 @@ abstract contract OwnableUpgradeable is Initializable, ContextUpgradeable {
      * @dev Initializes the contract setting the deployer as the initial owner.
      */
     function __Ownable_init() internal onlyInitializing {
-        __Context_init_unchained();
         __Ownable_init_unchained();
     }
 
@@ -2558,6 +2595,12 @@ abstract contract OwnableUpgradeable is Initializable, ContextUpgradeable {
         _owner = newOwner;
         emit OwnershipTransferred(oldOwner, newOwner);
     }
+
+    /**
+     * @dev This empty reserved space is put in place to allow future versions to add new
+     * variables without shifting down storage in the inheritance chain.
+     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
+     */
     uint256[49] private __gap;
 }
 
@@ -2692,6 +2735,11 @@ error BatchTooLarge();
 error ZeroLength();
 error BatchFailed();
 
+/// @title BatchCreate
+/// @author @colinnielsen
+/// @notice A contract to allow for the creation of multiple claims in a single transaction.
+/// @dev Uses delegatecall to forward the value of msg.sender to BullaBanker.
+/// @dev Max operations should be wary of the block gas limit on a certain network
 contract BatchCreate {
     address public bullaClaimERC721;
     address public bullaBanker;
@@ -3047,6 +3095,9 @@ pragma solidity ^0.8.7;
 ////import "./BullaBanker.sol";
 ////import "./BatchCreate.sol";
 ////import "./interfaces/IBullaClaim.sol";
+
+/// @title BullaBankerModule
+/// @author @colinnielsen
 /// @notice A gnosis module for BullaBanker allowing permissionless use of basic BullaClaim and BullaBanker
 ///     functions (e.g. createClaim, payClaim, updateTag, rejectClaim, rescindClaim) for the signers of a safe.
 

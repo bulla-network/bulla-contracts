@@ -1,6 +1,7 @@
 import { writeFileSync } from "fs";
 import hre, { ethers } from "hardhat";
 import { createInterface } from "readline";
+import { deployGnosis } from "./deploy-gnosisModule";
 
 const lineReader = createInterface({
   input: process.stdin,
@@ -60,13 +61,17 @@ const deployCreator = async function () {
     from: deployer,
     log: true
   });
-
+  
+  const { masterCopyAddress, moduleFactoryAddress } = await deployGnosis(bankerAddress,ERC721Address,batchCreateAddress);
+  
   console.log({
     bankerAddress,
     managerAddress,
     ERC721Address,
     batchCreateAddress,
     instantPaymentAddress,
+    masterCopyAddress,
+    moduleFactoryAddress,
     deployedOnBlock: managerReceipt?.blockNumber,
   });
   const now = new Date();
@@ -82,7 +87,9 @@ const deployCreator = async function () {
     bankerReceipt,
     bankerAddress,
     batchCreateAddress,
-    instantPaymentAddress
+    instantPaymentAddress,
+    masterCopyAddress,
+    moduleFactoryAddress,
   };
   
   writeFileSync(
