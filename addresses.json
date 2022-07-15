@@ -131,5 +131,16 @@
         "batchCreate": { "address": "0xE14E624b29BcDa2ec409BBBf97037fEDe3803797", "maxClaims": 20 },
         "moduleFactoryAddress": "0x11a4b946512E3A21838312Ab55C119Fb874d33d7",
         "bullaModuleMasterCopyAddress": "0xD57188d3053D96F2fE333107e1F35592314ffacD"
+    },
+    "5": {
+        "name": "Testnet Goerli",
+        "deployedOnBlock": 7232306,
+        "bullaManagerAddress": "0x1b4DB52FD952F70d3D28bfbd406dB71940eD8cA9",
+        "bullaBankerAddress": "0x873C25e47f3C5e4bC524771DFed53B5B36ad5eA2",
+        "bullaClaimERC721Address": "0x127948A4286A67A0A5Cb56a2D0d54881077A4889",
+        "batchCreate": { "address": "0x6811De39DC03245A15D54e2bc615821f9997bbC4", "maxClaims": 20 },
+        "instantPaymentAddress": "0xec6013D62Af8dfB65B8248204Dd1913d2f1F0181",
+        "moduleFactoryAddress": "0x26719d2A1073291559A9F5465Fafe73972B31b1f",
+        "bullaModuleMasterCopyAddress": "0xd285f3645Af07960C961B6DCBFe230Ee686aA12F"
     }
 }

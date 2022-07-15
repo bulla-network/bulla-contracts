@@ -1,3 +1,4 @@
+import { writeFileSync } from 'fs';
 import hre from 'hardhat';
 import { createInterface } from 'readline';
 import addresses from '../addresses.json';
@@ -42,6 +43,17 @@ export const deployGnosis = async function (bullaBankerAddress?: string, bullaCl
             batchCreateAddress ?? contractAddresses.batchCreate.address,
         ],
     });
+
+    const newAddresses = {
+        ...addresses,
+        [chainId]: {
+            ...(addresses[chainId as keyof typeof addresses] ?? {}),
+            moduleFactoryAddress,
+            bullaModuleMasterCopyAddress: masterCopyAddress,
+        },
+    };
+
+    writeFileSync('./addresses.json', JSON.stringify(newAddresses, null, 2));
 
     const now = new Date();
     const deployInfo = {
