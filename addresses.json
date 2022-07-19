@@ -1,146 +1,182 @@
 {
-    "1": {
-        "name": "ETH Mainnet",
-        "deployedOnBlock": 14837685,
-        "bullaBankerAddress": "0x873C25e47f3C5e4bC524771DFed53B5B36ad5eA2",
-        "bullaManagerAddress": "0x1b4DB52FD952F70d3D28bfbd406dB71940eD8cA9",
-        "bullaClaimERC721Address": "0x127948A4286A67A0A5Cb56a2D0d54881077A4889",
-        "bullaInstantPaymentAddress": "0xec6013D62Af8dfB65B8248204Dd1913d2f1F0181",
-        "batchCreate": { "address": "0x6811De39DC03245A15D54e2bc615821f9997bbC4", "maxClaims": 100 },
-        "moduleFactoryAddress": "0xCf4254cF35EB7F13B7e02bA774f5502f5f5C7A7d",
-        "bullaModuleMasterCopyAddress": "0xAA6E5B4E34f3C3BA4D90694909dca7DDdf058079"
+  "1": {
+    "name": "ETH Mainnet",
+    "deployedOnBlock": 14837685,
+    "bullaBankerAddress": "0x873C25e47f3C5e4bC524771DFed53B5B36ad5eA2",
+    "bullaManagerAddress": "0x1b4DB52FD952F70d3D28bfbd406dB71940eD8cA9",
+    "bullaClaimERC721Address": "0x127948A4286A67A0A5Cb56a2D0d54881077A4889",
+    "bullaInstantPaymentAddress": "0xec6013D62Af8dfB65B8248204Dd1913d2f1F0181",
+    "batchCreate": {
+      "address": "0x6811De39DC03245A15D54e2bc615821f9997bbC4",
+      "maxClaims": 100
     },
-    "30": {
-        "name": "RSK Mainnet",
-        "deployedOnBlock": 3788762,
-        "bullaBankerAddress": "0x2Cfd9A72500c0eE511cA3698318649F9d8352A8B",
-        "bullaManagerAddress": "0x53d61694146AB6226d0BEf4080617c28Ce250e14",
-        "bullaClaimERC721Address": "0xC4B52A6D94E8d468De7b2Bef97C49210395fB5Db",
-        "bullaInstantPaymentAddress": "0x2eF2431b2e965Fa3C686323B7b185Cf8ADE5FEe3",
-        "batchCreate": { "address": "0xf08227B90bC1bf6C651A8854D10dA76e9f1db1d8", "maxClaims": 20 },
-        "moduleFactoryAddress": "0xfbdf5dff946200B038e1455E532D9795F030aB91",
-        "bullaModuleMasterCopyAddress": "0x28BE4AB88bb7EA7b93e8eB155fFDa6010cde3C48"
+    "moduleFactoryAddress": "0xCf4254cF35EB7F13B7e02bA774f5502f5f5C7A7d",
+    "bullaModuleMasterCopyAddress": "0xAA6E5B4E34f3C3BA4D90694909dca7DDdf058079"
+  },
+  "4": {
+    "name": "Testnet Rinkeby",
+    "deployedOnBlock": 9510220,
+    "bullaManagerAddress": "0xd33abDe96F344FDe00B65650c8f68875D4c9e18B",
+    "bullaBankerAddress": "0xf1f41946c288246b2d6e4E16Cb077a07B93CBE9a",
+    "bullaClaimERC721Address": "0xC5E586BE8C2ae78dFbeBc41CB9232f652A837330",
+    "bullaInstantPaymentAddress": "0xfe3ad96857e18692818eb5fc798c68ef72518e6d",
+    "batchCreate": {
+      "address": "0xE14E624b29BcDa2ec409BBBf97037fEDe3803797",
+      "maxClaims": 20
     },
-    "1284": {
-        "name": "Moonbeam",
-        "deployedOnBlock": 470589,
-        "bullaBankerAddress": "0xeB0f09EEF3DCc3f35f605dAefa474e6caab96CD6",
-        "bullaManagerAddress": "0xE14E624b29BcDa2ec409BBBf97037fEDe3803797",
-        "bullaClaimERC721Address": "0x1c534661326b41c8b8aab5631ECED6D9755ff192",
-        "bullaInstantPaymentAddress": "0x127948a4286a67a0a5cb56a2d0d54881077a4889",
-        "batchCreate": { "address": "0x0af8C15D19058892cDEA66C8C74B7D7bB696FaD5", "maxClaims": 40 },
-        "moduleFactoryAddress": "0x68da2c92b60337aA55BAcF0d7e61126eDb535752",
-        "bullaModuleMasterCopyAddress": "0xAA6E5B4E34f3C3BA4D90694909dca7DDdf058079"
+    "moduleFactoryAddress": "0x11a4b946512E3A21838312Ab55C119Fb874d33d7",
+    "bullaModuleMasterCopyAddress": "0xD57188d3053D96F2fE333107e1F35592314ffacD"
+  },
+  "5": {
+    "name": "Testnet Goerli",
+    "deployedOnBlock": 7232306,
+    "bullaManagerAddress": "0x1b4DB52FD952F70d3D28bfbd406dB71940eD8cA9",
+    "bullaBankerAddress": "0x873C25e47f3C5e4bC524771DFed53B5B36ad5eA2",
+    "bullaClaimERC721Address": "0x127948A4286A67A0A5Cb56a2D0d54881077A4889",
+    "batchCreate": {
+      "address": "0x6811De39DC03245A15D54e2bc615821f9997bbC4",
+      "maxClaims": 20
     },
-    "1313161554": {
-        "name": "Aurora Mainnet",
-        "deployedOnBlock": 59115995,
-        "bullaBankerAddress": "0xeB0f09EEF3DCc3f35f605dAefa474e6caab96CD6",
-        "bullaManagerAddress": "0xE14E624b29BcDa2ec409BBBf97037fEDe3803797",
-        "bullaClaimERC721Address": "0x1c534661326b41c8b8aab5631ECED6D9755ff192",
-        "bullaInstantPaymentAddress": "0x1b4DB52FD952F70d3D28bfbd406dB71940eD8cA9",
-        "batchCreate": { "address": "0x0af8C15D19058892cDEA66C8C74B7D7bB696FaD5", "maxClaims": 40 },
-        "moduleFactoryAddress": "0xd285f3645Af07960C961B6DCBFe230Ee686aA12F",
-        "bullaModuleMasterCopyAddress": "0x44ad74A14f268551Dd8619B094769C10089239C8"
+    "instantPaymentAddress": "0xec6013D62Af8dfB65B8248204Dd1913d2f1F0181",
+    "moduleFactoryAddress": "0x26719d2A1073291559A9F5465Fafe73972B31b1f",
+    "bullaModuleMasterCopyAddress": "0xd285f3645Af07960C961B6DCBFe230Ee686aA12F"
+  },
+  "30": {
+    "name": "RSK Mainnet",
+    "deployedOnBlock": 3788762,
+    "bullaBankerAddress": "0x2Cfd9A72500c0eE511cA3698318649F9d8352A8B",
+    "bullaManagerAddress": "0x53d61694146AB6226d0BEf4080617c28Ce250e14",
+    "bullaClaimERC721Address": "0xC4B52A6D94E8d468De7b2Bef97C49210395fB5Db",
+    "bullaInstantPaymentAddress": "0x2eF2431b2e965Fa3C686323B7b185Cf8ADE5FEe3",
+    "batchCreate": {
+      "address": "0xf08227B90bC1bf6C651A8854D10dA76e9f1db1d8",
+      "maxClaims": 20
     },
-    "42161": {
-        "name": "Arbitrum",
-        "deployedOnBlock": 6898158,
-        "bullaBankerAddress": "0xeB0f09EEF3DCc3f35f605dAefa474e6caab96CD6",
-        "bullaManagerAddress": "0xE14E624b29BcDa2ec409BBBf97037fEDe3803797",
-        "bullaClaimERC721Address": "0x1c534661326b41c8b8aab5631ECED6D9755ff192",
-        "bullaInstantPaymentAddress": "0x1b4DB52FD952F70d3D28bfbd406dB71940eD8cA9",
-        "batchCreate": { "address": "0x0af8C15D19058892cDEA66C8C74B7D7bB696FaD5", "maxClaims": 255 },
-        "moduleFactoryAddress": "0x26719d2A1073291559A9F5465Fafe73972B31b1f",
-        "bullaModuleMasterCopyAddress": "0xec6013D62Af8dfB65B8248204Dd1913d2f1F0181"
+    "moduleFactoryAddress": "0xfbdf5dff946200B038e1455E532D9795F030aB91",
+    "bullaModuleMasterCopyAddress": "0x28BE4AB88bb7EA7b93e8eB155fFDa6010cde3C48"
+  },
+  "100": {
+    "name": "Gnosis Chain",
+    "deployedOnBlock": 18704278,
+    "bullaBankerAddress": "0x53A6762c7037e80ae2E9E5bC90287D5EA2FDAa09",
+    "bullaManagerAddress": "0x7c70dC167ebC555d2F68c93699343636e2A92308",
+    "bullaClaimERC721Address": "0xA19d5908e8F56fbf5013282837C4A73c3C5374DB",
+    "bullaInstantPaymentAddress": "0xA2d3332AdC23109129651A85388eB6561C69074A",
+    "batchCreate": {
+      "address": "0xe14e624b29bcda2ec409bbbf97037fede3803797",
+      "maxClaims": 40
     },
-    "100": {
-        "name": "Gnosis Chain",
-        "deployedOnBlock": 18704278,
-        "bullaBankerAddress": "0x53A6762c7037e80ae2E9E5bC90287D5EA2FDAa09",
-        "bullaManagerAddress": "0x7c70dC167ebC555d2F68c93699343636e2A92308",
-        "bullaClaimERC721Address": "0xA19d5908e8F56fbf5013282837C4A73c3C5374DB",
-        "bullaInstantPaymentAddress": "0xA2d3332AdC23109129651A85388eB6561C69074A",
-        "batchCreate": {
-            "address": "0xe14e624b29bcda2ec409bbbf97037fede3803797",
-            "maxClaims": 40
-        },
-        "moduleFactoryAddress": "0x8ad90CbA0786ed3E89F6f55a86d4B90728223116",
-        "bullaModuleMasterCopyAddress": "0x9c96fc42B87922f0f22603fF8a31Ee8768cc29F2"
+    "moduleFactoryAddress": "0x8ad90CbA0786ed3E89F6f55a86d4B90728223116",
+    "bullaModuleMasterCopyAddress": "0x9c96fc42B87922f0f22603fF8a31Ee8768cc29F2"
+  },
+  "122": {
+    "name": "fuse",
+    "deployedOnBlock": 18158523,
+    "bullaManagerAddress": "0xeB0f09EEF3DCc3f35f605dAefa474e6caab96CD6",
+    "bullaBankerAddress": "0xce704a7Fae206ad009852258dDD8574B844eDa3b",
+    "bullaClaimERC721Address": "0x0af8C15D19058892cDEA66C8C74B7D7bB696FaD5",
+    "batchCreate": {
+      "address": "0x6985d6af038f177438a6681d1F64d4409Dc8AaC2",
+      "maxClaims": "30"
     },
-    "137": {
-        "name": "Matic(Polygon) Mainnet", 
-        "deployedOnBlock": 20494269,
-        "bullaManagerAddress": "0x48D283521Ff91a1e83A16a7138B549C34BeDD44c",
-        "bullaBankerAddress": "0x85Acc8E44d732eFF1ddec75a1ee93D6e4A033eF8",
-        "bullaClaimERC721Address": "0x5A809C17d33c92f9EFF31e579E9DeDF247e1EBe4",
-        "bullaInstantPaymentAddress": "0x712359c61534c5da10821c09d0e9c7c2312e1d91",
-        "batchCreate": { "address": "0xfbdf5dff946200B038e1455E532D9795F030aB91", "maxClaims": 40 },
-        "moduleFactoryAddress": "0x71E634a30a6FEc0800C1d2740B46EC56fA32aA53",
-        "bullaModuleMasterCopyAddress": "0x5E279b981E4162a30eeE3F3eC4EbFd66ccA09222"
+    "instantPaymentAddress": "0xbe25A1086DE2b587B2D20E4B14c442cdA2437945"
+  },
+  "137": {
+    "name": "Matic(Polygon) Mainnet",
+    "deployedOnBlock": 20494269,
+    "bullaManagerAddress": "0x48D283521Ff91a1e83A16a7138B549C34BeDD44c",
+    "bullaBankerAddress": "0x85Acc8E44d732eFF1ddec75a1ee93D6e4A033eF8",
+    "bullaClaimERC721Address": "0x5A809C17d33c92f9EFF31e579E9DeDF247e1EBe4",
+    "bullaInstantPaymentAddress": "0x712359c61534c5da10821c09d0e9c7c2312e1d91",
+    "batchCreate": {
+      "address": "0xfbdf5dff946200B038e1455E532D9795F030aB91",
+      "maxClaims": 40
     },
-    "1666600000": {
-        "name": "Harmony Mainnet Shard 0",
-        "deployedOnBlock": 18836051,
-        "bullaManagerAddress": "0x127948A4286A67A0A5Cb56a2D0d54881077A4889",
-        "bullaBankerAddress": "0x6811De39DC03245A15D54e2bc615821f9997bbC4",
-        "bullaClaimERC721Address": "0x873C25e47f3C5e4bC524771DFed53B5B36ad5eA2",
-        "bullaInstantPaymentAddress": "0x4f71b513164127e68a2877e42811c45F632cda5F",
-        "batchCreate": {
-            "address": "0xe14e624b29bcda2ec409bbbf97037fede3803797",
-            "maxClaims": 40
-        },
-        "moduleFactoryAddress": "0x1EdEc726a0DEEad8E92a1a850b7bFD9c7356b9EC",
-        "bullaModuleMasterCopyAddress": "0x5a632dB79720Ddc32a441F15019e496751E68F72"
+    "moduleFactoryAddress": "0x71E634a30a6FEc0800C1d2740B46EC56fA32aA53",
+    "bullaModuleMasterCopyAddress": "0x5E279b981E4162a30eeE3F3eC4EbFd66ccA09222"
+  },
+  "1284": {
+    "name": "Moonbeam",
+    "deployedOnBlock": 470589,
+    "bullaBankerAddress": "0xeB0f09EEF3DCc3f35f605dAefa474e6caab96CD6",
+    "bullaManagerAddress": "0xE14E624b29BcDa2ec409BBBf97037fEDe3803797",
+    "bullaClaimERC721Address": "0x1c534661326b41c8b8aab5631ECED6D9755ff192",
+    "bullaInstantPaymentAddress": "0x127948a4286a67a0a5cb56a2d0d54881077a4889",
+    "batchCreate": {
+      "address": "0x0af8C15D19058892cDEA66C8C74B7D7bB696FaD5",
+      "maxClaims": 40
     },
-    "43114": {
-        "name": "Avalanche Mainnet",
-        "deployedOnBlock": 5968486,
-        "bullaManagerAddress": "0xAA6E5B4E34f3C3BA4D90694909dca7DDdf058079",
-        "bullaBankerAddress": "0x4Ba1453df995F4AAe2ef610A9c06fEecF0Fe2581",
-        "bullaClaimERC721Address": "0x68da2c92b60337aA55BAcF0d7e61126eDb535752",
-        "bullaInstantPaymentAddress": "0xFcA0E74af938919E43541D40330212324C8aF27F",
-        "batchCreate": {
-            "address": "0x1c534661326b41c8b8aab5631ECED6D9755ff192",
-            "maxClaims": 40
-        },
-        "moduleFactoryAddress": "0x101452DEF98B40A64d28A964Df1e35170aD5c647",
-        "bullaModuleMasterCopyAddress": "0xF9C5C979c4d80ADf5Da07e943658617d0110cC92"
+    "moduleFactoryAddress": "0x68da2c92b60337aA55BAcF0d7e61126eDb535752",
+    "bullaModuleMasterCopyAddress": "0xAA6E5B4E34f3C3BA4D90694909dca7DDdf058079"
+  },
+  "42161": {
+    "name": "Arbitrum",
+    "deployedOnBlock": 6898158,
+    "bullaBankerAddress": "0xeB0f09EEF3DCc3f35f605dAefa474e6caab96CD6",
+    "bullaManagerAddress": "0xE14E624b29BcDa2ec409BBBf97037fEDe3803797",
+    "bullaClaimERC721Address": "0x1c534661326b41c8b8aab5631ECED6D9755ff192",
+    "bullaInstantPaymentAddress": "0x1b4DB52FD952F70d3D28bfbd406dB71940eD8cA9",
+    "batchCreate": {
+      "address": "0x0af8C15D19058892cDEA66C8C74B7D7bB696FaD5",
+      "maxClaims": 255
     },
-    "42220": {
-        "name": "Celo Mainnet",
-        "deployedOnBlock": 9469593,
-        "bullaManagerAddress": "0x68da2c92b60337aA55BAcF0d7e61126eDb535752",
-        "bullaBankerAddress": "0xd2A779d4B8d2E4E7faFC0DA6F9d712fE19464D5B",
-        "bullaClaimERC721Address": "0x4Ba1453df995F4AAe2ef610A9c06fEecF0Fe2581",
-        "bullaInstantPaymentAddress": "0x48D283521Ff91a1e83A16a7138B549C34BeDD44c",
-        "batchCreate": {
-            "address": "0xe14e624b29bcda2ec409bbbf97037fede3803797",
-            "maxClaims": 40
-        },
-        "moduleFactoryAddress": "0xD5585F346414d57B04A9798F246C7DBfDf64fC35",
-        "masterCopyAddress": "0x25e6F45D4D8db871bb5D7F50D42EC7BcbDF32Fb3"
+    "moduleFactoryAddress": "0x26719d2A1073291559A9F5465Fafe73972B31b1f",
+    "bullaModuleMasterCopyAddress": "0xec6013D62Af8dfB65B8248204Dd1913d2f1F0181"
+  },
+  "42220": {
+    "name": "Celo Mainnet",
+    "deployedOnBlock": 9469593,
+    "bullaManagerAddress": "0x68da2c92b60337aA55BAcF0d7e61126eDb535752",
+    "bullaBankerAddress": "0xd2A779d4B8d2E4E7faFC0DA6F9d712fE19464D5B",
+    "bullaClaimERC721Address": "0x4Ba1453df995F4AAe2ef610A9c06fEecF0Fe2581",
+    "bullaInstantPaymentAddress": "0x48D283521Ff91a1e83A16a7138B549C34BeDD44c",
+    "batchCreate": {
+      "address": "0xe14e624b29bcda2ec409bbbf97037fede3803797",
+      "maxClaims": 40
     },
-    "4": {
-        "name": "Testnet Rinkeby",
-        "deployedOnBlock": 9510220,
-        "bullaManagerAddress": "0xd33abDe96F344FDe00B65650c8f68875D4c9e18B",
-        "bullaBankerAddress": "0xf1f41946c288246b2d6e4E16Cb077a07B93CBE9a",
-        "bullaClaimERC721Address": "0xC5E586BE8C2ae78dFbeBc41CB9232f652A837330",
-        "bullaInstantPaymentAddress": "0xfe3ad96857e18692818eb5fc798c68ef72518e6d",
-        "batchCreate": { "address": "0xE14E624b29BcDa2ec409BBBf97037fEDe3803797", "maxClaims": 20 },
-        "moduleFactoryAddress": "0x11a4b946512E3A21838312Ab55C119Fb874d33d7",
-        "bullaModuleMasterCopyAddress": "0xD57188d3053D96F2fE333107e1F35592314ffacD"
+    "moduleFactoryAddress": "0xD5585F346414d57B04A9798F246C7DBfDf64fC35",
+    "masterCopyAddress": "0x25e6F45D4D8db871bb5D7F50D42EC7BcbDF32Fb3"
+  },
+  "43114": {
+    "name": "Avalanche Mainnet",
+    "deployedOnBlock": 5968486,
+    "bullaManagerAddress": "0xAA6E5B4E34f3C3BA4D90694909dca7DDdf058079",
+    "bullaBankerAddress": "0x4Ba1453df995F4AAe2ef610A9c06fEecF0Fe2581",
+    "bullaClaimERC721Address": "0x68da2c92b60337aA55BAcF0d7e61126eDb535752",
+    "bullaInstantPaymentAddress": "0xFcA0E74af938919E43541D40330212324C8aF27F",
+    "batchCreate": {
+      "address": "0x1c534661326b41c8b8aab5631ECED6D9755ff192",
+      "maxClaims": 40
     },
-    "5": {
-        "name": "Testnet Goerli",
-        "deployedOnBlock": 7232306,
-        "bullaManagerAddress": "0x1b4DB52FD952F70d3D28bfbd406dB71940eD8cA9",
-        "bullaBankerAddress": "0x873C25e47f3C5e4bC524771DFed53B5B36ad5eA2",
-        "bullaClaimERC721Address": "0x127948A4286A67A0A5Cb56a2D0d54881077A4889",
-        "batchCreate": { "address": "0x6811De39DC03245A15D54e2bc615821f9997bbC4", "maxClaims": 20 },
-        "instantPaymentAddress": "0xec6013D62Af8dfB65B8248204Dd1913d2f1F0181",
-        "moduleFactoryAddress": "0x26719d2A1073291559A9F5465Fafe73972B31b1f",
-        "bullaModuleMasterCopyAddress": "0xd285f3645Af07960C961B6DCBFe230Ee686aA12F"
-    }
+    "moduleFactoryAddress": "0x101452DEF98B40A64d28A964Df1e35170aD5c647",
+    "bullaModuleMasterCopyAddress": "0xF9C5C979c4d80ADf5Da07e943658617d0110cC92"
+  },
+  "1313161554": {
+    "name": "Aurora Mainnet",
+    "deployedOnBlock": 59115995,
+    "bullaBankerAddress": "0xeB0f09EEF3DCc3f35f605dAefa474e6caab96CD6",
+    "bullaManagerAddress": "0xE14E624b29BcDa2ec409BBBf97037fEDe3803797",
+    "bullaClaimERC721Address": "0x1c534661326b41c8b8aab5631ECED6D9755ff192",
+    "bullaInstantPaymentAddress": "0x1b4DB52FD952F70d3D28bfbd406dB71940eD8cA9",
+    "batchCreate": {
+      "address": "0x0af8C15D19058892cDEA66C8C74B7D7bB696FaD5",
+      "maxClaims": 40
+    },
+    "moduleFactoryAddress": "0xd285f3645Af07960C961B6DCBFe230Ee686aA12F",
+    "bullaModuleMasterCopyAddress": "0x44ad74A14f268551Dd8619B094769C10089239C8"
+  },
+  "1666600000": {
+    "name": "Harmony Mainnet Shard 0",
+    "deployedOnBlock": 18836051,
+    "bullaManagerAddress": "0x127948A4286A67A0A5Cb56a2D0d54881077A4889",
+    "bullaBankerAddress": "0x6811De39DC03245A15D54e2bc615821f9997bbC4",
+    "bullaClaimERC721Address": "0x873C25e47f3C5e4bC524771DFed53B5B36ad5eA2",
+    "bullaInstantPaymentAddress": "0x4f71b513164127e68a2877e42811c45F632cda5F",
+    "batchCreate": {
+      "address": "0xe14e624b29bcda2ec409bbbf97037fede3803797",
+      "maxClaims": 40
+    },
+    "moduleFactoryAddress": "0x1EdEc726a0DEEad8E92a1a850b7bFD9c7356b9EC",
+    "bullaModuleMasterCopyAddress": "0x5a632dB79720Ddc32a441F15019e496751E68F72"
+  }
 }
