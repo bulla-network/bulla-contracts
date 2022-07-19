@@ -95,6 +95,11 @@ const config: HardhatUserConfig = {
       accounts: [DEPLOY_PK],
       chainId: 42161,
     },
+    fuse: {
+      url: `https://rpc.fuse.io`,
+      accounts: [DEPLOY_PK],
+      chainId: 122,
+    },
   },
   namedAccounts: {
     deployer: {
@@ -111,6 +116,7 @@ const config: HardhatUserConfig = {
       1313161554: DEPLOYER_ADDRESS,
       1284: DEPLOYER_ADDRESS,
       42161: DEPLOYER_ADDRESS,
+      122: DEPLOYER_ADDRESS,
     },
   },
   gasReporter: {
