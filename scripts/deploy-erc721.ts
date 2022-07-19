@@ -1,7 +1,7 @@
 import { writeFileSync } from "fs";
 import hre, { ethers } from "hardhat";
 import { createInterface } from "readline";
-import { deployGnosis } from "./deploy-gnosisModule";
+import addresses from '../addresses.json';
 
 const lineReader = createInterface({
   input: process.stdin,
@@ -14,6 +14,7 @@ const deployCreator = async function () {
   const { deployments, getNamedAccounts, getChainId, network } = hre;
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
+  const chainId = await getChainId();
 
   const MAX_BATCH_OPERATIONS = await new Promise(resolve =>
     lineReader.question('Max operations in BatchCreate? \n...\n', amount => {
@@ -62,24 +63,36 @@ const deployCreator = async function () {
     log: true
   });
   
-  const { masterCopyAddress, moduleFactoryAddress } = await deployGnosis(bankerAddress,ERC721Address,batchCreateAddress);
-  
   console.log({
     bankerAddress,
     managerAddress,
     ERC721Address,
     batchCreateAddress,
     instantPaymentAddress,
-    masterCopyAddress,
-    moduleFactoryAddress,
     deployedOnBlock: managerReceipt?.blockNumber,
   });
+
+  const newAddresses = {
+    ...addresses, [chainId]: {
+      ...(addresses[chainId as keyof typeof addresses] ?? {}),
+      name: network.name,
+      deployedOnBlock: managerReceipt?.blockNumber,
+      bullaManagerAddress: managerAddress,
+      bullaBankerAddress: bankerAddress,
+      "bullaClaimERC721Address": ERC721Address,
+      "batchCreate": { "address": batchCreateAddress, "maxClaims": MAX_BATCH_OPERATIONS },
+      instantPaymentAddress
+    }
+  }
+  
+  writeFileSync("./addresses.json", JSON.stringify(newAddresses, null, 2));
+
   const now = new Date();
   const deployInfo = {
     contract: "BullaManager",
     filename: `deploy_info_${dateLabel(now)}.json`,
     deployer,
-    chainId: await getChainId(),
+    chainId,
     currentTime: now.toISOString(),
     managerReceipt,
     managerAddress,
@@ -87,9 +100,7 @@ const deployCreator = async function () {
     bankerReceipt,
     bankerAddress,
     batchCreateAddress,
-    instantPaymentAddress,
-    masterCopyAddress,
-    moduleFactoryAddress,
+    instantPaymentAddress
   };
   
   writeFileSync(

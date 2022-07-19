@@ -39,6 +39,11 @@ const config: HardhatUserConfig = {
       accounts: [DEPLOY_PK],
       chainId: 4,
     },
+    goerli: {
+      url: `https://goerli.infura.io/v3/${INFURA_API_KEY}`,
+      accounts: [DEPLOY_PK],
+      chainId: 5,
+    },
     xdai: {
       url: "https://rpc.xdaichain.com",
       accounts: [DEPLOY_PK],
@@ -95,6 +100,7 @@ const config: HardhatUserConfig = {
     deployer: {
       default: 0,
       4: DEPLOYER_ADDRESS,
+      5: DEPLOYER_ADDRESS,
       100: DEPLOYER_ADDRESS,
       44787: DEPLOYER_ADDRESS,
       137: DEPLOYER_ADDRESS,

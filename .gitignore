@@ -8,7 +8,6 @@ coverage/
 .archive
 /deploy_info
 /deployments
-yarn.lock
 contracts/artifacts
 dist/
 .DS_Store
