@@ -75,7 +75,7 @@ const deployCreator = async function () {
   const newAddresses = {
     ...addresses, [chainId]: {
       ...(addresses[chainId as keyof typeof addresses] ?? {}),
-      name: network.name,
+      name: network.name.charAt(0).toUpperCase() + network.name.slice(1),
       deployedOnBlock: managerReceipt?.blockNumber,
       bullaManagerAddress: managerAddress,
       bullaBankerAddress: bankerAddress,
