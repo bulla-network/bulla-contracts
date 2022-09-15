@@ -1,5 +1,5 @@
 # Bulla Contracts V1
-The Bulla Protocol is a blockchain commerce primitive for [contigent claims](https://en.wikipedia.org/wiki/Contingent_claim). It is a simple protocol for minting credit relationships between a creditor and debtor, represented as an ERC721 token.
+The Bulla Protocol is a simple protocol for minting credit relationships between a creditor and debtor, represented as an ERC721 token. These tokens are referred to as Bulla claim tokens.
 
 ![image](https://user-images.githubusercontent.com/33375223/190233043-08336b6e-686d-415f-af58-f7f1fcec1eb0.png)
 
