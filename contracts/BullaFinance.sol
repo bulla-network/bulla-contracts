@@ -3,7 +3,7 @@ pragma solidity ^0.8.7;
 import './interfaces/IBullaClaim.sol';
 import './BullaBanker.sol';
 
-uint256 constant BPS = 10_000;
+uint256 constant MAX_BPS = 10_000;
 
 /// @title An extension to BullaClaim V1 that allows creditors to finance invoices
 /// @author @colinnielsen
@@ -12,12 +12,12 @@ abstract contract BullaFinance {
     struct FinanceTerms {
         uint24 minDownPaymentBPS;
         uint24 interestBPS;
-        uint40 termCompletionTimestamp;
+        uint40 termLength;
     }
 
-    event FinancingOffered(uint256 originatingClaimId, FinanceTerms terms);
-    event FinancingAccepted(uint256 originatingClaimId, uint256 financedClaimId);
-    event FeeReclaimed(uint256 originatingClaimId);
+    event FinancingOffered(uint256 indexed originatingClaimId, FinanceTerms terms);
+    event FinancingAccepted(uint256 indexed originatingClaimId, uint256 indexed financedClaimId);
+    event FeeReclaimed(uint256 indexed originatingClaimId);
 
     /// the admin of the contract
     address public admin;
@@ -26,7 +26,7 @@ abstract contract BullaFinance {
     /// the amount of fee that can be withdrawn by the admin
     uint256 public withdrawableFee;
     /// a mapping of financiable claimId to the FinanceTerms offered by the creditor
-    mapping(uint256 => FinanceTerms) public financeTerms;
+    mapping(uint256 => FinanceTerms) public financeTermsByClaimId;
 
     constructor(address _admin, uint256 _fee) {
         admin = _admin;
@@ -68,11 +68,10 @@ abstract contract BullaFinance {
     ///         P1. `msg.value == fee`
     ///         P2. `msg.sender == claim.creditor`
     ///         P3. `(terms.minDownPaymentBPS * claim.claimAmount / 10_000) > 0`
-    ///         P4. `terms.termCompletionTimestamp < type(uint40).max`
-    ///         P5. `terms.minDownPaymentBPS < type(uint24).max`
-    ///         P6. `terms.interestBPS < type(uint24).max`
-    ///         P7. `terms.termCompletionTimestamp < type(uint40).max`
-    ///         P8. `terms.termCompletionTimestamp > block.timestamp` TODO: necessary?
+    ///         P4. `terms.minDownPaymentBPS < type(uint24).max`
+    ///         P5. `terms.interestBPS < type(uint24).max`
+    ///         P6. `terms.termLength < type(uint40).max`
+    ///         P7. `terms.termLength > 1 days`
     function createInvoiceWithFinanceOffer(BullaBanker.ClaimParams memory claim, FinanceTerms memory terms)
         public
         virtual
@@ -88,12 +87,12 @@ abstract contract BullaFinance {
     ///     Given the following:
     ///         P1. `claim.status == ClaimStatus.Pending`
     ///         P2. `msg.sender == claim.creditor`
-    ///         P3. if terms[claimId].termCompletionTimestamp == 0 (implying new terms on an existing claim) ensure msg.value == fee
+    ///         P3. if terms[claimId].termLength == 0 (implying new terms on an existing claim) ensure msg.value == fee
     ///         P4. `(terms.minDownPaymentBPS * claim.claimAmount / 10_000) > 0`
     ///         P5. `terms.minDownPaymentBPS < type(uint24).max`
     ///         P6. `terms.interestBPS < type(uint24).max`
-    ///         P7. `terms.termCompletionTimestamp < type(uint40).max`
-    ///         P8. `terms.termCompletionTimestamp > block.timestamp` TODO: necessary?
+    ///         P7. `terms.termLength < type(uint40).max`
+    ///         P8. `terms.termLength > block.timestamp` TODO: necessary?
     function offerFinancing(uint256 claimId, FinanceTerms memory terms) public virtual;
 
     /// @param claimId the id of the underlying claim
@@ -116,16 +115,15 @@ abstract contract BullaFinance {
     /// @notice SPEC:
     ///     Allows a debtor to accept a creditor's financing offer and begin payment
     ///     This function will:
-    ///         RES1. load the previous claim details and create a new bulla claim specifying `claimAmount` as `originatingClaimAmount + (originatingClaimAmount * terms.interestBPS / 10_000)` and `dueBy` as `term.termCompletionTimestamp`
+    ///         RES1. load the previous claim details and create a new bulla claim specifying `claimAmount` as `originatingClaimAmount + (originatingClaimAmount * terms.interestBPS / 10_000)` and `dueBy` as `term.termLength + block.timestamp`
     ///         RES2. deletes the `financeTerms` TODO: does this have any potential negative side-effects / drawbacks?
     ///         RES3. increments `withdrawableFee` by `fee`
     ///         RES4. pays `downPayment` amount on the newly created claim
     ///         RES5. emits a LoanAccepted event with the `originatingClaimId` and the new claimId as `financedClaimId`
     ///     Given the following:
     ///         P1. msg.sender has approved BullaFinance to spend at least `downPayment` amount of the underlying claim's denominating ERC20 token
-    ///         P2. `financingTerms[claimId].termCompletionTimestamp != 0` (offer exists)
+    ///         P2. `financingTerms[claimId].termLength != 0` (offer exists)
     ///         P3. `msg.sender == claim.debtor`
-    ///         P4. `block.timestamp < termCompletionTimestamp` (offer has expired)
-    ///         P5. `downPayment >= (claimAmount * minDownPaymentBPS / 10_000)` && `downPayment < claimAmount + (claimAmount * minDownPaymentBPS / 10_000) (not overpaying or underpaying)
+    ///         P4. `downPayment >= (claimAmount * minDownPaymentBPS / 10_000)` && `downPayment < claimAmount + (claimAmount * minDownPaymentBPS / 10_000) (not overpaying or underpaying)
     function acceptLoan(uint256 claimId, uint256 downPayment) public virtual;
 }
