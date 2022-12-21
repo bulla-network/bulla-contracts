@@ -77,9 +77,9 @@ contract BullaFinance {
         if (msg.sender != admin) revert NOT_ADMIN();
 
         uint256 withdrawableFee = fee * unharvestedTransactions;
-        unharvestedTransactions = 0;
+        delete unharvestedTransactions;
 
-        (bool success, ) = admin.call{value: withdrawableFee}("");
+        (bool success, ) = admin.call{ value: withdrawableFee }('');
         if (!success) revert WITHDRAWAL_FAILED();
     }
 
@@ -194,24 +194,21 @@ contract BullaFinance {
         if (claim.debtor != msg.sender) revert NOT_DEBTOR();
         if (terms.termLength == 0) revert NO_FINANCE_OFFER();
         if (downPayment < ((claim.claimAmount * terms.minDownPaymentBPS) / MAX_BPS)) revert UNDER_PAYING();
-        if (downPayment > claim.claimAmount + (claim.claimAmount * terms.interestBPS / MAX_BPS)) revert OVER_PAYING();
+        if (downPayment > claim.claimAmount + ((claim.claimAmount * terms.interestBPS) / MAX_BPS)) revert OVER_PAYING();
 
-        uint256 financedClaimId;
-        {
-            address creditor = IERC721(address(bullaClaim)).ownerOf(claimId);
-            string memory tokenURI = ERC721URIStorage(address(bullaClaim)).tokenURI(claimId);
+        address creditor = IERC721(address(bullaClaim)).ownerOf(claimId);
+        string memory tokenURI = ERC721URIStorage(address(bullaClaim)).tokenURI(claimId);
 
-            financedClaimId = bullaClaim.createClaimWithURI({
-                creditor: creditor,
-                debtor: claim.debtor,
-                description: newDescription,
-                claimAmount: claim.claimAmount + ((claim.claimAmount * terms.interestBPS) / MAX_BPS), // add interest to the new claim
-                dueBy: block.timestamp + terms.termLength,
-                claimToken: claim.claimToken,
-                attachment: claim.attachment,
-                _tokenUri: tokenURI
-            });
-        }
+        uint256 financedClaimId = bullaClaim.createClaimWithURI({
+            creditor: creditor,
+            debtor: claim.debtor,
+            description: newDescription,
+            claimAmount: claim.claimAmount + ((claim.claimAmount * terms.interestBPS) / MAX_BPS), // add interest to the new claim
+            dueBy: block.timestamp + terms.termLength,
+            claimToken: claim.claimToken,
+            attachment: claim.attachment,
+            _tokenUri: tokenURI
+        });
 
         delete financeTermsByClaimId[claimId];
         unchecked {
