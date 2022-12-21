@@ -41,7 +41,7 @@ contract BullaFinance {
     address public admin;
     /// the fee represented as the wei amount of the network's native token
     uint256 public fee;
-    /// the amount transactions the fee has not been withdrawn against
+    /// the amount of transactions the fee has not been withdrawn against
     uint256 public unharvestedTransactions;
     /// a mapping of financiable claimId to the FinanceTerms offered by the creditor
     mapping(uint256 => FinanceTerms) public financeTermsByClaimId;
