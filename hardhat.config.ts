@@ -6,9 +6,11 @@ import "hardhat-deploy";
 import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-solhint";
 import "hardhat-gas-reporter";
+import "@nomiclabs/hardhat-etherscan";
 // import "hardhat-ethernal"
 
 const INFURA_API_KEY = process.env.INFURA_API_KEY!;
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY!;
 const GET_BLOCK_API_KEY = process.env.GET_BLOCK_API_KEY!;
 const DEPLOY_PK = process.env.DEPLOY_PK!;
 const COINMARKETCAP_API = process.env.COINMARKETCAP_API!;
@@ -125,5 +127,8 @@ const config: HardhatUserConfig = {
     gasPrice: 100,
     // coinmarketcap: COINMARKETCAP_API,
   },
+  etherscan: {
+    apiKey: ETHERSCAN_API_KEY
+  }
 };
 export default config;
