@@ -34,8 +34,9 @@ contract TestBullaFinance is Test {
         uint256 blocktime
     );
 
-    event FinancingOffered(uint256 indexed originatingClaimId, BullaFinance.FinanceTerms terms);
-    event FinancingAccepted(uint256 indexed originatingClaimId, uint256 indexed financedClaimId);
+    event FinancingOffered(uint256 indexed originatingClaimId, BullaFinance.FinanceTerms terms, uint256 blocktime);
+    event FinancingAccepted(uint256 indexed originatingClaimId, uint256 indexed financedClaimId, uint256 blocktime);
+    event BullaTagUpdated(address indexed bullaManager, uint256 indexed tokenId, address indexed updatedBy, bytes32 tag, uint256 blocktime);
     event ClaimPayment(
         address indexed bullaManager,
         uint256 indexed tokenId,
@@ -109,7 +110,8 @@ contract TestBullaFinance is Test {
         This function will:
             RES1. Create a claim on BullaClaim with the specified parameters in calldata
             RES2. Store the loanTerms as indexed by newly created claimId
-            RES3. Emit a FinancingOffered event with the newly created claimId and the terms from calldata
+            RES3. Emit a FinancingOffered event with the newl, terms from calldata
+            RES4. Emit a BullaTagUpdated event with the user's tag
             RETURNS: the newly created claimId
         Given the following:
             P1. `msg.value == fee`
@@ -137,16 +139,31 @@ contract TestBullaFinance is Test {
             block.timestamp
         );
 
+        /// SPEC.RES4
+        vm.expectEmit(true, true, true, true);
+        emit BullaTagUpdated(
+            bullaManager,
+            1,
+            alice,
+            bytes32(hex'01'),
+            block.timestamp
+        );
+
         /// SPEC.RES3
         vm.expectEmit(true, true, true, true);
-        emit FinancingOffered(1, terms);
+        emit FinancingOffered(1, terms, block.timestamp);
 
         uint256 aliceBalanceBefore = alice.balance;
         uint256 bullaFinanceBalanceBefore = address(bullaFinance).balance;
         uint256 nextClaimId = BullaClaimERC721(address(bullaClaim)).nextClaimId();
 
         vm.prank(alice, alice);
-        uint256 claimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(claimParams, 'https://testURI.com', terms);
+        uint256 claimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(
+            claimParams,
+            'https://testURI.com',
+            terms,
+            bytes32(hex'01')
+        );
 
         (uint24 minDownPaymentBPS, uint24 interestBPS, uint40 termLength) = bullaFinance.financeTermsByClaimId(claimId);
 
@@ -173,6 +190,7 @@ contract TestBullaFinance is Test {
     ) public {
         vm.assume(minDownPaymentBPS <= 10_000);
         vm.assume((minDownPaymentBPS * uint256(claimAmount)) / 10_000 > 0);
+
         uint256 financedClaimId;
         {
             (BullaBanker.ClaimParams memory claimParams, Claim memory expectedClaim, BullaFinance.FinanceTerms memory terms) = _getParams();
@@ -197,17 +215,20 @@ contract TestBullaFinance is Test {
 
             /// SPEC.RES3
             vm.expectEmit(true, true, true, true);
-            emit FinancingOffered(1, terms);
+            emit FinancingOffered(1, terms, block.timestamp);
 
             uint256 aliceBalanceBefore = alice.balance;
             uint256 bullaFinanceBalanceBefore = address(bullaFinance).balance;
-            uint256 nextClaimId = BullaClaimERC721(address(bullaClaim)).nextClaimId();
 
             vm.prank(alice, alice);
-            financedClaimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(claimParams, 'https://testURI.com', terms);
+            financedClaimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(
+                claimParams,
+                'https://testURI.com',
+                terms,
+                bytes32(hex'01')
+            );
 
             /// SPEC.RETURNS
-            assertEq(financedClaimId, nextClaimId, 'claimId');
             assertTrue(minDownPaymentBPS == terms.minDownPaymentBPS, 'down payment');
             assertTrue(interestBPS == terms.interestBPS, 'interest');
             assertEq(alice.balance, aliceBalanceBefore - fee, 'alice balance');
@@ -235,7 +256,7 @@ contract TestBullaFinance is Test {
             vm.expectEmit(true, true, true, true);
             emit ClaimPayment(bullaManager, nextClaimId, bob, address(bullaFinance), bob, downPayment, block.timestamp);
             vm.expectEmit(true, true, true, true);
-            emit FinancingAccepted(financedClaimId, nextClaimId);
+            emit FinancingAccepted(financedClaimId, nextClaimId, block.timestamp);
         }
         {
             uint256 newClaimId = bullaFinance.acceptFinancing(financedClaimId, downPayment, 'test');
@@ -260,7 +281,7 @@ contract TestBullaFinance is Test {
         (BullaBanker.ClaimParams memory claimParams, , BullaFinance.FinanceTerms memory terms) = _getParams();
 
         vm.expectRevert(BullaFinance.INSUFFICIENT_FEE.selector);
-        bullaFinance.createInvoiceWithFinanceOffer{ value: feeToPay }(claimParams, 'https://testURI.com', terms);
+        bullaFinance.createInvoiceWithFinanceOffer{ value: feeToPay }(claimParams, 'https://testURI.com', terms, bytes32(hex'01'));
     }
 
     /// @notice SPEC.P2
@@ -271,7 +292,7 @@ contract TestBullaFinance is Test {
 
         vm.expectRevert(BullaFinance.NOT_CREDITOR.selector);
         vm.prank(sender);
-        bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(claimParams, 'https://testURI.com', terms);
+        bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(claimParams, 'https://testURI.com', terms, bytes32(hex'01'));
     }
 
     /// @notice SPEC.P3
@@ -284,7 +305,7 @@ contract TestBullaFinance is Test {
 
         vm.expectRevert(BullaFinance.INVALID_MIN_DOWN_PAYMENT.selector);
         vm.prank(alice);
-        bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(claimParams, 'https://testURI.com', terms);
+        bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(claimParams, 'https://testURI.com', terms, bytes32(hex'01'));
     }
 
     /// @notice SPEC.P7
@@ -295,7 +316,7 @@ contract TestBullaFinance is Test {
 
         vm.expectRevert(BullaFinance.INVALID_TERM_LENGTH.selector);
         vm.prank(alice);
-        bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(claimParams, 'https://testURI.com', terms);
+        bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(claimParams, 'https://testURI.com', terms, bytes32(hex'01'));
     }
 
     ///
@@ -320,7 +341,12 @@ contract TestBullaFinance is Test {
         (BullaBanker.ClaimParams memory claimParams, , BullaFinance.FinanceTerms memory terms) = _getParams();
 
         vm.prank(alice);
-        uint256 originatingClaimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(claimParams, 'https://testURI.com', terms);
+        uint256 originatingClaimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(
+            claimParams,
+            'https://testURI.com',
+            terms,
+            bytes32(hex'01')
+        );
 
         uint256 downPayment = .2 ether;
         uint256 nextClaimId = BullaClaimERC721(address(bullaClaim)).nextClaimId();
@@ -333,7 +359,7 @@ contract TestBullaFinance is Test {
         emit ClaimPayment(bullaManager, nextClaimId, bob, address(bullaFinance), bob, downPayment, block.timestamp);
         // SPEC.RES4
         vm.expectEmit(true, true, true, true);
-        emit FinancingAccepted(originatingClaimId, nextClaimId);
+        emit FinancingAccepted(originatingClaimId, nextClaimId, block.timestamp);
 
         // SPEC.RETURNS
         uint256 financedClaimId = bullaFinance.acceptFinancing(originatingClaimId, downPayment, 'https://testnewURI.com');
@@ -363,7 +389,12 @@ contract TestBullaFinance is Test {
         (BullaBanker.ClaimParams memory claimParams, , BullaFinance.FinanceTerms memory terms) = _getParams();
 
         vm.prank(alice);
-        uint256 originatingClaimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(claimParams, 'https://testURI.com', terms);
+        uint256 originatingClaimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(
+            claimParams,
+            'https://testURI.com',
+            terms,
+            bytes32(hex'01')
+        );
 
         // down payment will be the full amount
         uint256 downPayment = claimParams.claimAmount;
@@ -383,7 +414,12 @@ contract TestBullaFinance is Test {
         (BullaBanker.ClaimParams memory claimParams, , BullaFinance.FinanceTerms memory terms) = _getParams();
 
         vm.prank(alice);
-        uint256 originatingClaimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(claimParams, 'https://testURI.com', terms);
+        uint256 originatingClaimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(
+            claimParams,
+            'https://testURI.com',
+            terms,
+            bytes32(hex'01')
+        );
 
         if (status == Status.Repaying) {
             bullaToken.approve(address(bullaClaim), .1 ether);
@@ -414,7 +450,12 @@ contract TestBullaFinance is Test {
         (BullaBanker.ClaimParams memory claimParams, , BullaFinance.FinanceTerms memory terms) = _getParams();
 
         vm.prank(alice);
-        uint256 originatingClaimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(claimParams, 'https://testURI.com', terms);
+        uint256 originatingClaimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(
+            claimParams,
+            'https://testURI.com',
+            terms,
+            bytes32(hex'01')
+        );
 
         bullaToken.transfer(caller, .2 ether);
 
@@ -451,7 +492,12 @@ contract TestBullaFinance is Test {
         (BullaBanker.ClaimParams memory claimParams, , BullaFinance.FinanceTerms memory terms) = _getParams();
 
         vm.prank(alice);
-        uint256 originatingClaimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(claimParams, 'https://testURI.com', terms);
+        uint256 originatingClaimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(
+            claimParams,
+            'https://testURI.com',
+            terms,
+            bytes32(hex'01')
+        );
 
         uint256 MIN_DOWN = ((claimParams.claimAmount * terms.minDownPaymentBPS) / 10000);
 
@@ -468,7 +514,12 @@ contract TestBullaFinance is Test {
         (BullaBanker.ClaimParams memory claimParams, , BullaFinance.FinanceTerms memory terms) = _getParams();
 
         vm.prank(alice);
-        uint256 originatingClaimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(claimParams, 'https://testURI.com', terms);
+        uint256 originatingClaimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(
+            claimParams,
+            'https://testURI.com',
+            terms,
+            bytes32(hex'01')
+        );
 
         vm.startPrank(bob);
         bullaToken.approve(address(bullaFinance), 1.5 ether);
@@ -491,7 +542,12 @@ contract TestBullaFinance is Test {
         for (uint256 i; i < financeEvents; i++) {
             (BullaBanker.ClaimParams memory claimParams, , BullaFinance.FinanceTerms memory terms) = _getParams();
             vm.prank(alice);
-            uint256 claimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(claimParams, 'https://testURI.com', terms);
+            uint256 claimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(
+                claimParams,
+                'https://testURI.com',
+                terms,
+                bytes32(hex'01')
+            );
 
             vm.startPrank(bob);
             bullaToken.approve(address(bullaFinance), PAYMENT_AMOUNT);
@@ -513,7 +569,12 @@ contract TestBullaFinance is Test {
 
         (BullaBanker.ClaimParams memory claimParams, , BullaFinance.FinanceTerms memory terms) = _getParams();
         vm.prank(alice);
-        uint256 claimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(claimParams, 'https://testURI.com', terms);
+        uint256 claimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(
+            claimParams,
+            'https://testURI.com',
+            terms,
+            bytes32(hex'01')
+        );
 
         vm.startPrank(bob);
         bullaToken.approve(address(bullaFinance), PAYMENT_AMOUNT);
@@ -533,7 +594,12 @@ contract TestBullaFinance is Test {
 
         (BullaBanker.ClaimParams memory claimParams, , BullaFinance.FinanceTerms memory terms) = _getParams();
         vm.prank(alice);
-        uint256 claimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(claimParams, 'https://testURI.com', terms);
+        uint256 claimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(
+            claimParams,
+            'https://testURI.com',
+            terms,
+            bytes32(hex'01')
+        );
 
         vm.startPrank(bob);
         bullaToken.approve(address(bullaFinance), PAYMENT_AMOUNT);

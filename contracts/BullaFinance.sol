@@ -19,9 +19,10 @@ contract BullaFinance {
         uint40 termLength;
     }
 
-    event FinancingOffered(uint256 indexed originatingClaimId, FinanceTerms terms);
-    event FinancingAccepted(uint256 indexed originatingClaimId, uint256 indexed financedClaimId);
-    event FeeReclaimed(uint256 indexed originatingClaimId);
+    event FinancingOffered(uint256 indexed originatingClaimId, FinanceTerms terms, uint256 blocktime);
+    event FinancingAccepted(uint256 indexed originatingClaimId, uint256 indexed financedClaimId, uint256 blocktime);
+    event BullaTagUpdated(address indexed bullaManager, uint256 indexed tokenId, address indexed updatedBy, bytes32 tag, uint256 blocktime);
+    event FeeReclaimed(uint256 indexed originatingClaimId, uint256 blocktime);
 
     error INSUFFICIENT_FEE();
     error NOT_CREDITOR();
@@ -89,7 +90,8 @@ contract BullaFinance {
     ///     This function will:
     ///         RES1. Create a claim on BullaClaim with the specified parameters in calldata
     ///         RES2. Store the loanTerms as indexed by newly created claimId
-    ///         RES3. Emit a FinancingOffered event with the newly created claimId and the terms from calldata
+    ///         RES3. Emit a FinancingOffered event with the newly created claimId, the terms from calldata, and any user tags
+    ///         RES4. Emit a BullaTagUpdated event with the user's tag
     ///         RETURNS: the newly created claimId
     ///     Given the following:
     ///         P1. `msg.value == fee`
@@ -101,8 +103,9 @@ contract BullaFinance {
     ///         P7. `terms.termLength > 0`
     function createInvoiceWithFinanceOffer(
         BullaBanker.ClaimParams calldata claim,
-        string memory tokenURI,
-        FinanceTerms calldata terms
+        string calldata tokenURI,
+        FinanceTerms calldata terms,
+        bytes32 tag
     ) public payable virtual returns (uint256) {
         if (msg.value != fee) revert INSUFFICIENT_FEE();
         if (msg.sender != claim.creditor) revert NOT_CREDITOR();
@@ -122,7 +125,8 @@ contract BullaFinance {
 
         financeTermsByClaimId[claimId] = terms;
 
-        emit FinancingOffered(claimId, terms);
+        emit BullaTagUpdated(bullaClaim.bullaManager(), claimId, msg.sender, tag, block.timestamp);
+        emit FinancingOffered(claimId, terms, block.timestamp);
 
         return claimId;
     }
@@ -179,7 +183,7 @@ contract BullaFinance {
     function acceptFinancing(
         uint256 claimId,
         uint256 downPayment,
-        string memory newDescription
+        string calldata description
     ) public returns (uint256) {
         Claim memory claim = bullaClaim.getClaim(claimId);
         FinanceTerms memory terms = financeTermsByClaimId[claimId];
@@ -193,11 +197,12 @@ contract BullaFinance {
         address creditor = IERC721(address(bullaClaim)).ownerOf(claimId);
         string memory tokenURI = ERC721URIStorage(address(bullaClaim)).tokenURI(claimId);
 
+        uint256 newClaimAmount = claim.claimAmount + (((claim.claimAmount - downPayment) * terms.interestBPS) / MAX_BPS);
         uint256 financedClaimId = bullaClaim.createClaimWithURI({
             creditor: creditor,
             debtor: claim.debtor,
-            description: newDescription,
-            claimAmount: claim.claimAmount + (((claim.claimAmount - downPayment) * terms.interestBPS) / MAX_BPS), // add interest to the new claim
+            description: description,
+            claimAmount: newClaimAmount, // add interest to the new claim
             dueBy: block.timestamp + terms.termLength,
             claimToken: claim.claimToken,
             attachment: claim.attachment,
@@ -210,7 +215,7 @@ contract BullaFinance {
         IERC20(claim.claimToken).approve(address(bullaClaim), downPayment);
         bullaClaim.payClaim(financedClaimId, downPayment);
 
-        emit FinancingAccepted(claimId, financedClaimId);
+        emit FinancingAccepted(claimId, financedClaimId, block.timestamp);
 
         return financedClaimId;
     }
