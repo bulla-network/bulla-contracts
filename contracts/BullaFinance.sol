@@ -41,8 +41,6 @@ contract BullaFinance {
     address public admin;
     /// the fee represented as the wei amount of the network's native token
     uint256 public fee;
-    /// the amount of transactions the fee has not been withdrawn against
-    uint256 public unharvestedTransactions;
     /// a mapping of financiable claimId to the FinanceTerms offered by the creditor
     mapping(uint256 => FinanceTerms) public financeTermsByClaimId;
 
@@ -73,13 +71,10 @@ contract BullaFinance {
     /// @notice SPEC:
     ///     allows an admin to withdraw `withdrawableFee` amount of tokens from this contract's balance
     ///     Given the following: `msg.sender == admin`
-    function withdrawFee() public {
+    function withdrawFee(uint256 _amount) public {
         if (msg.sender != admin) revert NOT_ADMIN();
 
-        uint256 withdrawableFee = fee * unharvestedTransactions;
-        delete unharvestedTransactions;
-
-        (bool success, ) = admin.call{ value: withdrawableFee }('');
+        (bool success, ) = admin.call{ value: _amount }('');
         if (!success) revert WITHDRAWAL_FAILED();
     }
 
@@ -172,9 +167,8 @@ contract BullaFinance {
     ///     This function will:
     ///         RES1. load the previous claim details and create a new bulla claim specifying `claimAmount` as `originatingClaimAmount + (originatingClaimAmount * terms.interestBPS / 10_000)` and `dueBy` as `term.termLength + block.timestamp`
     ///         RES2. deletes the `financeTerms`
-    ///         RES3. increments `unharvestedTransactions`
-    ///         RES4. pays `downPayment` amount on the newly created claim
-    ///         RES5. emits a LoanAccepted event with the `originatingClaimId` and the new claimId as `financedClaimId`
+    ///         RES3. pays `downPayment` amount on the newly created claim
+    ///         RES4. emits a LoanAccepted event with the `originatingClaimId` and the new claimId as `financedClaimId`
     ///         RETURNS: the newly created claimId
     ///     Given the following:
     ///         P1. msg.sender has approved BullaFinance to spend at least `downPayment` amount of the underlying claim's denominating ERC20 token
@@ -194,7 +188,7 @@ contract BullaFinance {
         if (claim.debtor != msg.sender) revert NOT_DEBTOR();
         if (terms.termLength == 0) revert NO_FINANCE_OFFER();
         if (downPayment < ((claim.claimAmount * terms.minDownPaymentBPS) / MAX_BPS)) revert UNDER_PAYING();
-        if (downPayment > claim.claimAmount + ((claim.claimAmount * terms.interestBPS) / MAX_BPS)) revert OVER_PAYING();
+        if (downPayment > claim.claimAmount) revert OVER_PAYING();
 
         address creditor = IERC721(address(bullaClaim)).ownerOf(claimId);
         string memory tokenURI = ERC721URIStorage(address(bullaClaim)).tokenURI(claimId);
@@ -203,7 +197,7 @@ contract BullaFinance {
             creditor: creditor,
             debtor: claim.debtor,
             description: newDescription,
-            claimAmount: claim.claimAmount + ((claim.claimAmount * terms.interestBPS) / MAX_BPS), // add interest to the new claim
+            claimAmount: claim.claimAmount + (((claim.claimAmount - downPayment) * terms.interestBPS) / MAX_BPS), // add interest to the new claim
             dueBy: block.timestamp + terms.termLength,
             claimToken: claim.claimToken,
             attachment: claim.attachment,
@@ -211,9 +205,6 @@ contract BullaFinance {
         });
 
         delete financeTermsByClaimId[claimId];
-        unchecked {
-            ++unharvestedTransactions;
-        }
 
         IERC20(claim.claimToken).safeTransferFrom(msg.sender, address(this), downPayment);
         IERC20(claim.claimToken).approve(address(bullaClaim), downPayment);

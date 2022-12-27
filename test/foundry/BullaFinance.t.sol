@@ -57,6 +57,9 @@ contract TestBullaFinance is Test {
 
         vm.deal(bob, 1 ether);
         bullaToken.transfer(bob, 2 ether);
+
+        vm.label(alice, 'ALICE');
+        vm.label(bob, 'BOB');
     }
 
     function _getParams()
@@ -91,7 +94,7 @@ contract TestBullaFinance is Test {
 
         terms = BullaFinance.FinanceTerms({
             minDownPaymentBPS: 2000, // 20%
-            interestBPS: 500, // 5% interest
+            interestBPS: 1000, // 10% interest
             termLength: 180 days
         });
     }
@@ -162,6 +165,95 @@ contract TestBullaFinance is Test {
         assertEq(address(bullaFinance).balance, bullaFinanceBalanceBefore + fee, 'bullaFinance balance');
     }
 
+    function test_FUZZ_BullaFinanceWorkflow(
+        uint128 claimAmount,
+        uint24 minDownPaymentBPS,
+        uint24 interestBPS,
+        uint128 downPayment
+    ) public {
+        vm.assume(minDownPaymentBPS <= 10_000);
+        vm.assume((minDownPaymentBPS * uint256(claimAmount)) / 10_000 > 0);
+        uint256 financedClaimId;
+        {
+            (BullaBanker.ClaimParams memory claimParams, Claim memory expectedClaim, BullaFinance.FinanceTerms memory terms) = _getParams();
+
+            claimParams.claimAmount = claimAmount;
+            expectedClaim.claimAmount = claimAmount;
+            terms.minDownPaymentBPS = minDownPaymentBPS;
+            terms.interestBPS = interestBPS;
+
+            vm.expectEmit(true, true, true, true);
+            emit ClaimCreated(
+                bullaManager,
+                1,
+                address(bullaFinance),
+                alice,
+                bob,
+                alice,
+                claimParams.description,
+                expectedClaim,
+                block.timestamp
+            );
+
+            /// SPEC.RES3
+            vm.expectEmit(true, true, true, true);
+            emit FinancingOffered(1, terms);
+
+            uint256 aliceBalanceBefore = alice.balance;
+            uint256 bullaFinanceBalanceBefore = address(bullaFinance).balance;
+            uint256 nextClaimId = BullaClaimERC721(address(bullaClaim)).nextClaimId();
+
+            vm.prank(alice, alice);
+            financedClaimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(claimParams, 'https://testURI.com', terms);
+
+            /// SPEC.RETURNS
+            assertEq(financedClaimId, nextClaimId, 'claimId');
+            assertTrue(minDownPaymentBPS == terms.minDownPaymentBPS, 'down payment');
+            assertTrue(interestBPS == terms.interestBPS, 'interest');
+            assertEq(alice.balance, aliceBalanceBefore - fee, 'alice balance');
+            assertEq(address(bullaFinance).balance, bullaFinanceBalanceBefore + fee, 'bullaFinance balance');
+        }
+
+        bullaToken.mint(bob, downPayment);
+
+        vm.startPrank(bob, bob);
+        bullaToken.approve(address(bullaFinance), downPayment);
+
+        uint256 creditorBalanceBefore = bullaToken.balanceOf(alice);
+        uint256 debtorBalanceBefore = bullaToken.balanceOf(bob);
+
+        bool expectFailure;
+
+        if (downPayment < (uint256(claimAmount) * uint256(minDownPaymentBPS)) / 10_000) {
+            vm.expectRevert(BullaFinance.UNDER_PAYING.selector);
+            expectFailure = true;
+        } else if (downPayment > claimAmount) {
+            vm.expectRevert(BullaFinance.OVER_PAYING.selector);
+            expectFailure = true;
+        } else {
+            uint256 nextClaimId = BullaClaimERC721(address(bullaClaim)).nextClaimId();
+            vm.expectEmit(true, true, true, true);
+            emit ClaimPayment(bullaManager, nextClaimId, bob, address(bullaFinance), bob, downPayment, block.timestamp);
+            vm.expectEmit(true, true, true, true);
+            emit FinancingAccepted(financedClaimId, nextClaimId);
+        }
+        {
+            uint256 newClaimId = bullaFinance.acceptFinancing(financedClaimId, downPayment, 'test');
+            vm.stopPrank();
+            if (expectFailure) return;
+
+            Claim memory newClaim = bullaClaim.getClaim(newClaimId);
+            assertEq(creditorBalanceBefore + downPayment, bullaToken.balanceOf(alice), 'alice received down payment');
+            assertEq(debtorBalanceBefore - downPayment, bullaToken.balanceOf(bob), 'bob paid down payment');
+            assertEq(
+                newClaim.claimAmount,
+                claimAmount + ((uint256((claimAmount - downPayment)) * interestBPS) / 10_000),
+                'new claim amount'
+            );
+            assertTrue(downPayment < claimAmount ? newClaim.status == Status.Repaying : newClaim.status == Status.Paid, 'new claim status');
+        }
+    }
+
     /// @notice SPEC.P1
     function testCannotUnderpayFee(uint256 _fee) public {
         uint256 feeToPay = _fee % fee;
@@ -216,9 +308,8 @@ contract TestBullaFinance is Test {
         This function will:
             RES1. load the previous claim details and create a new bulla claim specifying `claimAmount` as `originatingClaimAmount + (originatingClaimAmount * terms.interestBPS / 10_000)` and `dueBy` as `term.termLength + block.timestamp`
             RES2. deletes the `financeTerms`
-            RES3. increments `unharvestedTransactions`
-            RES4. pays `downPayment` amount on the newly created claim
-            RES5. emits a LoanAccepted event with the `originatingClaimId` and the new claimId as `financedClaimId`
+            RES3. pays `downPayment` amount on the newly created claim
+            RES4. emits a LoanAccepted event with the `originatingClaimId` and the new claimId as `financedClaimId`
         Given the following:
             P1. msg.sender has approved BullaFinance to spend at least `downPayment` amount of the underlying claim's denominating ERC20 token
             P2. `financingTerms[claimId].termLength != 0` (offer exists)
@@ -233,24 +324,20 @@ contract TestBullaFinance is Test {
 
         uint256 downPayment = .2 ether;
         uint256 nextClaimId = BullaClaimERC721(address(bullaClaim)).nextClaimId();
-        uint256 unharvestedTransactionsBefore = bullaFinance.unharvestedTransactions();
 
         vm.startPrank(bob, bob);
         bullaToken.approve(address(bullaFinance), downPayment);
 
-        // SPEC.RES4
+        // SPEC.RES3
         vm.expectEmit(true, true, true, true);
         emit ClaimPayment(bullaManager, nextClaimId, bob, address(bullaFinance), bob, downPayment, block.timestamp);
-        // SPEC.RES5
+        // SPEC.RES4
         vm.expectEmit(true, true, true, true);
         emit FinancingAccepted(originatingClaimId, nextClaimId);
 
         // SPEC.RETURNS
         uint256 financedClaimId = bullaFinance.acceptFinancing(originatingClaimId, downPayment, 'https://testnewURI.com');
         vm.stopPrank();
-
-        // SPEC.RES3
-        assertEq(bullaFinance.unharvestedTransactions(), unharvestedTransactionsBefore + 1, 'unharvested transactions');
 
         (uint24 minDownPaymentBPS, uint24 interestBPS, uint40 termLength) = bullaFinance.financeTermsByClaimId(originatingClaimId);
         // SPEC.RES2
@@ -265,10 +352,10 @@ contract TestBullaFinance is Test {
         // SPEC.RES1
         assertEq(financedClaimId, nextClaimId, 'financed claim id');
         // SPEC.RES1
-        assertEq(newClaim.claimAmount, 1.05 ether, 'new claim amount'); // 5% interest applied
+        assertEq(newClaim.claimAmount, 1.08 ether, 'new claim amount'); // 10% interest applied to a .8 eth loan
         // SPEC.RES1
         assertEq(newClaim.dueBy, block.timestamp + terms.termLength, 'new claim due by');
-        // SPEC.RES4
+        // SPEC.RES3
         assertTrue(newClaim.status == Status.Repaying, 'repaying status');
     }
 
@@ -279,7 +366,7 @@ contract TestBullaFinance is Test {
         uint256 originatingClaimId = bullaFinance.createInvoiceWithFinanceOffer{ value: fee }(claimParams, 'https://testURI.com', terms);
 
         // down payment will be the full amount
-        uint256 downPayment = claimParams.claimAmount + ((claimParams.claimAmount * terms.interestBPS) / MAX_BPS);
+        uint256 downPayment = claimParams.claimAmount;
 
         vm.startPrank(bob, bob);
         bullaToken.approve(address(bullaFinance), downPayment);
@@ -415,7 +502,7 @@ contract TestBullaFinance is Test {
         uint256 adminBalanceBefore = admin.balance;
 
         vm.prank(admin);
-        bullaFinance.withdrawFee();
+        bullaFinance.withdrawFee(address(bullaFinance).balance);
 
         assertEq(admin.balance, adminBalanceBefore + (financeEvents * fee), 'admin balance');
     }
@@ -435,7 +522,7 @@ contract TestBullaFinance is Test {
 
         vm.prank(caller);
         vm.expectRevert(BullaFinance.NOT_ADMIN.selector);
-        bullaFinance.withdrawFee();
+        bullaFinance.withdrawFee(address(bullaFinance).balance);
     }
 
     function testBadAdminRevert() public {
@@ -455,7 +542,7 @@ contract TestBullaFinance is Test {
 
         vm.prank(admin);
         vm.expectRevert(BullaFinance.WITHDRAWAL_FAILED.selector);
-        bullaFinance.withdrawFee();
+        bullaFinance.withdrawFee(address(bullaFinance).balance);
     }
 }
 
