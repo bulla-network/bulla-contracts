@@ -37,7 +37,7 @@ contract FrendLend {
     /// a mapping of id to the FinanceTerms offered by the creditor
     mapping(uint256 => LoanOffer) public loanOffers;
 
-    event LoanOffered(uint256 indexed loanId, address indexed offerredBy, LoanOffer loanOffer, uint256 blocktime);
+    event LoanOffered(uint256 indexed loanId, address indexed offeredBy, LoanOffer loanOffer, uint256 blocktime);
     event LoanOfferAccepted(uint256 indexed loanId, uint256 indexed claimId, uint256 blocktime);
     event LoanOfferRejected(uint256 indexed loanId, address indexed rejectedBy, uint256 blocktime);
     event BullaTagUpdated(address indexed bullaManager, uint256 indexed tokenId, address indexed updatedBy, bytes32 tag, uint256 blocktime);
