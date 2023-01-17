@@ -7,8 +7,8 @@ import './interfaces/IBullaClaim.sol';
 import './BullaBanker.sol';
 
 struct LoanOffer {
-    uint24 interestBPS;
-    uint40 termLength;
+    uint24 interestBPS; // can be 0
+    uint40 termLength; // cannot be 0
     uint128 loanAmount;
     address creditor;
     address debtor;
@@ -19,6 +19,10 @@ struct LoanOffer {
 
 uint256 constant MAX_BPS = 10_000;
 
+/// @title FrendLend POC
+/// @author @colinnielsen
+/// @notice An extension to BullaClaim V1 that allows a creditor to offer capital in exchange for a claim
+/// @notice This is experimental software, use at your own risk
 contract FrendLend {
     using SafeERC20 for IERC20;
 
@@ -30,12 +34,13 @@ contract FrendLend {
     uint256 public fee;
     /// the number of loan offers
     uint256 public loanOfferCount;
-    /// a mapping of financiable claimId to the FinanceTerms offered by the creditor
+    /// a mapping of id to the FinanceTerms offered by the creditor
     mapping(uint256 => LoanOffer) public loanOffers;
 
-    event LoanOffered(uint256 indexed loanId, LoanOffer loanOffer, uint256 blocktime);
+    event LoanOffered(uint256 indexed loanId, address indexed offerredBy, LoanOffer loanOffer, uint256 blocktime);
     event LoanOfferAccepted(uint256 indexed loanId, uint256 indexed claimId, uint256 blocktime);
     event LoanOfferRejected(uint256 indexed loanId, address indexed rejectedBy, uint256 blocktime);
+    event BullaTagUpdated(address indexed bullaManager, uint256 indexed tokenId, address indexed updatedBy, bytes32 tag, uint256 blocktime);
 
     error INSUFFICIENT_FEE();
     error NOT_CREDITOR();
@@ -56,6 +61,8 @@ contract FrendLend {
         fee = _fee;
     }
 
+    ////// ADMIN FUNCTIONS //////
+
     /// @notice SPEC:
     ///     allows an admin to withdraw `withdrawableFee` amount of tokens from this contract's balance
     ///     Given the following: `msg.sender == admin`
@@ -66,52 +73,60 @@ contract FrendLend {
         if (!success) revert WITHDRAWAL_FAILED();
     }
 
-    // todo: add bulla tags
+    ////// USER FUNCTIONS //////
+
     function offerLoan(LoanOffer calldata offer) public payable {
         if (msg.value != fee) revert INSUFFICIENT_FEE();
         if (msg.sender != offer.creditor) revert NOT_CREDITOR();
         if (offer.termLength == 0) revert INVALID_TERM_LENGTH();
+        // if ((offer.loanAmount * offer.interestBPS) / MAX_BPS == 0) revert INVALID_AMOUNT();
 
-        loanOfferCount++;
-        loanOffers[loanOfferCount] = offer;
+        uint256 offerCount = ++loanOfferCount;
+        loanOffers[offerCount] = offer;
 
-        emit LoanOffered(loanOfferCount, loanOffers[loanOfferCount], block.timestamp);
+        emit LoanOffered(offerCount, msg.sender, offer, block.timestamp);
     }
 
     function rejectLoanOffer(uint256 loanId) public {
         LoanOffer memory offer = loanOffers[loanId];
-        delete loanOffers[loanId];
-
         if (msg.sender != offer.creditor || msg.sender != offer.debtor) revert NOT_CREDITOR_OR_DEBTOR();
+
+        delete loanOffers[loanId];
 
         emit LoanOfferRejected(loanId, msg.sender, block.timestamp);
     }
 
-    // TODO: add bulla tags
-    function acceptLoan(uint256 loanId, string calldata tokenURI) public {
+    // @dev NOTE: does not accept fee on transfer tokens
+    function acceptLoan(
+        uint256 loanId,
+        string calldata tokenURI,
+        bytes32 tag
+    ) public {
         LoanOffer memory offer = loanOffers[loanId];
-        delete loanOffers[loanId];
-
         if (msg.sender != offer.debtor) revert NOT_DEBTOR();
 
-        // create the claim
+        delete loanOffers[loanId];
+
+        uint256 claimAmount = offer.loanAmount + (offer.loanAmount * offer.interestBPS) / MAX_BPS;
         uint256 claimId = bullaClaim.createClaimWithURI(
             offer.creditor,
             offer.debtor,
             offer.description,
-            (offer.loanAmount * offer.interestBPS) / MAX_BPS,
+            claimAmount,
             block.timestamp + offer.termLength,
             offer.claimToken,
             offer.attachment,
             tokenURI
         );
 
+        // add 1 wei to force repaying status
         IERC20(offer.claimToken).safeTransferFrom(offer.creditor, address(this), offer.loanAmount + 1);
         IERC20(offer.claimToken).approve(address(bullaClaim), 1);
         bullaClaim.payClaim(claimId, 1);
 
         IERC20(offer.claimToken).safeTransfer(offer.debtor, offer.loanAmount);
 
+        emit BullaTagUpdated(bullaClaim.bullaManager(), claimId, msg.sender, tag, block.timestamp);
         emit LoanOfferAccepted(loanId, claimId, block.timestamp);
     }
 }
