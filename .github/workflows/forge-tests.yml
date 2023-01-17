@@ -23,7 +23,9 @@ jobs:
           version: nightly
 
       - name: Install dependencies
-        run: forge install
+        run: |
+          forge install
+          npm i
 
       - name: Run forge build
         run: |
