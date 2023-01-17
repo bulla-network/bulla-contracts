@@ -79,7 +79,6 @@ contract FrendLend {
         if (msg.value != fee) revert INSUFFICIENT_FEE();
         if (msg.sender != offer.creditor) revert NOT_CREDITOR();
         if (offer.termLength == 0) revert INVALID_TERM_LENGTH();
-        // if ((offer.loanAmount * offer.interestBPS) / MAX_BPS == 0) revert INVALID_AMOUNT();
 
         uint256 offerCount = ++loanOfferCount;
         loanOffers[offerCount] = offer;
