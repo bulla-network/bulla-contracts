@@ -6,17 +6,6 @@ import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import './interfaces/IBullaClaim.sol';
 import './BullaBanker.sol';
 
-struct LoanOffer {
-    uint24 interestBPS; // can be 0
-    uint40 termLength; // cannot be 0
-    uint128 loanAmount;
-    address creditor;
-    address debtor;
-    string description;
-    address claimToken;
-    Multihash attachment;
-}
-
 uint256 constant MAX_BPS = 10_000;
 
 /// @title FrendLend POC
@@ -25,6 +14,17 @@ uint256 constant MAX_BPS = 10_000;
 /// @notice This is experimental software, use at your own risk
 contract FrendLend {
     using SafeERC20 for IERC20;
+
+    struct LoanOffer {
+        uint24 interestBPS; // can be 0
+        uint40 termLength; // cannot be 0
+        uint128 loanAmount;
+        address creditor;
+        address debtor;
+        string description;
+        address claimToken;
+        Multihash attachment;
+    }
 
     /// address of the Bulla Claim contract
     IBullaClaim public bullaClaim;
@@ -42,7 +42,7 @@ contract FrendLend {
     event LoanOfferRejected(uint256 indexed loanId, address indexed rejectedBy, uint256 blocktime);
     event BullaTagUpdated(address indexed bullaManager, uint256 indexed tokenId, address indexed updatedBy, bytes32 tag, uint256 blocktime);
 
-    error INSUFFICIENT_FEE();
+    error INCORRECT_FEE();
     error NOT_CREDITOR();
     error NOT_DEBTOR();
     error NOT_CREDITOR_OR_DEBTOR();
@@ -90,7 +90,7 @@ contract FrendLend {
     ///         P4. `terms.termLength < type(uint40).max`
     ///         P5. `terms.termLength > 0`
     function offerLoan(LoanOffer calldata offer) public payable returns (uint256) {
-        if (msg.value != fee) revert INSUFFICIENT_FEE();
+        if (msg.value != fee) revert INCORRECT_FEE();
         if (msg.sender != offer.creditor) revert NOT_CREDITOR();
         if (offer.termLength == 0) revert INVALID_TERM_LENGTH();
 
@@ -112,7 +112,7 @@ contract FrendLend {
     ///         P1. the current msg.sender is either the creditor or debtor (covers: offer exists)
     function rejectLoanOffer(uint256 offerId) public {
         LoanOffer memory offer = loanOffers[offerId];
-        if (msg.sender != offer.creditor || msg.sender != offer.debtor) revert NOT_CREDITOR_OR_DEBTOR();
+        if (msg.sender != offer.creditor && msg.sender != offer.debtor) revert NOT_CREDITOR_OR_DEBTOR();
 
         delete loanOffers[offerId];
 
@@ -127,12 +127,11 @@ contract FrendLend {
     ///     Allows a debtor to accept a loan offer, and receive payment
     ///     This function will:
     ///         RES1. Delete the offer from storage
-    ///         RES2. Creates a new claim for the loan amount + interest 
-    ///         RES3. Transfers the offered loan amount to the debtor
+    ///         RES2. Creates a new claim for the loan amount + interest
+    ///         RES3. Transfers the offered loan amount from the creditor to the debtor
     ///         RES4. Puts the claim into a non-rejectable repaying state by paying 1 wei
-    ///         RES5. Transfers the loan amount from the creditor to the debtor
-    ///         RES6. Emits a BullaTagUpdated event with the claimId, the debtor address, a tag, and the current timestamp
-    ///         RES7. Emits a LoanOfferAccepted event with the offerId, the accepted claimId, and the current timestamp
+    ///         RES5. Emits a BullaTagUpdated event with the claimId, the debtor address, a tag, and the current timestamp
+    ///         RES6. Emits a LoanOfferAccepted event with the offerId, the accepted claimId, and the current timestamp
     ///     Given the following:
     ///         P1. the current msg.sender is the debtor listed on the offer (covers: offer exists)
     function acceptLoan(
