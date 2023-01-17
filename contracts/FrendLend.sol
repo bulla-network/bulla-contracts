@@ -75,36 +75,75 @@ contract FrendLend {
 
     ////// USER FUNCTIONS //////
 
-    function offerLoan(LoanOffer calldata offer) public payable {
+    /// @param offer claim creation params and loan info
+    /// @notice SPEC:
+    ///     Allows a user to create offer a loan to a potential debtor
+    ///     This function will:
+    ///         RES1. Increment the loan offer count in storage
+    ///         RES2. Store the offer parameters
+    ///         RES3. Emit a LoanOffered event with the offer parameters, the offerId, the creator, and the current timestamp
+    ///         RETURNS: the offerId
+    ///     Given the following:
+    ///         P1. `msg.value == fee`
+    ///         P2. `msg.sender == offer.creditor`
+    ///         P3. `terms.interestBPS < type(uint24).max`
+    ///         P4. `terms.termLength < type(uint40).max`
+    ///         P5. `terms.termLength > 0`
+    function offerLoan(LoanOffer calldata offer) public payable returns (uint256) {
         if (msg.value != fee) revert INSUFFICIENT_FEE();
         if (msg.sender != offer.creditor) revert NOT_CREDITOR();
         if (offer.termLength == 0) revert INVALID_TERM_LENGTH();
 
-        uint256 offerCount = ++loanOfferCount;
-        loanOffers[offerCount] = offer;
+        uint256 offerId = ++loanOfferCount;
+        loanOffers[offerId] = offer;
 
-        emit LoanOffered(offerCount, msg.sender, offer, block.timestamp);
+        emit LoanOffered(offerId, msg.sender, offer, block.timestamp);
+
+        return offerId;
     }
 
-    function rejectLoanOffer(uint256 loanId) public {
-        LoanOffer memory offer = loanOffers[loanId];
+    /// @param offerId the offerId to reject
+    /// @notice SPEC:
+    ///     Allows a debtor or a offerrer to reject (or rescind) a loan offer
+    ///     This function will:
+    ///         RES1. Delete the offer from storage
+    ///         RES2. Emit a LoanOfferRejected event with the offerId, the msg.sender, and the current timestamp
+    ///     Given the following:
+    ///         P1. the current msg.sender is either the creditor or debtor (covers: offer exists)
+    function rejectLoanOffer(uint256 offerId) public {
+        LoanOffer memory offer = loanOffers[offerId];
         if (msg.sender != offer.creditor || msg.sender != offer.debtor) revert NOT_CREDITOR_OR_DEBTOR();
 
-        delete loanOffers[loanId];
+        delete loanOffers[offerId];
 
-        emit LoanOfferRejected(loanId, msg.sender, block.timestamp);
+        emit LoanOfferRejected(offerId, msg.sender, block.timestamp);
     }
 
-    // @dev NOTE: does not accept fee on transfer tokens
+    /// @param offerId the offerId to acceot
+    /// @param tokenURI the tokenURI for the underlying claim
+    /// @param tag a bytes32 tag for the frontend
+    /// @notice WARNING: will not work with fee on transfer tokens
+    /// @notice SPEC:
+    ///     Allows a debtor to accept a loan offer, and receive payment
+    ///     This function will:
+    ///         RES1. Delete the offer from storage
+    ///         RES2. Creates a new claim for the loan amount + interest 
+    ///         RES3. Transfers the offered loan amount to the debtor
+    ///         RES4. Puts the claim into a non-rejectable repaying state by paying 1 wei
+    ///         RES5. Transfers the loan amount from the creditor to the debtor
+    ///         RES6. Emits a BullaTagUpdated event with the claimId, the debtor address, a tag, and the current timestamp
+    ///         RES7. Emits a LoanOfferAccepted event with the offerId, the accepted claimId, and the current timestamp
+    ///     Given the following:
+    ///         P1. the current msg.sender is the debtor listed on the offer (covers: offer exists)
     function acceptLoan(
-        uint256 loanId,
+        uint256 offerId,
         string calldata tokenURI,
         bytes32 tag
     ) public {
-        LoanOffer memory offer = loanOffers[loanId];
+        LoanOffer memory offer = loanOffers[offerId];
         if (msg.sender != offer.debtor) revert NOT_DEBTOR();
 
-        delete loanOffers[loanId];
+        delete loanOffers[offerId];
 
         uint256 claimAmount = offer.loanAmount + (offer.loanAmount * offer.interestBPS) / MAX_BPS + 1;
         uint256 claimId = bullaClaim.createClaimWithURI(
@@ -126,6 +165,6 @@ contract FrendLend {
         IERC20(offer.claimToken).safeTransfer(offer.debtor, offer.loanAmount);
 
         emit BullaTagUpdated(bullaClaim.bullaManager(), claimId, msg.sender, tag, block.timestamp);
-        emit LoanOfferAccepted(loanId, claimId, block.timestamp);
+        emit LoanOfferAccepted(offerId, claimId, block.timestamp);
     }
 }
