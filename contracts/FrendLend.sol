@@ -106,7 +106,7 @@ contract FrendLend {
 
         delete loanOffers[loanId];
 
-        uint256 claimAmount = offer.loanAmount + (offer.loanAmount * offer.interestBPS) / MAX_BPS;
+        uint256 claimAmount = offer.loanAmount + (offer.loanAmount * offer.interestBPS) / MAX_BPS + 1;
         uint256 claimId = bullaClaim.createClaimWithURI(
             offer.creditor,
             offer.debtor,
