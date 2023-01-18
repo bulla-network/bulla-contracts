@@ -40,7 +40,8 @@
     "instantPaymentAddress": "0xec6013D62Af8dfB65B8248204Dd1913d2f1F0181",
     "moduleFactoryAddress": "0x26719d2A1073291559A9F5465Fafe73972B31b1f",
     "bullaModuleMasterCopyAddress": "0xd285f3645Af07960C961B6DCBFe230Ee686aA12F",
-    "bullaFinanceAddress": "0xf7e917671b3137a5753De7f30597027909C482f5"
+    "bullaFinanceAddress": "0xf7e917671b3137a5753De7f30597027909C482f5",
+    "frendLendAddress": "0xD736e59952E9e4564AE1F7d2EC5552746d2E4Bb3"
   },
   "30": {
     "name": "RSK Mainnet",
