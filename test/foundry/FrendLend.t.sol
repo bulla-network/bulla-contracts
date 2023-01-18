@@ -316,10 +316,10 @@ contract TestFrendLend is Test {
         {
             Claim memory actualClaim = bullaClaim.getClaim(expectedClaimId);
             address creditor = ERC721(address(bullaClaim)).ownerOf(expectedClaimId);
-            uint128 claimAmount = uint128(((offer.loanAmount * offer.interestBPS) / MAX_BPS) + offer.loanAmount) + 1;
+            uint256 amountLent = actualClaim.claimAmount - ((offer.loanAmount * offer.interestBPS) / MAX_BPS) - 1;
             assertEq(creditor, offer.creditor);
             assertEq(actualClaim.debtor, offer.debtor);
-            assertEq(actualClaim.claimAmount, claimAmount);
+            assertEq(offer.loanAmount, amountLent);
             assertTrue(actualClaim.status == Status.Repaying);
             assertEq(actualClaim.dueBy, block.timestamp + offer.termLength);
             assertEq(actualClaim.claimToken, offer.claimToken);
