@@ -19,10 +19,10 @@ contract BullaFinance {
         uint40 termLength;
     }
 
+    // TODO: in v2, index both the creditor and the debtor for frontend RPC listening
     event FinancingOffered(uint256 indexed originatingClaimId, FinanceTerms terms, uint256 blocktime);
     event FinancingAccepted(uint256 indexed originatingClaimId, uint256 indexed financedClaimId, uint256 blocktime);
     event BullaTagUpdated(address indexed bullaManager, uint256 indexed tokenId, address indexed updatedBy, bytes32 tag, uint256 blocktime);
-    event FeeReclaimed(uint256 indexed originatingClaimId, uint256 blocktime);
 
     error INSUFFICIENT_FEE();
     error NOT_CREDITOR();

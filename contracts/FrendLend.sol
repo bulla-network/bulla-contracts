@@ -37,6 +37,7 @@ contract FrendLend {
     /// a mapping of id to the FinanceTerms offered by the creditor
     mapping(uint256 => LoanOffer) public loanOffers;
 
+    // TODO: in v2, index both the creditor and the debtor for frontend RPC listening
     event LoanOffered(uint256 indexed loanId, address indexed offeredBy, LoanOffer loanOffer, uint256 blocktime);
     event LoanOfferAccepted(uint256 indexed loanId, uint256 indexed claimId, uint256 blocktime);
     event LoanOfferRejected(uint256 indexed loanId, address indexed rejectedBy, uint256 blocktime);
