@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - main
+      - master
   
   pull_request:
 
@@ -23,7 +23,9 @@ jobs:
           version: nightly
 
       - name: Install dependencies
-        run: forge install
+        run: |
+          forge install
+          yarn
 
       - name: Run forge build
         run: |
