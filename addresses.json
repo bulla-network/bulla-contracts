@@ -42,6 +42,18 @@
     "bullaModuleMasterCopyAddress": "0xd285f3645Af07960C961B6DCBFe230Ee686aA12F",
     "bullaFinanceAddress": "0xf7e917671b3137a5753De7f30597027909C482f5"
   },
+  "10": {
+    "name": "optimism",
+    "deployedOnBlock": 74562791,
+    "bullaManagerAddress": "0xE14E624b29BcDa2ec409BBBf97037fEDe3803797",
+    "bullaBankerAddress": "0xce704a7Fae206ad009852258dDD8574B844eDa3b",
+    "bullaClaimERC721Address": "0x0af8C15D19058892cDEA66C8C74B7D7bB696FaD5",
+    "batchCreate": {
+      "address": "0x6985d6af038f177438a6681d1F64d4409Dc8AaC2",
+      "maxClaims": "55"
+    },
+    "instantPaymentAddress": "0xbe25A1086DE2b587B2D20E4B14c442cdA2437945"
+  },
   "30": {
     "name": "RSK Mainnet",
     "deployedOnBlock": 3788762,
