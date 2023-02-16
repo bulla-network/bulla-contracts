@@ -10,6 +10,8 @@ const lineReader = createInterface({
 
 const dateLabel = (date: Date) => date.toISOString().replace(/\D/g, "");
 
+const snooze = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 const deployCreator = async function () {
   const { deployments, getNamedAccounts, getChainId, network } = hre;
   const { deploy } = deployments;
@@ -24,6 +26,7 @@ const deployCreator = async function () {
       }),
   );
 
+  console.log('deploying BullaManager...');
   const { address: managerAddress, receipt: managerReceipt } = await deploy(
     "BullaManager",
     {
@@ -36,13 +39,17 @@ const deployCreator = async function () {
       log: true,
     }
   );
+  await snooze(2000);
 
+  console.log('deploying BullaClaimERC721...');
   const { address: ERC721Address } = await deploy("BullaClaimERC721", {
     from: deployer,
     log: true,
     args: [managerAddress, "https://ipfs.io/ipfs/"],
   });
 
+  await snooze(2000);
+  console.log('deploying BullaBanker...');
   const { address: bankerAddress, receipt: bankerReceipt } = await deploy(
     "BullaBanker",
     {
@@ -51,13 +58,17 @@ const deployCreator = async function () {
       args: [ERC721Address],
     }
   );
+  await snooze(2000);
 
+  console.log('deploying BatchCreate...');
   const { address: batchCreateAddress } = await deploy("BatchCreate", {
     from: deployer,
     log: true,
     args: [bankerAddress, ERC721Address, MAX_BATCH_OPERATIONS],
   });
+  await snooze(2000);
 
+  console.log('deploying BullaInstantPayment...');
   const { address: instantPaymentAddress } = await deploy("BullaInstantPayment", {
     from: deployer,
     log: true

@@ -102,6 +102,11 @@ const config: HardhatUserConfig = {
       accounts: [DEPLOY_PK],
       chainId: 122,
     },
+    optimism: {
+      url: `https://mainnet.optimism.io`,
+      accounts: [DEPLOY_PK],
+      chainId: 10,
+    },
   },
   namedAccounts: {
     deployer: {
@@ -119,6 +124,7 @@ const config: HardhatUserConfig = {
       1284: DEPLOYER_ADDRESS,
       42161: DEPLOYER_ADDRESS,
       122: DEPLOYER_ADDRESS,
+      10: DEPLOYER_ADDRESS,
     },
   },
   gasReporter: {
