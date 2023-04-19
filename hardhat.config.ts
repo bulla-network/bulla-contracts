@@ -46,6 +46,11 @@ const config: HardhatUserConfig = {
       accounts: [DEPLOY_PK],
       chainId: 5,
     },
+    base_goerli: {
+      url: `https://goerli.base.org`,
+      accounts: [DEPLOY_PK],
+      chainId: 84531,
+    },
     xdai: {
       url: "https://rpc.xdaichain.com",
       accounts: [DEPLOY_PK],
@@ -105,20 +110,7 @@ const config: HardhatUserConfig = {
   },
   namedAccounts: {
     deployer: {
-      default: 0,
-      4: DEPLOYER_ADDRESS,
-      5: DEPLOYER_ADDRESS,
-      100: DEPLOYER_ADDRESS,
-      44787: DEPLOYER_ADDRESS,
-      137: DEPLOYER_ADDRESS,
-      1666600000: DEPLOYER_ADDRESS,
-      1666700000: DEPLOYER_ADDRESS,
-      43114: DEPLOYER_ADDRESS,
-      30: DEPLOYER_ADDRESS,
-      1313161554: DEPLOYER_ADDRESS,
-      1284: DEPLOYER_ADDRESS,
-      42161: DEPLOYER_ADDRESS,
-      122: DEPLOYER_ADDRESS,
+      default: DEPLOYER_ADDRESS,
     },
   },
   gasReporter: {
@@ -128,7 +120,17 @@ const config: HardhatUserConfig = {
     // coinmarketcap: COINMARKETCAP_API,
   },
   etherscan: {
-    apiKey: ETHERSCAN_API_KEY
+    apiKey: ETHERSCAN_API_KEY,
+    customChains: [
+      {
+        network: "base-goerli",
+        chainId: 84531,
+        urls: {
+         apiURL: "https://api-goerli.basescan.org/api",
+         browserURL: "https://goerli.basescan.org"
+        }
+      }
+    ]
   }
 };
 export default config;

@@ -1,18 +1,14 @@
 import { BigNumber } from 'ethers';
 import { writeFileSync } from 'fs';
 import hre from 'hardhat';
-import { createInterface } from 'readline';
 import addresses from '../addresses.json';
-
-const lineReader = createInterface({
-    input: process.stdin,
-    output: process.stdout,
-});
+import { getLineReader } from './deploy';
 
 export const deployBullaFinance = async function () {
     const { deployments, getNamedAccounts, getChainId, ethers } = hre;
     const { deploy } = deployments;
     const { deployer } = await getNamedAccounts();
+    const lineReader = getLineReader();
 
     let contractAdmin: string | undefined = await new Promise(resolve =>
         lineReader.question('admin address?: (optional. press enter to use deployer) \n...\n', address => {
@@ -22,7 +18,6 @@ export const deployBullaFinance = async function () {
 
     let contractFee: BigNumber | undefined = await new Promise(resolve =>
         lineReader.question('fee amount?: (in native token. e.g: .005) \n...\n', fee => {
-            lineReader.close();
             resolve(ethers.utils.parseEther(fee) ?? undefined);
         }),
     );
@@ -56,9 +51,10 @@ export const deployBullaFinance = async function () {
     return deployInfo;
 };
 
-deployBullaFinance()
-    .then(() => process.exit(0))
-    .catch(error => {
-        console.error(error);
-        process.exit(1);
-    });
+// uncomment this line to run the script individually
+// deployBullaFinance()
+//     .then(() => process.exit(0))
+//     .catch(error => {
+//         console.error(error);
+//         process.exit(1);
+//     });
