@@ -4,22 +4,7 @@ import { createInterface, Interface } from 'readline';
 import addresses from '../addresses.json';
 import { deployBullaFinance } from './deploy-bullaFinance';
 import { deployFrendLend } from './deploy-frendLend';
-
-declare global {
-    var lineReader: Interface;
-}
-
-export const getLineReader = () => {
-    if (!globalThis.lineReader) {
-        const lineReader = createInterface({
-            input: process.stdin,
-            output: process.stdout,
-        });
-        globalThis.lineReader = lineReader;
-        return lineReader;
-    }
-    return globalThis.lineReader;
-};
+import { getLineReader } from './utils';
 
 const dateLabel = (date: Date) => date.toISOString().replace(/\D/g, '');
 

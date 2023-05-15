@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers';
 import { writeFileSync } from 'fs';
 import hre from 'hardhat';
 import addresses from '../addresses.json';
-import { getLineReader } from './deploy';
+import { getLineReader } from './utils';
 
 export const deployBullaFinance = async function () {
     const { deployments, getNamedAccounts, getChainId, ethers } = hre;
