@@ -95,7 +95,9 @@
       "maxClaims": 40
     },
     "moduleFactoryAddress": "0x71E634a30a6FEc0800C1d2740B46EC56fA32aA53",
-    "bullaModuleMasterCopyAddress": "0x5E279b981E4162a30eeE3F3eC4EbFd66ccA09222"
+    "bullaModuleMasterCopyAddress": "0x5E279b981E4162a30eeE3F3eC4EbFd66ccA09222",
+    "bullaFinanceAddress": "0xF7d793dc425E64CA93Cf92bb6cfF6173bdbA3995",
+    "frendLendAddress": "0x60b49BB18b60dE3A95235A4d5F42062dD1D461E2"
   },
   "1284": {
     "name": "Moonbeam",
