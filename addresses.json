@@ -70,6 +70,18 @@
     "moduleFactoryAddress": "0xfbdf5dff946200B038e1455E532D9795F030aB91",
     "bullaModuleMasterCopyAddress": "0x28BE4AB88bb7EA7b93e8eB155fFDa6010cde3C48"
   },
+  "56": {
+    "name": "bnb",
+    "deployedOnBlock": 28345705,
+    "bullaManagerAddress": "0x15250D092a789e2304472eD581D587B714615d24",
+    "bullaBankerAddress": "0x69E7e315a6fea4775e568337ca58F1395C0c01fc",
+    "bullaClaimERC721Address": "0xBAD5c53cC6b37d706E6153d397864E5fdbD38170",
+    "batchCreate": {
+      "address": "0x15C43c1483816C0DEfcb3154b09A9e450d139033",
+      "maxClaims": "20"
+    },
+    "instantPaymentAddress": "0xa9a04d0C22B6f264BC72a108d124f25BD199c928"
+  },
   "100": {
     "name": "Gnosis Chain",
     "deployedOnBlock": 18704278,
