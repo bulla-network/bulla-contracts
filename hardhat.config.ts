@@ -107,6 +107,11 @@ const config: HardhatUserConfig = {
             accounts: [DEPLOY_PK],
             chainId: 122,
         },
+        optimism: {
+            url: 'https://mainnet.optimism.io',
+            accounts: [DEPLOY_PK],
+            chainId: 10,
+        },
         bnb: {
             url: `https://bsc-dataseed.binance.org/`,
             accounts: [DEPLOY_PK],
