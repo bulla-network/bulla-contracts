@@ -20,8 +20,6 @@
         "deploy:goerli": "npx hardhat run --network goerli scripts/deploy.ts",
         "deploy:base_goerli": "npx hardhat run --network base_goerli scripts/deploy.ts",
         "deploy:xdai": "npx hardhat run --network xdai scripts/deploy.ts",
-        "deploy:xdai-bullaFinance": "npx hardhat run --network xdai scripts/deploy-bullaFinance.ts",
-        "deploy:xdai-frendLend": "npx hardhat run --network xdai scripts/deploy-frendLend.ts",
         "deploy:avalanche": "npx hardhat run --network avalanche_cChain scripts/deploy.ts",
         "deploy:harmony": "npx hardhat run --network harmony scripts/deploy.ts",
         "deploy:harmony_testnet": "npx hardhat run --network harmony_testnet scripts/deploy.ts",
