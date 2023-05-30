@@ -52,7 +52,7 @@ const config: HardhatUserConfig = {
             chainId: 84531,
         },
         xdai: {
-            url: 'https://rpc.xdaichain.com',
+            url: 'https://rpc.gnosischain.com/',
             accounts: [DEPLOY_PK],
             chainId: 100,
         },
