@@ -43,6 +43,22 @@
     "bullaFinanceAddress": "0xf7e917671b3137a5753De7f30597027909C482f5",
     "frendLendAddress": "0xD736e59952E9e4564AE1F7d2EC5552746d2E4Bb3"
   },
+  "10": {
+    "name": "optimism",
+    "deployedOnBlock": 74562791,
+    "bullaManagerAddress": "0xE14E624b29BcDa2ec409BBBf97037fEDe3803797",
+    "bullaBankerAddress": "0xce704a7Fae206ad009852258dDD8574B844eDa3b",
+    "bullaClaimERC721Address": "0x0af8C15D19058892cDEA66C8C74B7D7bB696FaD5",
+    "batchCreate": {
+        "address": "0x6985d6af038f177438a6681d1F64d4409Dc8AaC2",
+        "maxClaims": "55"
+    },
+    "instantPaymentAddress": "0xbe25A1086DE2b587B2D20E4B14c442cdA2437945",
+    "moduleFactoryAddress": "0x772b675A4180B4F48d9D816619620664f90Cf281",
+    "bullaModuleMasterCopyAddress": "0x2544E95e643F0d27dD4CA13496D8155D052aC030",
+    "frendLendAddress": "0x3702D060cbB102b6AebF40B40880F77BeF3d7225",
+    "bullaFinanceAddress": "0x5369F71e1Fe238f0e6D938c734E2D2aE7296F362"
+  },
   "30": {
     "name": "RSK Mainnet",
     "deployedOnBlock": 3788762,
@@ -138,7 +154,9 @@
       "maxClaims": 255
     },
     "moduleFactoryAddress": "0x26719d2A1073291559A9F5465Fafe73972B31b1f",
-    "bullaModuleMasterCopyAddress": "0xec6013D62Af8dfB65B8248204Dd1913d2f1F0181"
+    "bullaModuleMasterCopyAddress": "0xec6013D62Af8dfB65B8248204Dd1913d2f1F0181",
+    "frendLendAddress": "0xF75313de7055097b07e621DDD7FEEe9ea3e2147d",
+    "bullaFinanceAddress": "0x5cBfeeF2Af2313Bd9C28484Af7508133Fa99E464"
   },
   "42220": {
     "name": "Celo Mainnet",
