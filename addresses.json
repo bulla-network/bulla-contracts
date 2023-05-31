@@ -174,7 +174,9 @@
       "maxClaims": 40
     },
     "moduleFactoryAddress": "0xD5585F346414d57B04A9798F246C7DBfDf64fC35",
-    "masterCopyAddress": "0x25e6F45D4D8db871bb5D7F50D42EC7BcbDF32Fb3"
+    "masterCopyAddress": "0x25e6F45D4D8db871bb5D7F50D42EC7BcbDF32Fb3",
+    "bullaFinanceAddress": "0x15250D092a789e2304472eD581D587B714615d24",
+    "frendLendAddress": "0xBAD5c53cC6b37d706E6153d397864E5fdbD38170"
   },
   "43114": {
     "name": "Avalanche Mainnet",
