@@ -50,8 +50,8 @@
     "bullaBankerAddress": "0xce704a7Fae206ad009852258dDD8574B844eDa3b",
     "bullaClaimERC721Address": "0x0af8C15D19058892cDEA66C8C74B7D7bB696FaD5",
     "batchCreate": {
-        "address": "0x6985d6af038f177438a6681d1F64d4409Dc8AaC2",
-        "maxClaims": "55"
+      "address": "0x6985d6af038f177438a6681d1F64d4409Dc8AaC2",
+      "maxClaims": "55"
     },
     "instantPaymentAddress": "0xbe25A1086DE2b587B2D20E4B14c442cdA2437945",
     "moduleFactoryAddress": "0x772b675A4180B4F48d9D816619620664f90Cf281",
@@ -142,7 +142,9 @@
       "maxClaims": 40
     },
     "moduleFactoryAddress": "0x68da2c92b60337aA55BAcF0d7e61126eDb535752",
-    "bullaModuleMasterCopyAddress": "0xAA6E5B4E34f3C3BA4D90694909dca7DDdf058079"
+    "bullaModuleMasterCopyAddress": "0xAA6E5B4E34f3C3BA4D90694909dca7DDdf058079",
+    "bullaFinanceAddress": "0x15250D092a789e2304472eD581D587B714615d24",
+    "frendLendAddress": "0xBAD5c53cC6b37d706E6153d397864E5fdbD38170"
   },
   "42161": {
     "name": "Arbitrum",
