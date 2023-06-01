@@ -190,7 +190,9 @@
       "maxClaims": 40
     },
     "moduleFactoryAddress": "0x101452DEF98B40A64d28A964Df1e35170aD5c647",
-    "bullaModuleMasterCopyAddress": "0xF9C5C979c4d80ADf5Da07e943658617d0110cC92"
+    "bullaModuleMasterCopyAddress": "0xF9C5C979c4d80ADf5Da07e943658617d0110cC92",
+    "bullaFinanceAddress": "0x15250D092a789e2304472eD581D587B714615d24",
+    "frendLendAddress": "0xBAD5c53cC6b37d706E6153d397864E5fdbD38170"
   },
   "84531": {
     "name": "base_goerli",
