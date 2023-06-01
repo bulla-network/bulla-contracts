@@ -234,6 +234,8 @@
       "maxClaims": 40
     },
     "moduleFactoryAddress": "0x1EdEc726a0DEEad8E92a1a850b7bFD9c7356b9EC",
-    "bullaModuleMasterCopyAddress": "0x5a632dB79720Ddc32a441F15019e496751E68F72"
+    "bullaModuleMasterCopyAddress": "0x5a632dB79720Ddc32a441F15019e496751E68F72",
+    "bullaFinanceAddress": "0x15250D092a789e2304472eD581D587B714615d24",
+    "frendLendAddress": "0xBAD5c53cC6b37d706E6153d397864E5fdbD38170"
   }
 }
