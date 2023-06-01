@@ -71,7 +71,8 @@
       "maxClaims": 20
     },
     "moduleFactoryAddress": "0xfbdf5dff946200B038e1455E532D9795F030aB91",
-    "bullaModuleMasterCopyAddress": "0x28BE4AB88bb7EA7b93e8eB155fFDa6010cde3C48"
+    "bullaModuleMasterCopyAddress": "0x28BE4AB88bb7EA7b93e8eB155fFDa6010cde3C48",
+    "bullaFinanceAddress": "0x15250D092a789e2304472eD581D587B714615d24"
   },
   "56": {
     "name": "bnb",
