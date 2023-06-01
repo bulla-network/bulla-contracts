@@ -72,7 +72,8 @@
     },
     "moduleFactoryAddress": "0xfbdf5dff946200B038e1455E532D9795F030aB91",
     "bullaModuleMasterCopyAddress": "0x28BE4AB88bb7EA7b93e8eB155fFDa6010cde3C48",
-    "bullaFinanceAddress": "0x15250D092a789e2304472eD581D587B714615d24"
+    "bullaFinanceAddress": "0x15250D092a789e2304472eD581D587B714615d24",
+    "frendLendAddress": "0xBAD5c53cC6b37d706E6153d397864E5fdbD38170"
   },
   "56": {
     "name": "bnb",
