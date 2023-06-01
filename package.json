@@ -30,7 +30,9 @@
         "deploy:moonbeam": "npx hardhat run --network moonbeam scripts/deploy.ts",
         "deploy:arbitrum": "npx hardhat run --network arbitrum scripts/deploy.ts",
         "deploy:fuse": "npx hardhat run --network fuse scripts/deploy.ts",
-        "deploy:bnb": "npx hardhat run --network bnb scripts/deploy.ts"
+        "deploy:bnb": "npx hardhat run --network bnb scripts/deploy.ts",
+        "verify": "hardhat etherscan-verify"
+
     },
     "dependencies": {
         "@gnosis.pm/safe-contracts": "^1.3.0",
