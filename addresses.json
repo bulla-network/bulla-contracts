@@ -84,6 +84,7 @@
       "maxClaims": 20
     },
     "bullaInstantPaymentAddress": "0xa9a04d0C22B6f264BC72a108d124f25BD199c928",
+    "bullaFinanceAddress": "0x3702D060cbB102b6AebF40B40880F77BeF3d7225",
     "frendLendAddress": "0x5369F71e1Fe238f0e6D938c734E2D2aE7296F362"
   },
   "100": {
