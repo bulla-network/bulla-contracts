@@ -112,7 +112,9 @@
       "address": "0x6985d6af038f177438a6681d1F64d4409Dc8AaC2",
       "maxClaims": "30"
     },
-    "instantPaymentAddress": "0xbe25A1086DE2b587B2D20E4B14c442cdA2437945"
+    "instantPaymentAddress": "0xbe25A1086DE2b587B2D20E4B14c442cdA2437945",
+    "bullaFinanceAddress": "0x15250D092a789e2304472eD581D587B714615d24",
+    "frendLendAddress": "0xBAD5c53cC6b37d706E6153d397864E5fdbD38170"
   },
   "137": {
     "name": "Matic(Polygon) Mainnet",
