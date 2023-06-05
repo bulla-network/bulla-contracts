@@ -11,7 +11,9 @@
       "maxClaims": 100
     },
     "moduleFactoryAddress": "0xCf4254cF35EB7F13B7e02bA774f5502f5f5C7A7d",
-    "bullaModuleMasterCopyAddress": "0xAA6E5B4E34f3C3BA4D90694909dca7DDdf058079"
+    "bullaModuleMasterCopyAddress": "0xAA6E5B4E34f3C3BA4D90694909dca7DDdf058079",
+    "bullaFinanceAddress": "0x5369F71e1Fe238f0e6D938c734E2D2aE7296F362",
+    "frendLendAddress": "0xbAB429068fc4A5455849f58C4Bf04F398e8006c1"
   },
   "4": {
     "name": "Testnet Rinkeby",
