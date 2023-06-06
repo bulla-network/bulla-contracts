@@ -57,7 +57,7 @@ const config: HardhatUserConfig = {
             chainId: 100,
         },
         rsk: {
-            url: `https://rsk.getblock.io/mainnet/?api_key=${GET_BLOCK_API_KEY}`,
+            url: `https://rsk.getblock.io/${GET_BLOCK_API_KEY}/mainnet/`,
             accounts: [DEPLOY_PK],
             chainId: 30,
         },
