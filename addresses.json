@@ -11,7 +11,9 @@
             "maxClaims": 100
         },
         "moduleFactoryAddress": "0xCf4254cF35EB7F13B7e02bA774f5502f5f5C7A7d",
-        "bullaModuleMasterCopyAddress": "0xAA6E5B4E34f3C3BA4D90694909dca7DDdf058079"
+        "bullaModuleMasterCopyAddress": "0xAA6E5B4E34f3C3BA4D90694909dca7DDdf058079",
+        "bullaFinanceAddress": "0x5369F71e1Fe238f0e6D938c734E2D2aE7296F362",
+        "frendLendAddress": "0xbAB429068fc4A5455849f58C4Bf04F398e8006c1"
     },
     "4": {
         "name": "Testnet Rinkeby",
@@ -40,7 +42,8 @@
         "instantPaymentAddress": "0xec6013D62Af8dfB65B8248204Dd1913d2f1F0181",
         "moduleFactoryAddress": "0x26719d2A1073291559A9F5465Fafe73972B31b1f",
         "bullaModuleMasterCopyAddress": "0xd285f3645Af07960C961B6DCBFe230Ee686aA12F",
-        "bullaFinanceAddress": "0xf7e917671b3137a5753De7f30597027909C482f5"
+        "bullaFinanceAddress": "0xf7e917671b3137a5753De7f30597027909C482f5",
+        "frendLendAddress": "0xD736e59952E9e4564AE1F7d2EC5552746d2E4Bb3"
     },
     "10": {
         "name": "optimism",
@@ -54,7 +57,9 @@
         },
         "instantPaymentAddress": "0xbe25A1086DE2b587B2D20E4B14c442cdA2437945",
         "moduleFactoryAddress": "0x772b675A4180B4F48d9D816619620664f90Cf281",
-        "bullaModuleMasterCopyAddress": "0x2544E95e643F0d27dD4CA13496D8155D052aC030"
+        "bullaModuleMasterCopyAddress": "0x2544E95e643F0d27dD4CA13496D8155D052aC030",
+        "frendLendAddress": "0x3702D060cbB102b6AebF40B40880F77BeF3d7225",
+        "bullaFinanceAddress": "0x5369F71e1Fe238f0e6D938c734E2D2aE7296F362"
     },
     "30": {
         "name": "RSK Mainnet",
@@ -68,7 +73,9 @@
             "maxClaims": 20
         },
         "moduleFactoryAddress": "0xfbdf5dff946200B038e1455E532D9795F030aB91",
-        "bullaModuleMasterCopyAddress": "0x28BE4AB88bb7EA7b93e8eB155fFDa6010cde3C48"
+        "bullaModuleMasterCopyAddress": "0x28BE4AB88bb7EA7b93e8eB155fFDa6010cde3C48",
+        "bullaFinanceAddress": "0x15250D092a789e2304472eD581D587B714615d24",
+        "frendLendAddress": "0xBAD5c53cC6b37d706E6153d397864E5fdbD38170"
     },
     "56": {
         "name": "bnb",
@@ -78,9 +85,9 @@
         "bullaClaimERC721Address": "0xBAD5c53cC6b37d706E6153d397864E5fdbD38170",
         "batchCreate": {
             "address": "0x15C43c1483816C0DEfcb3154b09A9e450d139033",
-            "maxClaims": "20"
+            "maxClaims": 20
         },
-        "instantPaymentAddress": "0xa9a04d0C22B6f264BC72a108d124f25BD199c928",
+        "bullaInstantPaymentAddress": "0xa9a04d0C22B6f264BC72a108d124f25BD199c928",
         "bullaFinanceAddress": "0x3702D060cbB102b6AebF40B40880F77BeF3d7225",
         "frendLendAddress": "0x5369F71e1Fe238f0e6D938c734E2D2aE7296F362"
     },
@@ -96,7 +103,9 @@
             "maxClaims": 40
         },
         "moduleFactoryAddress": "0x8ad90CbA0786ed3E89F6f55a86d4B90728223116",
-        "bullaModuleMasterCopyAddress": "0x9c96fc42B87922f0f22603fF8a31Ee8768cc29F2"
+        "bullaModuleMasterCopyAddress": "0x9c96fc42B87922f0f22603fF8a31Ee8768cc29F2",
+        "bullaFinanceAddress": "0x69E7e315a6fea4775e568337ca58F1395C0c01fc",
+        "frendLendAddress": "0x15C43c1483816C0DEfcb3154b09A9e450d139033"
     },
     "122": {
         "name": "fuse",
@@ -108,7 +117,9 @@
             "address": "0x6985d6af038f177438a6681d1F64d4409Dc8AaC2",
             "maxClaims": "30"
         },
-        "instantPaymentAddress": "0xbe25A1086DE2b587B2D20E4B14c442cdA2437945"
+        "instantPaymentAddress": "0xbe25A1086DE2b587B2D20E4B14c442cdA2437945",
+        "bullaFinanceAddress": "0x15250D092a789e2304472eD581D587B714615d24",
+        "frendLendAddress": "0xBAD5c53cC6b37d706E6153d397864E5fdbD38170"
     },
     "137": {
         "name": "Matic(Polygon) Mainnet",
@@ -122,7 +133,9 @@
             "maxClaims": 40
         },
         "moduleFactoryAddress": "0x71E634a30a6FEc0800C1d2740B46EC56fA32aA53",
-        "bullaModuleMasterCopyAddress": "0x5E279b981E4162a30eeE3F3eC4EbFd66ccA09222"
+        "bullaModuleMasterCopyAddress": "0x5E279b981E4162a30eeE3F3eC4EbFd66ccA09222",
+        "bullaFinanceAddress": "0xF7d793dc425E64CA93Cf92bb6cfF6173bdbA3995",
+        "frendLendAddress": "0x60b49BB18b60dE3A95235A4d5F42062dD1D461E2"
     },
     "1284": {
         "name": "Moonbeam",
@@ -136,7 +149,9 @@
             "maxClaims": 40
         },
         "moduleFactoryAddress": "0x68da2c92b60337aA55BAcF0d7e61126eDb535752",
-        "bullaModuleMasterCopyAddress": "0xAA6E5B4E34f3C3BA4D90694909dca7DDdf058079"
+        "bullaModuleMasterCopyAddress": "0xAA6E5B4E34f3C3BA4D90694909dca7DDdf058079",
+        "bullaFinanceAddress": "0x15250D092a789e2304472eD581D587B714615d24",
+        "frendLendAddress": "0xBAD5c53cC6b37d706E6153d397864E5fdbD38170"
     },
     "42161": {
         "name": "Arbitrum",
@@ -150,7 +165,9 @@
             "maxClaims": 255
         },
         "moduleFactoryAddress": "0x26719d2A1073291559A9F5465Fafe73972B31b1f",
-        "bullaModuleMasterCopyAddress": "0xec6013D62Af8dfB65B8248204Dd1913d2f1F0181"
+        "bullaModuleMasterCopyAddress": "0xec6013D62Af8dfB65B8248204Dd1913d2f1F0181",
+        "frendLendAddress": "0xF75313de7055097b07e621DDD7FEEe9ea3e2147d",
+        "bullaFinanceAddress": "0x5cBfeeF2Af2313Bd9C28484Af7508133Fa99E464"
     },
     "42220": {
         "name": "Celo Mainnet",
@@ -164,7 +181,9 @@
             "maxClaims": 40
         },
         "moduleFactoryAddress": "0xD5585F346414d57B04A9798F246C7DBfDf64fC35",
-        "masterCopyAddress": "0x25e6F45D4D8db871bb5D7F50D42EC7BcbDF32Fb3"
+        "masterCopyAddress": "0x25e6F45D4D8db871bb5D7F50D42EC7BcbDF32Fb3",
+        "bullaFinanceAddress": "0x15250D092a789e2304472eD581D587B714615d24",
+        "frendLendAddress": "0xBAD5c53cC6b37d706E6153d397864E5fdbD38170"
     },
     "43114": {
         "name": "Avalanche Mainnet",
@@ -178,7 +197,23 @@
             "maxClaims": 40
         },
         "moduleFactoryAddress": "0x101452DEF98B40A64d28A964Df1e35170aD5c647",
-        "bullaModuleMasterCopyAddress": "0xF9C5C979c4d80ADf5Da07e943658617d0110cC92"
+        "bullaModuleMasterCopyAddress": "0xF9C5C979c4d80ADf5Da07e943658617d0110cC92",
+        "bullaFinanceAddress": "0x15250D092a789e2304472eD581D587B714615d24",
+        "frendLendAddress": "0xBAD5c53cC6b37d706E6153d397864E5fdbD38170"
+    },
+    "84531": {
+        "name": "base_goerli",
+        "deployedOnBlock": 3375601,
+        "bullaManagerAddress": "0x1b4DB52FD952F70d3D28bfbd406dB71940eD8cA9",
+        "bullaBankerAddress": "0x873C25e47f3C5e4bC524771DFed53B5B36ad5eA2",
+        "bullaClaimERC721Address": "0x127948A4286A67A0A5Cb56a2D0d54881077A4889",
+        "batchCreate": {
+            "address": "0x6811De39DC03245A15D54e2bc615821f9997bbC4",
+            "maxClaims": "255"
+        },
+        "bullaInstantPaymentAddress": "0xec6013D62Af8dfB65B8248204Dd1913d2f1F0181",
+        "bullaFinanceAddress": "0x26719d2A1073291559A9F5465Fafe73972B31b1f",
+        "frendLendAddress": "0xd3A33aE646701507eB043e2DB16f8C1428241F53"
     },
     "1313161554": {
         "name": "Aurora Mainnet",
@@ -206,6 +241,8 @@
             "maxClaims": 40
         },
         "moduleFactoryAddress": "0x1EdEc726a0DEEad8E92a1a850b7bFD9c7356b9EC",
-        "bullaModuleMasterCopyAddress": "0x5a632dB79720Ddc32a441F15019e496751E68F72"
+        "bullaModuleMasterCopyAddress": "0x5a632dB79720Ddc32a441F15019e496751E68F72",
+        "bullaFinanceAddress": "0x15250D092a789e2304472eD581D587B714615d24",
+        "frendLendAddress": "0xBAD5c53cC6b37d706E6153d397864E5fdbD38170"
     }
 }

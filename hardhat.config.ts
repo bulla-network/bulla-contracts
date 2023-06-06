@@ -46,13 +46,18 @@ const config: HardhatUserConfig = {
             accounts: [DEPLOY_PK],
             chainId: 5,
         },
+        base_goerli: {
+            url: `https://goerli.base.org`,
+            accounts: [DEPLOY_PK],
+            chainId: 84531,
+        },
         xdai: {
-            url: 'https://rpc.xdaichain.com',
+            url: 'https://rpc.gnosischain.com/',
             accounts: [DEPLOY_PK],
             chainId: 100,
         },
         rsk: {
-            url: `https://rsk.getblock.io/mainnet/?api_key=${GET_BLOCK_API_KEY}`,
+            url: `https://rsk.getblock.io/${GET_BLOCK_API_KEY}/mainnet/`,
             accounts: [DEPLOY_PK],
             chainId: 30,
         },
@@ -103,7 +108,7 @@ const config: HardhatUserConfig = {
             chainId: 122,
         },
         optimism: {
-            url: `https://mainnet.optimism.io`,
+            url: 'https://mainnet.optimism.io',
             accounts: [DEPLOY_PK],
             chainId: 10,
         },
@@ -115,22 +120,7 @@ const config: HardhatUserConfig = {
     },
     namedAccounts: {
         deployer: {
-            default: 0,
-            4: DEPLOYER_ADDRESS,
-            5: DEPLOYER_ADDRESS,
-            100: DEPLOYER_ADDRESS,
-            44787: DEPLOYER_ADDRESS,
-            137: DEPLOYER_ADDRESS,
-            1666600000: DEPLOYER_ADDRESS,
-            1666700000: DEPLOYER_ADDRESS,
-            43114: DEPLOYER_ADDRESS,
-            30: DEPLOYER_ADDRESS,
-            1313161554: DEPLOYER_ADDRESS,
-            1284: DEPLOYER_ADDRESS,
-            42161: DEPLOYER_ADDRESS,
-            122: DEPLOYER_ADDRESS,
-            10: DEPLOYER_ADDRESS,
-            56: DEPLOYER_ADDRESS,
+            default: DEPLOYER_ADDRESS,
         },
     },
     gasReporter: {
@@ -141,6 +131,16 @@ const config: HardhatUserConfig = {
     },
     etherscan: {
         apiKey: ETHERSCAN_API_KEY,
+        customChains: [
+            {
+                network: 'base-goerli',
+                chainId: 84531,
+                urls: {
+                    apiURL: 'https://api-goerli.basescan.org/api',
+                    browserURL: 'https://goerli.basescan.org',
+                },
+            },
+        ],
     },
 };
 export default config;

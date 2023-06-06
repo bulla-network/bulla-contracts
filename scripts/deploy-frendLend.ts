@@ -4,7 +4,7 @@ import hre from 'hardhat';
 import addresses from '../addresses.json';
 import { getLineReader } from './utils';
 
-export const deployBullaFinance = async function () {
+export const deployFrendLend = async function () {
     const { deployments, getNamedAccounts, getChainId, ethers } = hre;
     const { deploy } = deployments;
     const { deployer } = await getNamedAccounts();
@@ -18,6 +18,7 @@ export const deployBullaFinance = async function () {
 
     let contractFee: BigNumber | undefined = await new Promise(resolve =>
         lineReader.question('fee amount?: (in native token. e.g: .005) \n...\n', fee => {
+            lineReader.close();
             resolve(ethers.utils.parseEther(fee) ?? undefined);
         }),
     );
@@ -25,7 +26,7 @@ export const deployBullaFinance = async function () {
     const chainId = await getChainId();
     const contractAddresses = addresses[chainId as keyof typeof addresses];
 
-    const { address: bullaFinanceAddress } = await deploy('BullaFinance', {
+    const { address: frendLendAddress } = await deploy('FrendLend', {
         from: deployer,
         args: [contractAddresses.bullaClaimERC721Address, contractAdmin ?? deployer, contractFee ?? BigNumber.from(0)],
     });
@@ -34,7 +35,7 @@ export const deployBullaFinance = async function () {
         ...addresses,
         [chainId]: {
             ...(addresses[chainId as keyof typeof addresses] ?? {}),
-            bullaFinanceAddress,
+            frendLendAddress,
         },
     };
 
@@ -45,14 +46,14 @@ export const deployBullaFinance = async function () {
         deployer,
         chainId: await getChainId(),
         currentTime: now.toISOString(),
-        bullaFinanceAddress,
+        frendLendAddress,
     };
-    console.log('Bulla Finance Deployment: \n', deployInfo);
+    console.log('FrendLend Deployment: \n', deployInfo);
     return deployInfo;
 };
 
 // uncomment this line to run the script individually
-deployBullaFinance()
+deployFrendLend()
     .then(() => process.exit(0))
     .catch(error => {
         console.error(error);
