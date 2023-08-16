@@ -18,6 +18,7 @@
         "deploy:mainnet": "npx hardhat run --network mainnet scripts/deploy.ts",
         "deploy:rinkeby": "npx hardhat run --network rinkeby scripts/deploy.ts",
         "deploy:goerli": "npx hardhat run --network goerli scripts/deploy.ts",
+        "deploy:base": "npx hardhat run --network base scripts/deploy.ts",
         "deploy:base_goerli": "npx hardhat run --network base_goerli scripts/deploy.ts",
         "deploy:xdai": "npx hardhat run --network xdai scripts/deploy.ts",
         "deploy:avalanche": "npx hardhat run --network avalanche_cChain scripts/deploy.ts",
