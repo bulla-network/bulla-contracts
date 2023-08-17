@@ -153,6 +153,20 @@
         "bullaFinanceAddress": "0x15250D092a789e2304472eD581D587B714615d24",
         "frendLendAddress": "0xBAD5c53cC6b37d706E6153d397864E5fdbD38170"
     },
+    "8453": {
+        "name": "base",
+        "deployedOnBlock": 2715267,
+        "bullaManagerAddress": "0x127948A4286A67A0A5Cb56a2D0d54881077A4889",
+        "bullaBankerAddress": "0x6811De39DC03245A15D54e2bc615821f9997bbC4",
+        "bullaClaimERC721Address": "0x873C25e47f3C5e4bC524771DFed53B5B36ad5eA2",
+        "batchCreate": {
+            "address": "0xec6013D62Af8dfB65B8248204Dd1913d2f1F0181",
+            "maxClaims": 255
+        },
+        "bullaInstantPaymentAddress": "0x26719d2A1073291559A9F5465Fafe73972B31b1f",
+        "bullaFinanceAddress": "0xd3A33aE646701507eB043e2DB16f8C1428241F53",
+        "frendLendAddress": "0x44ad74A14f268551Dd8619B094769C10089239C8"
+    },
     "42161": {
         "name": "Arbitrum",
         "deployedOnBlock": 6898158,

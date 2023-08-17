@@ -51,6 +51,11 @@ const config: HardhatUserConfig = {
             accounts: [DEPLOY_PK],
             chainId: 84531,
         },
+        base: {
+            url: `https://mainnet.base.org`,
+            accounts: [DEPLOY_PK],
+            chainId: 8453,
+        },
         xdai: {
             url: 'https://rpc.gnosischain.com/',
             accounts: [DEPLOY_PK],
