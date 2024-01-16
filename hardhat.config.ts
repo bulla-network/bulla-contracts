@@ -46,6 +46,11 @@ const config: HardhatUserConfig = {
             accounts: [DEPLOY_PK],
             chainId: 5,
         },
+        sepolia: {
+            url: `https://sepolia.infura.io/v3/${INFURA_API_KEY}`,
+            accounts: [DEPLOY_PK],
+            chainId: 11155111,
+        },
         base_goerli: {
             url: `https://goerli.base.org`,
             accounts: [DEPLOY_PK],
