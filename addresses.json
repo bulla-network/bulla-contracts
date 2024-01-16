@@ -231,6 +231,19 @@
     "bullaFinanceAddress": "0x26719d2A1073291559A9F5465Fafe73972B31b1f",
     "frendLendAddress": "0xd3A33aE646701507eB043e2DB16f8C1428241F53"
   },
+  "11155111": {
+    "name": "sepolia",
+    "deployedOnBlock": 5096555,
+    "bullaManagerAddress": "0x15C43c1483816C0DEfcb3154b09A9e450d139033",
+    "bullaBankerAddress": "0x5369F71e1Fe238f0e6D938c734E2D2aE7296F362",
+    "bullaClaimERC721Address": "0x3702D060cbB102b6AebF40B40880F77BeF3d7225",
+    "batchCreate": {
+      "address": "0xbAB429068fc4A5455849f58C4Bf04F398e8006c1",
+      "maxClaims": 20
+    },
+    "bullaInstantPaymentAddress": "0x1cD1A83C2965CB7aD55d60551877Eb390e9C3d7A",
+    "frendLendAddress": "0x3E058834CE20A54F0755889c008D3fF62D33cE85"
+  },
   "1313161554": {
     "name": "Aurora Mainnet",
     "deployedOnBlock": 59115995,
