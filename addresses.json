@@ -243,7 +243,9 @@
     },
     "bullaInstantPaymentAddress": "0x1cD1A83C2965CB7aD55d60551877Eb390e9C3d7A",
     "frendLendAddress": "0x3E058834CE20A54F0755889c008D3fF62D33cE85",
-    "bullaFinanceAddress": "0xB219ecd037E8A5410d2e8839586D9F3996685cfB"
+    "bullaFinanceAddress": "0xB219ecd037E8A5410d2e8839586D9F3996685cfB",
+    "moduleFactoryAddress": "0xd849f582e960610B5704Ed2bb245872A60e56853",
+    "bullaModuleMasterCopyAddress": "0x085478C955686B38aeD1FF6C2901f503aB5c4984"
   },
   "1313161554": {
     "name": "Aurora Mainnet",
