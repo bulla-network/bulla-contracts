@@ -34,6 +34,7 @@
         "deploy:optimism": "npx hardhat run --network optimism scripts/deploy.ts",
         "deploy:bnb": "npx hardhat run --network bnb scripts/deploy.ts",
         "deploy:sepolia": "npx hardhat run --network sepolia scripts/deploy.ts",
+        "verify:sepolia": "npx hardhat run --network sepolia scripts/verify.ts",
         "verify": "hardhat etherscan-verify"
     },
     "dependencies": {
