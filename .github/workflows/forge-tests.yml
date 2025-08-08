@@ -1,37 +1,43 @@
 on:
-  push:
-    branches:
-      - master
-  
-  pull_request:
+    push:
+        branches:
+            - master
+
+    pull_request:
 
 env:
-  FOUNDRY_PROFILE: ci
+    FOUNDRY_PROFILE: ci
 
 jobs:
-  check:
-    name: "Forge Tests + Gas 🧪"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
+    check:
+        name: 'Forge Tests + Gas 🧪'
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  submodules: recursive
 
-      - name: Install Foundry
-        uses: onbjerg/foundry-toolchain@v1
-        with:
-          version: nightly
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+                  cache: 'yarn'
 
-      - name: Install dependencies
-        run: |
-          forge install
-          yarn
+            - name: Install Foundry
+              uses: onbjerg/foundry-toolchain@v1
+              with:
+                  version: nightly
 
-      - name: Run forge build
-        run: |
-          forge --version
-          forge build --sizes
-        id: build
-        
-      - name: Run tests with fuzzing
-        run: forge test -vvv --gas-report
+            - name: Install dependencies
+              run: |
+                  forge install
+                  yarn
+
+            - name: Run forge build
+              run: |
+                  forge --version
+                  forge build --sizes
+              id: build
+
+            - name: Run tests with fuzzing
+              run: forge test -vvv --gas-report
