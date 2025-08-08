@@ -1,23 +1,23 @@
-
 name: Run tests
 on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
-  workflow_dispatch:
+    push:
+        branches: [master]
+    pull_request:
+        branches: [master]
+    workflow_dispatch:
 jobs:
-  Hardhat-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 14.17.0
-          registry-url: https://registry.npmjs.org/
-      - name: setup and run hardhat tests
-        run: |
-          echo 'DEPLOY_PK=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80' > .env
-          yarn 
-          yarn compile
-          yarn test
+    Hardhat-tests:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: 'yarn'
+                  registry-url: https://registry.npmjs.org/
+            - name: setup and run hardhat tests
+              run: |
+                  echo 'DEPLOY_PK=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80' > .env
+                  yarn 
+                  yarn compile
+                  yarn test

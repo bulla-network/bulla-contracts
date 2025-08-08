@@ -137,6 +137,19 @@
     "bullaFinanceAddress": "0xF7d793dc425E64CA93Cf92bb6cfF6173bdbA3995",
     "frendLendAddress": "0x60b49BB18b60dE3A95235A4d5F42062dD1D461E2"
   },
+  "151": {
+    "name": "redbelly",
+    "deployedOnBlock": 2487888,
+    "bullaManagerAddress": "0xE14E624b29BcDa2ec409BBBf97037fEDe3803797",
+    "bullaBankerAddress": "0xeB0f09EEF3DCc3f35f605dAefa474e6caab96CD6",
+    "bullaClaimERC721Address": "0x1c534661326b41c8b8aab5631ECED6D9755ff192",
+    "batchCreate": {
+      "address": "0x0af8C15D19058892cDEA66C8C74B7D7bB696FaD5",
+      "maxClaims": 255
+    },
+    "bullaInstantPaymentAddress": "0xce704a7Fae206ad009852258dDD8574B844eDa3b",
+    "frendLendAddress": "0x6985d6af038f177438a6681d1F64d4409Dc8AaC2"
+  },
   "1284": {
     "name": "Moonbeam",
     "deployedOnBlock": 470589,

@@ -1,6 +1,5 @@
 import { writeFileSync } from 'fs';
 import hre, { ethers } from 'hardhat';
-import { createInterface, Interface } from 'readline';
 import addresses from '../addresses.json';
 import { deployBullaFinance } from './deploy-bullaFinance';
 import { deployFrendLend } from './deploy-frendLend';

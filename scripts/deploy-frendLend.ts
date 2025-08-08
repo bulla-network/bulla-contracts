@@ -53,9 +53,9 @@ export const deployFrendLend = async function () {
 };
 
 // uncomment this line to run the script individually
-deployFrendLend()
-    .then(() => process.exit(0))
-    .catch(error => {
-        console.error(error);
-        process.exit(1);
-    });
+// deployFrendLend()
+//     .then(() => process.exit(0))
+//     .catch(error => {
+//         console.error(error);
+//         process.exit(1);
+//     });

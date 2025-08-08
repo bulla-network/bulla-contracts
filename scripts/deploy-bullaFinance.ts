@@ -52,9 +52,9 @@ export const deployBullaFinance = async function () {
 };
 
 // uncomment this line to run the script individually
-deployBullaFinance()
-    .then(() => process.exit(0))
-    .catch(error => {
-        console.error(error);
-        process.exit(1);
-    });
+// deployBullaFinance()
+//     .then(() => process.exit(0))
+//     .catch(error => {
+//         console.error(error);
+//         process.exit(1);
+//     });
