@@ -1,12 +1,12 @@
 require('dotenv').config({ path: './.env' });
-import { HardhatUserConfig } from 'hardhat/types';
 import '@nomiclabs/hardhat-ethers';
+import '@nomiclabs/hardhat-etherscan';
+import '@nomiclabs/hardhat-solhint';
+import '@nomiclabs/hardhat-waffle';
 import '@typechain/hardhat';
 import 'hardhat-deploy';
-import '@nomiclabs/hardhat-waffle';
-import '@nomiclabs/hardhat-solhint';
 import 'hardhat-gas-reporter';
-import '@nomiclabs/hardhat-etherscan';
+import { HardhatUserConfig } from 'hardhat/types';
 // import "hardhat-ethernal"
 
 const INFURA_API_KEY = process.env.INFURA_API_KEY!;
@@ -127,6 +127,11 @@ const config: HardhatUserConfig = {
             accounts: [DEPLOY_PK],
             chainId: 56,
         },
+        redbelly: {
+            url: 'https://governors.mainnet.redbelly.network',
+            accounts: [DEPLOY_PK],
+            chainId: 151,
+        },
     },
     namedAccounts: {
         deployer: {
@@ -140,7 +145,7 @@ const config: HardhatUserConfig = {
         // coinmarketcap: COINMARKETCAP_API,
     },
     etherscan: {
-        apiKey: ETHERSCAN_API_KEY,
+        apiKey: { base: ETHERSCAN_API_KEY },
         customChains: [
             {
                 network: 'base-goerli',
@@ -148,6 +153,14 @@ const config: HardhatUserConfig = {
                 urls: {
                     apiURL: 'https://api-goerli.basescan.org/api',
                     browserURL: 'https://goerli.basescan.org',
+                },
+            },
+            {
+                network: 'base',
+                chainId: 8453,
+                urls: {
+                    apiURL: 'https://api.basescan.org/api',
+                    browserURL: 'https://basescan.org',
                 },
             },
         ],
