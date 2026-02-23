@@ -1,0 +1,103 @@
+{
+  "repo": "bulla-contracts",
+  "contracts": {
+    "1": {
+      "bullaManager": "0x1b4DB52FD952F70d3D28bfbd406dB71940eD8cA9",
+      "bullaClaim": "0x127948A4286A67A0A5Cb56a2D0d54881077A4889",
+      "bullaBanker": "0x873C25e47f3C5e4bC524771DFed53B5B36ad5eA2",
+      "bullaFinance": "0x5369F71e1Fe238f0e6D938c734E2D2aE7296F362",
+      "frendLend": "0xbAB429068fc4A5455849f58C4Bf04F398e8006c1",
+      "batchCreate": "0x6811De39DC03245A15D54e2bc615821f9997bbC4",
+      "bullaInstantPayment": "0xec6013D62Af8dfB65B8248204Dd1913d2f1F0181"
+    },
+    "10": {
+      "bullaManager": "0xE14E624b29BcDa2ec409BBBf97037fEDe3803797",
+      "bullaClaim": "0x0af8C15D19058892cDEA66C8C74B7D7bB696FaD5",
+      "bullaBanker": "0xce704a7Fae206ad009852258dDD8574B844eDa3b",
+      "bullaFinance": "0x5369F71e1Fe238f0e6D938c734E2D2aE7296F362",
+      "frendLend": "0x3702D060cbB102b6AebF40B40880F77BeF3d7225",
+      "batchCreate": "0x6985d6af038f177438a6681d1F64d4409Dc8AaC2",
+      "bullaInstantPayment": "0xbe25A1086DE2b587B2D20E4B14c442cdA2437945"
+    },
+    "56": {
+      "bullaManager": "0x15250D092a789e2304472eD581D587B714615d24",
+      "bullaClaim": "0xBAD5c53cC6b37d706E6153d397864E5fdbD38170",
+      "bullaBanker": "0x69E7e315a6fea4775e568337ca58F1395C0c01fc",
+      "bullaFinance": "0x3702D060cbB102b6AebF40B40880F77BeF3d7225",
+      "frendLend": "0x5369F71e1Fe238f0e6D938c734E2D2aE7296F362",
+      "batchCreate": "0x15C43c1483816C0DEfcb3154b09A9e450d139033",
+      "bullaInstantPayment": "0xa9a04d0C22B6f264BC72a108d124f25BD199c928"
+    },
+    "100": {
+      "bullaManager": "0x7c70dC167ebC555d2F68c93699343636e2A92308",
+      "bullaClaim": "0xA19d5908e8F56fbf5013282837C4A73c3C5374DB",
+      "bullaBanker": "0x53A6762c7037e80ae2E9E5bC90287D5EA2FDAa09",
+      "bullaFinance": "0x69E7e315a6fea4775e568337ca58F1395C0c01fc",
+      "frendLend": "0x15C43c1483816C0DEfcb3154b09A9e450d139033",
+      "batchCreate": "0xe14e624b29bcda2ec409bbbf97037fede3803797",
+      "bullaInstantPayment": "0xA2d3332AdC23109129651A85388eB6561C69074A"
+    },
+    "137": {
+      "bullaManager": "0x48D283521Ff91a1e83A16a7138B549C34BeDD44c",
+      "bullaClaim": "0x5A809C17d33c92f9EFF31e579E9DeDF247e1EBe4",
+      "bullaBanker": "0x85Acc8E44d732eFF1ddec75a1EE93D6e4A033eF8",
+      "bullaFinance": "0xF7d793dc425E64CA93Cf92bb6cfF6173bdbA3995",
+      "frendLend": "0x60b49BB18b60dE3A95235A4d5F42062dD1D461E2",
+      "batchCreate": "0xfbdf5dff946200B038e1455E532D9795F030aB91",
+      "bullaInstantPayment": "0x712359c61534c5da10821c09d0e9c7c2312e1d91"
+    },
+    "151": {
+      "bullaManager": "0xE14E624b29BcDa2ec409BBBf97037fEDe3803797",
+      "bullaClaim": "0x1c534661326b41c8b8aab5631ECED6D9755ff192",
+      "bullaBanker": "0xeB0f09EEF3DCc3f35f605dAefa474e6caab96CD6",
+      "frendLend": "0x6985d6af038f177438a6681d1F64d4409Dc8AaC2",
+      "batchCreate": "0x0af8C15D19058892cDEA66C8C74B7D7bB696FaD5",
+      "bullaInstantPayment": "0xce704a7Fae206ad009852258dDD8574B844eDa3b"
+    },
+    "8453": {
+      "bullaManager": "0x127948A4286A67A0A5Cb56a2D0d54881077A4889",
+      "bullaClaim": "0x873C25e47f3C5e4bC524771DFed53B5B36ad5eA2",
+      "bullaBanker": "0x6811De39DC03245A15D54e2bc615821f9997bbC4",
+      "bullaFinance": "0xd3A33aE646701507eB043e2DB16f8C1428241F53",
+      "frendLend": "0x44ad74A14f268551Dd8619B094769C10089239C8",
+      "batchCreate": "0xec6013D62Af8dfB65B8248204Dd1913d2f1F0181",
+      "bullaInstantPayment": "0x26719d2A1073291559A9F5465Fafe73972B31b1f"
+    },
+    "42161": {
+      "bullaManager": "0xE14E624b29BcDa2ec409BBBf97037fEDe3803797",
+      "bullaClaim": "0x1c534661326b41c8b8aab5631ECED6D9755ff192",
+      "bullaBanker": "0xeB0f09EEF3DCc3f35f605dAefa474e6caab96CD6",
+      "bullaFinance": "0x5cBfeeF2Af2313Bd9C28484Af7508133Fa99E464",
+      "frendLend": "0xF75313de7055097b07e621DDD7FEEe9ea3e2147d",
+      "batchCreate": "0x0af8C15D19058892cDEA66C8C74B7D7bB696FaD5",
+      "bullaInstantPayment": "0x1b4DB52FD952F70d3D28bfbd406dB71940eD8cA9"
+    },
+    "42220": {
+      "bullaManager": "0x68da2c92b60337aA55BAcF0d7e61126eDb535752",
+      "bullaClaim": "0x4Ba1453df995F4AAe2ef610A9c06fEecF0Fe2581",
+      "bullaBanker": "0xd2A779d4B8d2E4E7faFC0DA6F9d712fE19464D5B",
+      "bullaFinance": "0x15250D092a789e2304472eD581D587B714615d24",
+      "frendLend": "0xBAD5c53cC6b37d706E6153d397864E5fdbD38170",
+      "batchCreate": "0xe14e624b29bcda2ec409bbbf97037fede3803797",
+      "bullaInstantPayment": "0x48D283521Ff91a1e83A16a7138B549C34BeDD44c"
+    },
+    "43114": {
+      "bullaManager": "0xAA6E5B4E34f3C3BA4D90694909dca7DDdf058079",
+      "bullaClaim": "0x68327a91E79f87F501bC8522fc333FB7A72393cb",
+      "bullaBanker": "0x4Ba1453df995F4AAe2ef610A9c06fEecF0Fe2581",
+      "bullaFinance": "0x15250D092a789e2304472eD581D587B714615d24",
+      "frendLend": "0xBAD5c53cC6b37d706E6153d397864E5fdbD38170",
+      "batchCreate": "0x1c534661326b41c8b8aab5631ECED6D9755ff192",
+      "bullaInstantPayment": "0xFcA0E74af938919E43541D40330212324C8aF27F"
+    },
+    "11155111": {
+      "bullaManager": "0x15C43c1483816C0DEfcb3154b09A9e450d139033",
+      "bullaClaim": "0x3702D060cbB102b6AebF40B40880F77BeF3d7225",
+      "bullaBanker": "0x5369F71e1Fe238f0e6D938c734E2D2aE7296F362",
+      "bullaFinance": "0xB219ecd037E8A5410d2e8839586D9F3996685cfB",
+      "frendLend": "0x3E058834CE20A54F0755889c008D3fF62D33cE85",
+      "batchCreate": "0xbAB429068fc4A5455849f58C4Bf04F398e8006c1",
+      "bullaInstantPayment": "0x1cD1A83C2965CB7aD55d60551877Eb390e9C3d7A"
+    }
+  }
+}
