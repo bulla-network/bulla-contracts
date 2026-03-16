@@ -36,30 +36,20 @@ const config: HardhatUserConfig = {
             accounts: [DEPLOY_PK],
             chainId: 1,
         },
-        rinkeby: {
-            url: `https://rinkeby.infura.io/v3/${INFURA_API_KEY}`,
-            accounts: [DEPLOY_PK],
-            chainId: 4,
-        },
-        goerli: {
-            url: `https://goerli.infura.io/v3/${INFURA_API_KEY}`,
-            accounts: [DEPLOY_PK],
-            chainId: 5,
-        },
         sepolia: {
             url: `https://sepolia.infura.io/v3/${INFURA_API_KEY}`,
             accounts: [DEPLOY_PK],
             chainId: 11155111,
         },
-        base_goerli: {
-            url: `https://goerli.base.org`,
-            accounts: [DEPLOY_PK],
-            chainId: 84531,
-        },
         base: {
             url: `https://mainnet.base.org`,
             accounts: [DEPLOY_PK],
             chainId: 8453,
+        },
+        base_sepolia: {
+            url: `https://sepolia.base.org`,
+            accounts: [DEPLOY_PK],
+            chainId: 84532,
         },
         xdai: {
             url: 'https://rpc.gnosischain.com/',
@@ -76,11 +66,6 @@ const config: HardhatUserConfig = {
             accounts: [DEPLOY_PK],
             chainId: 137,
             gasPrice: 80000000000,
-        },
-        harmony_testnet: {
-            url: 'https://api.s0.b.hmny.io',
-            accounts: [DEPLOY_PK],
-            chainId: 1666700000,
         },
         harmony: {
             url: 'https://a.api.s0.t.hmny.io',
@@ -148,11 +133,11 @@ const config: HardhatUserConfig = {
         apiKey: { base: ETHERSCAN_API_KEY },
         customChains: [
             {
-                network: 'base-goerli',
-                chainId: 84531,
+                network: 'base-sepolia',
+                chainId: 84532,
                 urls: {
-                    apiURL: 'https://api-goerli.basescan.org/api',
-                    browserURL: 'https://goerli.basescan.org',
+                    apiURL: 'https://api-sepolia.basescan.org/api',
+                    browserURL: 'https://sepolia.basescan.org',
                 },
             },
             {

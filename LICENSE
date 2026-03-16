@@ -5,6 +5,13 @@ License text copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
 -----------------------------------------------------------------------------
 
+IMPORTANT NOTICE: As of February 9, 2024, the Change Date specified below has
+passed. This means the Licensed Work is now available under the GNU General
+Public License v2.0 or later (the "Change License"). You may use, modify, and
+distribute this software under the terms of the GPL v2.0 or any later version.
+
+-----------------------------------------------------------------------------
+
 Parameters
 
 Licensor:             Arkitoken, LLC
@@ -60,7 +67,7 @@ EXPRESS OR IMPLIED, INCLUDING (WITHOUT LIMITATION) WARRANTIES OF
 MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, AND
 TITLE.
 
-MariaDB hereby grants you permission to use this License’s text to license
+MariaDB hereby grants you permission to use this License's text to license
 your works, and to refer to it using the trademark "Business Source License",
 as long as you comply with the Covenants of Licensor below.
 
@@ -68,7 +75,7 @@ as long as you comply with the Covenants of Licensor below.
 
 Covenants of Licensor
 
-In consideration of the right to use this License’s text and the "Business
+In consideration of the right to use this License's text and the "Business
 Source License" name and trademark, Licensor covenants to MariaDB, and to all
 other recipients of the licensed work to be provided by Licensor:
 
