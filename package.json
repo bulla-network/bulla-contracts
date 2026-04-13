@@ -35,10 +35,10 @@
         "deploy:bnb": "npx hardhat run --network bnb scripts/deploy.ts",
         "deploy:redbelly": "npx hardhat run --network redbelly scripts/deploy.ts",
         "deploy:sepolia": "npx hardhat run --network sepolia scripts/deploy.ts",
-        "deploy:xdc": "npx hardhat run --network xdc scripts/deploy-instantPayment.ts",
+        "deploy:xdc": "node scripts/deploy-instantPayment-prompt.js xdc",
         "verify:sepolia": "npx hardhat run --network sepolia scripts/verify.ts",
         "verify:base": "npx hardhat run --network base scripts/verify.ts",
-        "verify:xdc": "npx hardhat run --network xdc scripts/verify-instantPayment.ts",
+        "verify:xdc": "node scripts/verify-instantPayment-prompt.js xdc",
         "verify": "hardhat etherscan-verify"
     },
     "dependencies": {
