@@ -134,7 +134,7 @@ const config: HardhatUserConfig = {
         },
         xdc: {
             url: 'https://rpc.xinfin.network',
-            accounts: [DEPLOY_PK],
+            accounts: DEPLOY_PK ? [DEPLOY_PK] : [],
             chainId: 50,
         },
     },
