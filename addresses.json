@@ -77,6 +77,10 @@
     "bullaFinanceAddress": "0x15250D092a789e2304472eD581D587B714615d24",
     "frendLendAddress": "0xBAD5c53cC6b37d706E6153d397864E5fdbD38170"
   },
+  "50": {
+    "name": "xdc",
+    "bullaInstantPaymentAddress": "0xd60F8Fc651BdcEe2C6Ed9914d610c0E22cE190d6"
+  },
   "56": {
     "name": "bnb",
     "deployedOnBlock": 28345705,
