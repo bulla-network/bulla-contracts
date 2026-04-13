@@ -132,6 +132,11 @@ const config: HardhatUserConfig = {
             accounts: [DEPLOY_PK],
             chainId: 151,
         },
+        xdc: {
+            url: 'https://rpc.xinfin.network',
+            accounts: [DEPLOY_PK],
+            chainId: 50,
+        },
     },
     namedAccounts: {
         deployer: {
@@ -145,7 +150,7 @@ const config: HardhatUserConfig = {
         // coinmarketcap: COINMARKETCAP_API,
     },
     etherscan: {
-        apiKey: { base: ETHERSCAN_API_KEY },
+        apiKey: { base: ETHERSCAN_API_KEY, xdc: ETHERSCAN_API_KEY },
         customChains: [
             {
                 network: 'base-goerli',
@@ -161,6 +166,14 @@ const config: HardhatUserConfig = {
                 urls: {
                     apiURL: 'https://api.basescan.org/api',
                     browserURL: 'https://basescan.org',
+                },
+            },
+            {
+                network: 'xdc',
+                chainId: 50,
+                urls: {
+                    apiURL: 'https://api.etherscan.io/v2/api?chainid=50',
+                    browserURL: 'https://xdcscan.com',
                 },
             },
         ],
