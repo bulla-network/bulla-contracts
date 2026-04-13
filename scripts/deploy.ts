@@ -1,6 +1,6 @@
 import { writeFileSync } from 'fs';
 import hre, { ethers } from 'hardhat';
-import addresses from '../addresses.json';
+import addresses from './addresses';
 import { deployBullaFinance } from './deploy-bullaFinance';
 import { deployFrendLend } from './deploy-frendLend';
 import { getLineReader } from './utils';
@@ -62,7 +62,7 @@ const deployContracts = async function () {
     const newAddresses = {
         ...addresses,
         [chainId]: {
-            ...(addresses[chainId as keyof typeof addresses] ?? {}),
+            ...(addresses[chainId] ?? {}),
             name: network.name,
             deployedOnBlock: managerReceipt?.blockNumber,
             bullaManagerAddress: managerAddress,

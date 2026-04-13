@@ -1,6 +1,6 @@
 import { writeFileSync } from 'fs';
 import hre from 'hardhat';
-import addresses from '../addresses.json';
+import addresses from './addresses';
 
 const dateLabel = (date: Date) => date.toISOString().replace(/\D/g, '');
 
@@ -23,7 +23,7 @@ const deployInstantPayment = async function () {
     const newAddresses = {
         ...addresses,
         [chainId]: {
-            ...(addresses[chainId as keyof typeof addresses] ?? {}),
+            ...(addresses[chainId] ?? {}),
             name: network.name,
             bullaInstantPaymentAddress: instantPaymentAddress,
         },
