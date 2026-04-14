@@ -1,0 +1,54 @@
+{
+    "contract": "BullaInstantPayment",
+    "filename": "deploy_info_20260413173135238.json",
+    "deployer": "0x81f1e947811496453dBBaeA0AC2c250e056BBd96",
+    "chainId": "50",
+    "currentTime": "2026-04-13T17:31:35.238Z",
+    "receipt": {
+        "to": null,
+        "from": "0x81f1e947811496453dBBaeA0AC2c250e056BBd96",
+        "contractAddress": "0xd60F8Fc651BdcEe2C6Ed9914d610c0E22cE190d6",
+        "transactionIndex": 0,
+        "gasUsed": {
+            "type": "BigNumber",
+            "hex": "0x1d4b57"
+        },
+        "logsBloom": "0x00000000000000000000000000000000000000000000040002800000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000001000000000000040000000000000000000000020000000000000000000800000000000000000000000000000000400000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000",
+        "blockHash": "0x3966594d69c2e898bc44f1f1e7274a0c446d40b806ebef3494f3aa62906aac5f",
+        "transactionHash": "0xf7f24b3cd65138e36d74592282e7c7b950fb351588d08f828fd5230657a013ff",
+        "logs": [
+            {
+                "transactionIndex": 0,
+                "blockNumber": 101440194,
+                "transactionHash": "0xf7f24b3cd65138e36d74592282e7c7b950fb351588d08f828fd5230657a013ff",
+                "address": "0xd60F8Fc651BdcEe2C6Ed9914d610c0E22cE190d6",
+                "topics": [
+                    "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0",
+                    "0x0000000000000000000000000000000000000000000000000000000000000000",
+                    "0x00000000000000000000000081f1e947811496453dbbaea0ac2c250e056bbd96"
+                ],
+                "data": "0x",
+                "logIndex": 0,
+                "blockHash": "0x3966594d69c2e898bc44f1f1e7274a0c446d40b806ebef3494f3aa62906aac5f"
+            }
+        ],
+        "blockNumber": 101440194,
+        "confirmations": 1,
+        "cumulativeGasUsed": {
+            "type": "BigNumber",
+            "hex": "0x1d4b57"
+        },
+        "effectiveGasPrice": {
+            "type": "BigNumber",
+            "hex": "0x037e11d600"
+        },
+        "status": 1,
+        "type": 2,
+        "byzantium": true
+    },
+    "instantPaymentAddress": "0xd60F8Fc651BdcEe2C6Ed9914d610c0E22cE190d6",
+    "gasUsed": {
+        "type": "BigNumber",
+        "hex": "0x1d4b57"
+    }
+}

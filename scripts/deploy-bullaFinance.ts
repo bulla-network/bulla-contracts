@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 import { writeFileSync } from 'fs';
 import hre from 'hardhat';
-import addresses from '../addresses.json';
+import addresses from './addresses';
 import { getLineReader } from './utils';
 
 export const deployBullaFinance = async function () {
@@ -23,7 +23,10 @@ export const deployBullaFinance = async function () {
     );
 
     const chainId = await getChainId();
-    const contractAddresses = addresses[chainId as keyof typeof addresses];
+    const contractAddresses = addresses[chainId];
+    if (!contractAddresses?.bullaClaimERC721Address) {
+        throw new Error(`bullaClaimERC721Address not deployed on chainId ${chainId}`);
+    }
 
     const { address: bullaFinanceAddress } = await deploy('BullaFinance', {
         from: deployer,
@@ -33,7 +36,7 @@ export const deployBullaFinance = async function () {
     const newAddresses = {
         ...addresses,
         [chainId]: {
-            ...(addresses[chainId as keyof typeof addresses] ?? {}),
+            ...contractAddresses,
             bullaFinanceAddress,
         },
     };

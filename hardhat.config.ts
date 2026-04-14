@@ -16,6 +16,8 @@ const DEPLOY_PK = process.env.DEPLOY_PK!;
 const COINMARKETCAP_API = process.env.COINMARKETCAP_API!;
 const DEPLOYER_ADDRESS = process.env.DEPLOYER_ADDRESS!;
 
+const accounts = DEPLOY_PK ? [DEPLOY_PK] : [];
+
 const config: HardhatUserConfig = {
     defaultNetwork: 'hardhat',
     solidity: {
@@ -33,104 +35,109 @@ const config: HardhatUserConfig = {
         /** ^^^ */
         mainnet: {
             url: `https://mainnet.infura.io/v3/${INFURA_API_KEY}`,
-            accounts: [DEPLOY_PK],
+            accounts,
             chainId: 1,
         },
         rinkeby: {
             url: `https://rinkeby.infura.io/v3/${INFURA_API_KEY}`,
-            accounts: [DEPLOY_PK],
+            accounts,
             chainId: 4,
         },
         goerli: {
             url: `https://goerli.infura.io/v3/${INFURA_API_KEY}`,
-            accounts: [DEPLOY_PK],
+            accounts,
             chainId: 5,
         },
         sepolia: {
             url: `https://sepolia.infura.io/v3/${INFURA_API_KEY}`,
-            accounts: [DEPLOY_PK],
+            accounts,
             chainId: 11155111,
         },
         base_goerli: {
             url: `https://goerli.base.org`,
-            accounts: [DEPLOY_PK],
+            accounts,
             chainId: 84531,
         },
         base: {
             url: `https://mainnet.base.org`,
-            accounts: [DEPLOY_PK],
+            accounts,
             chainId: 8453,
         },
         xdai: {
             url: 'https://rpc.gnosischain.com/',
-            accounts: [DEPLOY_PK],
+            accounts,
             chainId: 100,
         },
         rsk: {
             url: `https://rsk.getblock.io/${GET_BLOCK_API_KEY}/mainnet/`,
-            accounts: [DEPLOY_PK],
+            accounts,
             chainId: 30,
         },
         polygon: {
             url: 'https://polygon-rpc.com/',
-            accounts: [DEPLOY_PK],
+            accounts,
             chainId: 137,
             gasPrice: 80000000000,
         },
         harmony_testnet: {
             url: 'https://api.s0.b.hmny.io',
-            accounts: [DEPLOY_PK],
+            accounts,
             chainId: 1666700000,
         },
         harmony: {
             url: 'https://a.api.s0.t.hmny.io',
-            accounts: [DEPLOY_PK],
+            accounts,
             chainId: 1666600000,
         },
         avalanche_cChain: {
             url: 'https://api.avax.network/ext/bc/C/rpc',
-            accounts: [DEPLOY_PK],
+            accounts,
             chainId: 43114,
         },
         celo: {
             url: `https://forno.celo.org`,
-            accounts: [DEPLOY_PK],
+            accounts,
             chainId: 42220,
         },
         aurora: {
             url: `https://mainnet.aurora.dev`,
-            accounts: [DEPLOY_PK],
+            accounts,
             chainId: 1313161554,
         },
         moonbeam: {
             url: `https://rpc.api.moonbeam.network`,
-            accounts: [DEPLOY_PK],
+            accounts,
             chainId: 1284,
         },
         arbitrum: {
             url: `https://arb1.arbitrum.io/rpc`,
-            accounts: [DEPLOY_PK],
+            accounts,
             chainId: 42161,
         },
         fuse: {
             url: `https://rpc.fuse.io`,
-            accounts: [DEPLOY_PK],
+            accounts,
             chainId: 122,
         },
         optimism: {
             url: 'https://mainnet.optimism.io',
-            accounts: [DEPLOY_PK],
+            accounts,
             chainId: 10,
         },
         bnb: {
             url: `https://bsc-dataseed.binance.org/`,
-            accounts: [DEPLOY_PK],
+            accounts,
             chainId: 56,
         },
         redbelly: {
             url: 'https://governors.mainnet.redbelly.network',
-            accounts: [DEPLOY_PK],
+            accounts,
             chainId: 151,
+        },
+        xdc: {
+            url: 'https://rpc.xinfin.network',
+            accounts,
+            chainId: 50,
         },
     },
     namedAccounts: {
@@ -145,7 +152,7 @@ const config: HardhatUserConfig = {
         // coinmarketcap: COINMARKETCAP_API,
     },
     etherscan: {
-        apiKey: { base: ETHERSCAN_API_KEY },
+        apiKey: { base: ETHERSCAN_API_KEY, xdc: ETHERSCAN_API_KEY },
         customChains: [
             {
                 network: 'base-goerli',
@@ -161,6 +168,14 @@ const config: HardhatUserConfig = {
                 urls: {
                     apiURL: 'https://api.basescan.org/api',
                     browserURL: 'https://basescan.org',
+                },
+            },
+            {
+                network: 'xdc',
+                chainId: 50,
+                urls: {
+                    apiURL: 'https://api.etherscan.io/v2/api?chainid=50',
+                    browserURL: 'https://xdcscan.com',
                 },
             },
         ],

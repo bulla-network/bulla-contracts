@@ -1,7 +1,7 @@
 import { writeFileSync } from 'fs';
 import hre from 'hardhat';
 import { createInterface } from 'readline';
-import addresses from '../addresses.json';
+import addresses from './addresses';
 
 const lineReader = createInterface({
     input: process.stdin,
@@ -30,7 +30,13 @@ export const deployGnosis = async function (bullaBankerAddress?: string, bullaCl
     }
 
     const chainId = await getChainId();
-    const contractAddresses = addresses[chainId as keyof typeof addresses];
+    const contractAddresses = addresses[chainId];
+    const resolvedBankerAddress = bullaBankerAddress ?? contractAddresses?.bullaBankerAddress;
+    const resolvedClaimAddress = bullaClaimAddress ?? contractAddresses?.bullaClaimERC721Address;
+    const resolvedBatchCreateAddress = batchCreateAddress ?? contractAddresses?.batchCreate?.address;
+    if (!resolvedBankerAddress || !resolvedClaimAddress || !resolvedBatchCreateAddress) {
+        throw new Error(`Missing banker/claim/batchCreate addresses for chainId ${chainId}`);
+    }
 
     // the "master copy" is just 1 deployed instance of a cloneable module
     console.log('deploying module master copy');
@@ -38,16 +44,16 @@ export const deployGnosis = async function (bullaBankerAddress?: string, bullaCl
         from: deployer,
         args: [
             '0x0000000000000000000000000000000000000001', // "null" safeAddress
-            bullaBankerAddress ?? contractAddresses.bullaBankerAddress,
-            bullaClaimAddress ?? contractAddresses.bullaClaimERC721Address,
-            batchCreateAddress ?? contractAddresses.batchCreate.address,
+            resolvedBankerAddress,
+            resolvedClaimAddress,
+            resolvedBatchCreateAddress,
         ],
     });
 
     const newAddresses = {
         ...addresses,
         [chainId]: {
-            ...(addresses[chainId as keyof typeof addresses] ?? {}),
+            ...(contractAddresses ?? {}),
             moduleFactoryAddress,
             bullaModuleMasterCopyAddress: masterCopyAddress,
         },
