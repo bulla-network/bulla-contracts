@@ -29,10 +29,10 @@ jobs:
               with:
                   version: nightly
 
+            # lib/ submodules come from the checkout above. `forge install` would re-check out
+            # forge-std's `v1.2.0` branch, which the checkout's shallow submodule clone doesn't have.
             - name: Install dependencies
-              run: |
-                  forge install
-                  yarn
+              run: yarn
 
             - name: Run forge build
               run: |
